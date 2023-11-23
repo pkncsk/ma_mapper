@@ -3,3 +3,9 @@
 # testing stuff 
 
 data/
+# vscode/environment session
+*.code-workspace
+/.venv/*
+/.vscode/*
+/.ipynb_checkpoints/
+*.pyc
