@@ -1,15 +1,16 @@
 import subprocess
 
-def mafft_wrapper(input_filepath, nthread, nthreadtb, output_filepath = None, mafft_arg = '--threadit=0 --treeout --reorder'):
+def mafft_wrapper(input_filepath, nthread = None, nthreadtb = None, output_filepath = None, mafft_arg = '--threadit 0 --treeout --reorder '):
     mafft_command = 'mafft '
     if nthread is not None:
         nthread_arg = '--thread '+ str(nthread) + ' ' 
         mafft_command += nthread_arg
-    if nthreadb is not None:
+    if nthreadtb is not None:
         nthreadb_arg = '--threadb '+ str(nthread) + ' ' 
         mafft_command += nthreadb_arg
     if mafft_arg is not None:
         mafft_command += mafft_arg
+    mafft_command += input_filepath
     if output_filepath is None:
         output_filepath = input_filepath+'.aligned' 
     try:

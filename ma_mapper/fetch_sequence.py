@@ -12,12 +12,12 @@ import os
 #records = {}
 #metadata = None
 #%%
-def parallel_init(metadata_var, records_var):
-    #metadata_var, records_var = init_args
-    global metadata
-    metadata = metadata_var
-    global records 
-    records = records_var
+######################run directly from windows
+#def parallel_init(metadata_var, records_var):
+#    global metadata
+#    metadata = metadata_var
+#    global records 
+#    records = records_var
 
 def extract_sequence(metadata_row):
     row=metadata.iloc[metadata_row]
@@ -35,6 +35,7 @@ def extract_sequence(metadata_row):
     return seq_record
 
 def fetch_sequence(metadata_input,source_fasta,output_filepath = None, nthread = 1):
+    global metadata
     if (os.path.isfile(metadata_input) == True):
         metadata = pd.read_csv(metadata_input, delim_whitespace=True)
     else:
@@ -53,10 +54,12 @@ def fetch_sequence(metadata_input,source_fasta,output_filepath = None, nthread =
                         ]
                     )
     logging.info('read sequence source: '+ source_fasta)
+    global records
     records = SeqIO.to_dict(SeqIO.parse(open(source_fasta), 'fasta'))
     seq_records = list()
     metadata_rows = metadata.index.to_list()
-    with ProcessPoolExecutor(max_workers=nthread, initializer=parallel_init, initargs= (metadata, records)) as executor:
+############### run directly from windows    with ProcessPoolExecutor(max_workers=nthread, initializer=parallel_init, initargs= (metadata, records)) as executor:
+    with ProcessPoolExecutor(max_workers=nthread) as executor:
         results = list(executor.map(extract_sequence, metadata_rows))
     for result in results:
         seq_records.append(result)
@@ -67,7 +70,7 @@ def fetch_sequence(metadata_input,source_fasta,output_filepath = None, nthread =
 def main():
     source_fasta = '/home/pc575/phd_project_development/data/hg38_fasta/hg38.fa'
     metadata = '/home/pc575/phd_project_development/data/ma_mapper_output/mer11a_coord.txt'
-    fetch_sequence(metadata,source_fasta)
+    fetch_sequence(metadata,source_fasta, nthread= 2)
 #%%
 if __name__ == '__main__':
     main()
