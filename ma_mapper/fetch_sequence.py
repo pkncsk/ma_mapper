@@ -5,12 +5,7 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from concurrent.futures import ProcessPoolExecutor
-import logging
 import os
-#global metadata
-#global records 
-#records = {}
-#metadata = None
 #%%
 ######################run directly from windows
 #def parallel_init(metadata_var, records_var):
@@ -19,13 +14,8 @@ import os
 #    global records 
 #    records = records_var
 
-def extract_sequence(metadata_row):
-    row=metadata.iloc[metadata_row]
-    genoname = row.genoName
-    genostart = row.genoStart
-    genoend = row.genoEnd
-    strand = row.strand
-    seqname = '::'.join([row.id,genoname,str(genostart),str(genoend),strand])
+def extract_sequence(genoname, genostart, genoend, strand, meta_id):
+    seqname = '::'.join([meta_id,genoname,str(genostart),str(genoend),strand])
     chromosome_extract=records[genoname]
     if strand == '+':
         seq_string = str(chromosome_extract[genostart:genoend].seq)
@@ -42,6 +32,7 @@ def fetch_sequence(metadata_input,source_fasta,output_filepath = None, nthread =
         metadata = metadata_input
     if output_filepath is None:
         output_filepath = '/'.join(str.split(metadata_input, sep ='/')[:-1]) + '/seqrecords.fasta'
+    import logging
     log_path = output_filepath+'.log'
     #setup logger
     logging.root.handlers = []
@@ -57,10 +48,15 @@ def fetch_sequence(metadata_input,source_fasta,output_filepath = None, nthread =
     global records
     records = SeqIO.to_dict(SeqIO.parse(open(source_fasta), 'fasta'))
     seq_records = list()
-    metadata_rows = metadata.index.to_list()
-############### run directly from windows    with ProcessPoolExecutor(max_workers=nthread, initializer=parallel_init, initargs= (metadata, records)) as executor:
+    genoname = metadata.genoName
+    genostart = metadata.genoStart
+    genoend = metadata.genoEnd
+    strand = metadata.strand
+    meta_id = metadata.id
+
+    ############### run directly from windows    with ProcessPoolExecutor(max_workers=nthread, initializer=parallel_init, initargs= (metadata, records)) as executor:
     with ProcessPoolExecutor(max_workers=nthread) as executor:
-        results = list(executor.map(extract_sequence, metadata_rows))
+        results = list(executor.map(extract_sequence, genoname, genostart, genoend, strand, meta_id))
     for result in results:
         seq_records.append(result)
     with open(output_filepath, "w") as output_handle:
