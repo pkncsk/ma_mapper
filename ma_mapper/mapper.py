@@ -1,112 +1,12 @@
 #%%
-import pysam
-import math
 import numpy as np
-import pandas as pd
-import os
-from concurrent.futures import ProcessPoolExecutor
-from itertools import repeat
+import sys
 #%%
-#-> BAM file overlay 
-def normal_array(width=1, sigma=1, odd=0):
-    ''' Returns an array of the normal distribution of the specified width '''
-    sigma2 = float(sigma) ** 2
-    def normal_func(x):
-        return math.exp(-x * x / (2 * sigma2))
-    # width is the half of the distribution
-    values = list(map(normal_func, range(-width, width + odd)))
-    values = np.array(values)
-    return values
-#%%
-def extract_bam(bam_file, chrom, start, end, strand, offset = 5, probe_length =100, smoothing_length= 100):
-
-    data_min = list()
-    data_max = list()
-    data_forward = list()
-    data_reverse = list()
-    fragment_length = end - start
-    profile_normals_forward = np.zeros(fragment_length + (2*probe_length), dtype=np.float16)
-    profile_normals_reverse = np.zeros(fragment_length + (2*probe_length), dtype=np.float16)
-    profile_reads_forward = np.zeros(fragment_length + (2*probe_length), dtype=np.uint8)
-    profile_reads_reverse = np.zeros(fragment_length + (2*probe_length), dtype=np.uint8)
-    mapped_reads = bam_file.fetch(chrom, start, end)
-    
-    for mapped_read in mapped_reads:
-        if mapped_read.is_reverse is False:
-            read_position = mapped_read.reference_start - start + offset + probe_length
-        else:
-            read_position = mapped_read.reference_end - start - offset - 1 + probe_length
-
-        start_in_window = read_position - probe_length
-        end_in_window = read_position + probe_length + 1
-
-        if (start_in_window < 0) or (end_in_window > fragment_length + (2*probe_length)):
-            continue
-        
-        if strand == '+':
-            if mapped_read.is_reverse is False:
-                profile_normals_forward[start_in_window:end_in_window] += normal
-                profile_reads_forward[read_position] += 1
-            else:
-                profile_normals_reverse[start_in_window:end_in_window] += normal
-                profile_reads_reverse[read_position] += 1
-        #for - strand, throw forward read into reverse bin
-        elif strand == '-':
-            if mapped_read.is_reverse is False:
-                profile_normals_reverse[start_in_window:end_in_window] += normal
-                profile_reads_reverse[read_position] += 1
-            else:
-                profile_normals_forward[start_in_window:end_in_window] += normal
-                profile_reads_forward[read_position] += 1
-
-        #if mode == 'smooth-min':
-        output_min = np.minimum(profile_normals_forward, profile_normals_reverse)
-        #elif mode == 'smooth-max':
-        output_max = np.maximum(profile_normals_forward, profile_normals_reverse)
-        #elif mode == 'forward-read':
-        output_forward = np.array(profile_reads_forward)
-        #elif mode == 'reverse-read':
-        output_reverse = np.array(profile_reads_reverse)
-        #else:
-        #    output_signal = np.maximum(profile_reads_forward, profile_reads_reverse)
-
-        if strand == '-':
-            output_min = np.flip(output_min)
-            output_max = np.flip(output_max)
-            output_forward = np.flip(output_forward)
-            output_reverse = np.flip(output_reverse)
-
-        output_min = output_min[probe_length:probe_length+fragment_length]
-        output_max = output_max[probe_length:probe_length+fragment_length]
-        output_forward = output_forward[probe_length:probe_length+fragment_length]
-        output_reverse = output_reverse[probe_length:probe_length+fragment_length]
-     
-        
-        data_min.extend(output_min)
-        data_max.extend(output_max)
-        data_forward.extend(output_forward)
-        data_reverse.extend(output_reverse)
-        
-    #print(data)
-    np_min = np.array(data_min)
-    np_max = np.array(data_max)
-    np_forward = np.array(data_forward)
-    np_reverse = np.array(data_reverse)
-    
-    return np_min, np_max, np_forward, np_reverse
-#%%
-def fetch_bam(metadata_input, bam_input, output_dir = None, offset = 5, probe_length =100, smoothing_length= 100):
-    bam_file = pysam.AlignmentFile(bam_input, "rb")
-    global normal
-    normal = normal_array(width=probe_length, sigma=smoothing_length, odd=1)
-    if (os.path.isfile(metadata_input) == True):
-        metadata = pd.read_csv(metadata_input, delim_whitespace=True)
-    else:
-        metadata = metadata_input
-    if output_dir is None:
-        output_dir = '/'.join(str.split(metadata_input, sep ='/')[:-1])
+def parse_alignment(alignment_file, save_to_file=False, output_file=None):
+    if output_file is None:
+        output_file = alignment_file + '.parsed'
     import logging
-    log_path = output_dir+'bam_extract.log'
+    log_path = output_file+'.parsed.log'
     #setup logger
     logging.root.handlers = []
     logging.basicConfig(level=logging.DEBUG,
@@ -117,37 +17,118 @@ def fetch_bam(metadata_input, bam_input, output_dir = None, offset = 5, probe_le
                         logging.StreamHandler()
                         ]
                     )
-    logging.info('extract from bam file: '+ bam_input)
-    bam_min = list()
-    bam_max = list()
-    bam_forward = list()
-    bam_reverse = list()
-    for idx, row in metadata.iterrows():
-        genoname = row.genoName
-        genostart = row.genoStart
-        genoend = row.genoEnd
-        strand = row.strand
-        np_min, np_max, np_forward, np_reverse = extract_bam(bam_file ,genoname, genostart, genoend, strand, offset, probe_length, smoothing_length)
-        bam_min.append(np_min)
-        bam_max.append(np_max)
-        bam_forward.append(np_forward)
-        bam_reverse.append(np_reverse)
-    import compress_pickle
-    output_filepath_min = output_dir+'/bam_min.lzma'
-    compress_pickle.dump(bam_min, output_filepath_min, compression="lzma")
-    logging.info('done, saving te bam_min at: '+output_filepath_min)
-    output_filepath_max = output_dir+'/bam_max.lzma'
-    compress_pickle.dump(bam_max, output_filepath_max, compression="lzma")
-    logging.info('done, saving te bam_max at: '+output_filepath_max)
-    output_filepath_forward = output_dir+'/bam_forward.lzma'
-    compress_pickle.dump(bam_forward, output_filepath_forward, compression="lzma")
-    logging.info('done, saving te bam_forward at: '+output_filepath_forward)
-    output_filepath_reverse = output_dir+'/bam_reverse.lzma'
-    compress_pickle.dump(bam_reverse, output_filepath_reverse, compression="lzma")
-    logging.info('done, saving te bam_reverse at: '+output_filepath_reverse)
+    logging.info('parse alignment: '+ alignment_file)
+    if isinstance(alignment_file, str) == True:
+        from Bio import SeqIO
+        records = (r for r in SeqIO.parse(alignment_file, "fasta"))
+    else:
+        records = alignment_file
+    #counting sequence records
+    seq_count = 0
+    for i, value in enumerate(records):
+        if seq_count == 0:
+            seq_length = len(value)
+        seq_count = seq_count + 1
+    if seq_count == 0:
+        logging.info('no records')
+    else:
+        seq_id_list = list()
+        for idx, content in enumerate(records):
+            seq_id_list.append(content.name)
+    #create parsed array
+    parsed_array = np.zeros((seq_count, seq_length), dtype=np.uint8)
+    for i, value in enumerate(records):
+        parsed_array[i, :] = np.array(str(value.seq).upper(), 'c').view(np.uint8)
+    
+    hash_table = {45:0, 65:1, 67:2, 84:3, 71:4, 78:5}
+    result_array = np.ndarray(parsed_array.shape)
+    for k in hash_table:
+        result_array[parsed_array == k] = hash_table[k]
+    if save_to_file == True:
+        import h5py
+        with h5py.File(output_file, 'w') as hf:
+            hf.create_dataset("parsed_array",  data=result_array, compression="lzf")
+        logging.info('done, saving parsed array at: '+output_file)
+    else: 
+        return result_array
 #%%
-def main():
-    print('main process')
+def import_parsed_array(parsed_array_file):
+    import h5py
+    with h5py.File(import_parsed_array+'/parsed_array.h5', 'r') as hf:
+        parsed_array = hf['result_array'][:]  
+    return parsed_array
+#%%
+def sort_parsed_array(parsed_array, aligned_seqeunce):
+    if isinstance(parsed_array, str) == True:
+        parsed_array = import_parsed_array(parsed_array)
+    if isinstance(aligned_seqeunce, str) == True:
+        from Bio import SeqIO
+        records = (r for r in SeqIO.parse(aligned_seqeunce, "fasta"))
+    else:
+        records = aligned_seqeunce
+    align_order = []
+    seq_id_list = []
+    seq_row_nmber_list=[]
+    for i, value in enumerate(records):
+        #print(i)
+        seq_id, seq_row_nmber=value.name.split(sep='(')[0].split(sep='.')
+        seq_id_list.append(int(seq_id))
+        seq_row_nmber_list.append(int(seq_row_nmber))
+        align_order.append(i)
 
-if __name__ == '__main__':
-    main()
+    seq_id_list_sorted, seq_row_nmber_list_sorted, parsed_array_sorted,align_order_sort = zip(*sorted(zip(seq_id_list, seq_row_nmber_list, parsed_array,align_order)))
+    parsed_array_sorted = np.array(parsed_array_sorted)
+    return parsed_array_sorted
+#%%
+def create_filter(parsed_array, col_threshold = 0.50, col_content_threshold = 0.10, row_threshold = 0.50, save_to_file = False, output_file = None):
+    if isinstance(parsed_array, str) == True:
+        parsed_array = import_parsed_array(parsed_array)
+    col_counts = np.zeros(parsed_array.shape[1])
+    col_counts_max = np.zeros(parsed_array.shape[1])  
+    for i, row in enumerate(parsed_array):
+        nonzeros = np.nonzero(row)[0]
+        col_counts[nonzeros] += 1
+        col_counts_max[nonzeros[0]:nonzeros[-1]] += 1
+    col_filter = (col_counts > col_counts_max * col_threshold) & (col_counts >= parsed_array.shape[0] * col_content_threshold)
+    row_ratio = np.zeros(parsed_array.shape[0])
+    for i, row in enumerate(parsed_array[:, col_filter]):
+        nonzeros = np.nonzero(row)[0]
+        if nonzeros.size and float(nonzeros[-1] - nonzeros[0]) > 0:
+            row_ratio[i] = len(nonzeros) / (float(nonzeros[-1] - nonzeros[0]))
+            #print(row_ratio[i])
+    row_filter = row_ratio >= row_threshold
+    for i, row in  enumerate(parsed_array[row_filter, :]):
+        nonzeros = np.nonzero(row)[0]
+
+        col_counts[nonzeros] += 1
+        col_counts_max[nonzeros[0]:nonzeros[-1]] += 1
+    col_filter = (col_counts > col_counts_max * col_threshold) & (col_counts >= parsed_array.shape[0] * col_content_threshold)
+    filters = [row_filter,col_filter]
+    if save_to_file == True:
+        import pickle
+        if output_file is None:
+            output_file = 'filter.p'
+        pickle.dump(filters, open(output_file, "wb" ))
+    else:
+        return filters
+#%%
+def map_data(data_file, sorted_parsed_array, filter= None):
+    if isinstance(data_file, str) == True:
+        import compress_pickle
+        data_file = compress_pickle.load(data_file)
+    if filter is not None:
+        if isinstance(filter,str) == True:
+            import pickle
+            filter = pickle.load(open(filter)) 
+        else:
+            filter = filter
+
+    canvas = np.zeros(sorted_parsed_array.shape, np.float32)
+    for index, row in enumerate(sorted_parsed_array):
+        canvas[index, row>0] = data_file[index]
+    mapped_data = canvas
+    if filter is not None:
+        row_filter = filter[0]
+        col_filter = filter[1]
+        mapped_data=mapped_data[np.ix_(row_filter,col_filter)]
+    return mapped_data
