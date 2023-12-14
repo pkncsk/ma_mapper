@@ -132,3 +132,19 @@ def map_data(data_file, sorted_parsed_array, filter= None):
         col_filter = filter[1]
         mapped_data=mapped_data[np.ix_(row_filter,col_filter)]
     return mapped_data
+#%%
+from typing import Literal
+_METHOD = Literal['average',]
+_MODE = Literal['all','present']
+def normalise(mapped_data, method:_METHOD = 'average', mode:_MODE = 'present', outlier = None):
+    #if isinstance(mapped_data, str) == True:
+    if outlier is not None:
+        mapped_data[mapped_data >= outlier] = 0
+    if method == 'average':
+        numerator =np.sum(mapped_data, axis = 0)
+        if mode == 'present':
+            denominator = np.count_nonzero(mapped_data, axis=0)
+        else:
+            denominator = np.shape(mapped_data)[0] 
+    normalised_array = numerator/denominator
+    return normalised_array
