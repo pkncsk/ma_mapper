@@ -4,7 +4,7 @@ import pandas as pd
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-from concurrent.futures import ProcessPoolExecutor
+#from concurrent.futures import ProcessPoolExecutor
 import os
 #%%
 ######################run directly from windows
@@ -14,17 +14,18 @@ import os
 #    global records 
 #    records = records_var
 
-def extract_sequence(genoname, genostart, genoend, strand, meta_id):
-    seqname = '::'.join([meta_id,genoname,str(genostart),str(genoend),strand])
+def extract_sequence(genoname, genostart, genoend, strand):
+    #seqname = '::'.join([meta_id,genoname,str(genostart),str(genoend),strand])
     chromosome_extract=records[genoname]
     if strand == '+':
         seq_string = str(chromosome_extract[genostart:genoend].seq)
     else:
         seq_string = str(chromosome_extract[genostart:genoend].seq.reverse_complement())
-    seq_record = SeqRecord(Seq(''.join(seq_string)),seqname , '', '')
-    return seq_record
+    return seq_string
+    #seq_record = SeqRecord(Seq(''.join(seq_string)),seqname , '', '')
+    #return seq_record
 
-def fetch_sequence(metadata_input,source_fasta,output_filepath = None, nthread = 1):
+def fetch_sequence(metadata_input,source_fasta,output_filepath = None, custom_id = False):
     global metadata
     if (os.path.isfile(metadata_input) == True):
         metadata = pd.read_csv(metadata_input, delim_whitespace=True)
@@ -47,26 +48,43 @@ def fetch_sequence(metadata_input,source_fasta,output_filepath = None, nthread =
     logging.info('read sequence source: '+ source_fasta)
     global records
     records = SeqIO.to_dict(SeqIO.parse(open(source_fasta), 'fasta'))
-    seq_records = list()
-    genoname = metadata.genoName
-    genostart = metadata.genoStart
-    genoend = metadata.genoEnd
-    strand = metadata.strand
-    meta_id = metadata.id
+    seq_records = []
+    
+    if custom_id == False:
+        meta_id = 'sample_n'+ metadata.index.astype(str)
+        metadata['meta_id'] = meta_id
+    else:
 
+        metadata['meta_id'] = metadata.iloc[:,4]
+        meta_id = metadata.iloc[:,4].unique()
     ############### run directly from windows    with ProcessPoolExecutor(max_workers=nthread, initializer=parallel_init, initargs= (metadata, records)) as executor:
-    with ProcessPoolExecutor(max_workers=nthread) as executor:
-        results = list(executor.map(extract_sequence, genoname, genostart, genoend, strand, meta_id))
-    for result in results:
-        seq_records.append(result)
+    #with ProcessPoolExecutor(max_workers=nthread) as executor:
+    #    results = list(executor.map(extract_sequence, chrom, start, end, strand, meta_id))
+    #for result in results:
+    #    seq_records.append(result)
+    for uniq_meta_id in meta_id:
+        metadata_by_id = metadata[metadata.meta_id == uniq_meta_id]
+        seq_strings = []
+        for idx, row in metadata_by_id.iterrows():
+        
+            chrom = row.iloc[0]
+            start = row.iloc[1]
+            end = row.iloc[2]
+            strand = row.iloc[3]
+            seq_string = extract_sequence(chrom, start, end, strand)
+            seq_strings.append(seq_string)
+        seqname = '::'.join([uniq_meta_id,chrom,str(min(metadata_by_id.iloc[:,1])),str(max(metadata_by_id.iloc[:,2])),strand])
+        seq_record = SeqRecord(Seq(''.join(seq_strings)),seqname , '', '')
+        seq_records.append(seq_record)
     with open(output_filepath, "w") as output_handle:
         SeqIO.write(seq_records, output_handle, "fasta")
         logging.info('done, saving te sequences at: '+output_filepath)   
 #%%
 def main():
     source_fasta = '/home/pc575/phd_project_development/data/hg38_fasta/hg38.fa'
-    metadata = '/home/pc575/phd_project_development/data/ma_mapper_output/mer11a_coord.txt'
-    fetch_sequence(metadata,source_fasta, nthread= 2)
+    metadata = '/home/pc575/phd_project_development/data/_ma_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/mer11a_coord_with_id.txt'
+    output = '/home/pc575/phd_project_development/data/_ma_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/custom_id.fasta'
+    fetch_sequence(metadata,source_fasta, output_filepath = output, custom_id= True)
 #%%
 if __name__ == '__main__':
     main()
