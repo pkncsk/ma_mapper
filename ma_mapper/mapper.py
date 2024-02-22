@@ -2,11 +2,20 @@
 import numpy as np
 import sys
 #%%
+def load_alignment_file(alignment_file):
+    if isinstance(alignment_file, str) == True:
+        from Bio import SeqIO
+        records = (r for r in SeqIO.parse(alignment_file, "fasta"))
+    else:
+        records = alignment_file
+    return records
 def parse_alignment(alignment_file, save_to_file=False, output_file=None):
     if output_file is None:
         output_file = alignment_file + '.parsed'
+    output_dir = '/'.join(str.split(output_file, sep ='/')[:-1])
     import logging
-    log_path = output_file+'.parsed.log'
+    
+    log_path = output_dir+'/parsed.log'
     #setup logger
     logging.root.handlers = []
     logging.basicConfig(level=logging.DEBUG,
@@ -18,11 +27,7 @@ def parse_alignment(alignment_file, save_to_file=False, output_file=None):
                         ]
                     )
     logging.info('parse alignment: '+ alignment_file)
-    if isinstance(alignment_file, str) == True:
-        from Bio import SeqIO
-        records = (r for r in SeqIO.parse(alignment_file, "fasta"))
-    else:
-        records = alignment_file
+    records = load_alignment_file(alignment_file)
     #counting sequence records
     seq_count = 0
     for i, value in enumerate(records):
@@ -37,6 +42,7 @@ def parse_alignment(alignment_file, save_to_file=False, output_file=None):
             seq_id_list.append(content.name)
     #create parsed array
     parsed_array = np.zeros((seq_count, seq_length), dtype=np.uint8)
+    records = load_alignment_file(alignment_file)
     for i, value in enumerate(records):
         parsed_array[i, :] = np.array(str(value.seq).upper(), 'c').view(np.uint8)
     
@@ -57,7 +63,7 @@ def import_parsed_array(parsed_array_file):
     with h5py.File(import_parsed_array+'/parsed_array.h5', 'r') as hf:
         parsed_array = hf['result_array'][:]  
     return parsed_array
-#%%
+#%%#FIXME: find a better way to sort your alignment (and why does it need to be sorted?)
 def sort_parsed_array(parsed_array, aligned_seqeunce):
     if isinstance(parsed_array, str) == True:
         parsed_array = import_parsed_array(parsed_array)
@@ -112,24 +118,24 @@ def create_filter(parsed_array, col_threshold = 0.50, col_content_threshold = 0.
     else:
         return filters
 #%%
-def map_data(data_file, sorted_parsed_array, filter= None):
+def map_data(data_file, sorted_parsed_array, filters= None):
     if isinstance(data_file, str) == True:
         import compress_pickle
         data_file = compress_pickle.load(data_file)
-    if filter is not None:
-        if isinstance(filter,str) == True:
+    if filters is not None:
+        if isinstance(filters,str) == True:
             import pickle
-            filter = pickle.load(open(filter)) 
+            filters = pickle.load(open(filters)) 
         else:
-            filter = filter
+            filters = filters
 
     canvas = np.zeros(sorted_parsed_array.shape, np.float32)
     for index, row in enumerate(sorted_parsed_array):
         canvas[index, row>0] = data_file[index]
     mapped_data = canvas
-    if filter is not None:
-        row_filter = filter[0]
-        col_filter = filter[1]
+    if filters is not None:
+        row_filter = filters[0]
+        col_filter = filters[1]
         mapped_data=mapped_data[np.ix_(row_filter,col_filter)]
     return mapped_data
 #%%
