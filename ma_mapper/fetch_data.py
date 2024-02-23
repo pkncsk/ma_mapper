@@ -216,7 +216,8 @@ def fetch_vcf(metadata_input, vcf_input, query_key = 'AF', output_dir = None, vc
     compress_pickle.dump(vcf_out, output_filepath, compression="lzma")
     logging.info('done, saving vcf_out at: '+output_filepath)
 #%%
-def extract_maf(maf_file, chrom, start, end, strand, target_species = 'homo_sapiens', coverage_count = None):
+def extract_maf(maf_file, chrom, start, end, strand, target_species = "Homo_sapiens", coverage_count = False):
+    #print(target_species,chrom, start, end, strand)
     maf_id = target_species+'.'+chrom
     from Bio.AlignIO import MafIO
     index_maf = MafIO.MafIndex(maf_file+".mafindex", maf_file, maf_id) 
@@ -255,15 +256,21 @@ def extract_maf(maf_file, chrom, start, end, strand, target_species = 'homo_sapi
         alt_freq_array.append(alt_freq)
     return alt_freq_array
 #%%
-def fetch_maf(metadata_input, maf_input, coverage_count = False):
-    if (os.path.isfile(metadata_input) == True):
-        metadata = pd.read_csv(metadata_input, delim_whitespace=True)
+def fetch_maf(metadata_input, maf_input,output_dir = None, separated_maf = False, target_species = 'Homo_sapiens', coverage_count = False, save_to_file = False, custom_id = False):
+    if isinstance(metadata_input, str):
+        if os.path.isfile(metadata_input):
+            metadata = pd.read_csv(metadata_input, delim_whitespace=True)
+        else:
+            print('metadata file not found')
     else:
         metadata = metadata_input
     if output_dir is None:
-        output_dir = '/'.join(str.split(metadata_input, sep ='/')[:-1])
+        if isinstance(metadata_input, str):
+            output_dir = '/'.join(str.split(metadata_input, sep ='/')[:-1])
+        else: 
+            output_dir = os.getcwd()
     import logging
-    log_path = output_dir+'maf_extract.log'
+    log_path = output_dir+'/'+'maf_extract.log'
     #setup logger
     logging.root.handlers = []
     logging.basicConfig(level=logging.DEBUG,
@@ -275,24 +282,44 @@ def fetch_maf(metadata_input, maf_input, coverage_count = False):
                         ]
                     )
     logging.info('extract from maf target: '+ maf_input)
+    if custom_id == False:
+        meta_id = 'sample_n'+ metadata.index.astype(str)
+        metadata['meta_id'] = meta_id
+    else:
+        metadata['meta_id'] = metadata.iloc[:,4]
+        meta_id = metadata.iloc[:,4].unique()
     maf_call_list = []
-    for idx, row in metadata.iterrows():
-        genoname = row.genoName
-        genostart = row.genoStart
-        genoend = row.genoEnd
-        strand = row.strand
-        vcf_file = maf_input + genoname
-        maf_call_list.append(vcf_file)
+    chrom_list = []
+    start_list = []
+    end_list = []
+    strand_list = []
+    for uniq_meta_id in meta_id:
+        metadata_by_id = metadata[metadata.meta_id == uniq_meta_id]
+        chrom = metadata_by_id.iloc[:,0].unique()[0]
+        chrom_list.append(chrom)
+        start_list.append(metadata_by_id.iloc[:,1].to_list())
+        end_list.append(metadata_by_id.iloc[:,2].to_list())
+        strand_list.append(metadata_by_id.iloc[:,3].unique()[0])
+        if separated_maf == True:
+            maf_file = maf_input + '.' + chrom
+        else:
+            maf_file = maf_input
+        maf_call_list.append(maf_file)
     from Bio.AlignIO import MafIO
     with ProcessPoolExecutor(max_workers=40) as executor:
-        results  = executor.map(extract_vcf, maf_call_list, metadata.genoName, metadata.genoStart, metadata.genoEnd, metadata.strand, repeat(coverage_count))
+        results  = executor.map(extract_maf, maf_call_list, chrom_list, start_list, end_list, strand_list, repeat(target_species) ,repeat(coverage_count))
     maf_out = []
     for result in results:
         maf_out.append(result)
-    import compress_pickle
-    output_filepath = output_dir+'/maf_out.lzma'
-    compress_pickle.dump(maf_out, output_filepath, compression="lzma")
-    logging.info('done, saving maf_out at: '+output_filepath)
+    if save_to_file == True:
+        import compress_pickle
+        output_filepath = output_dir+'/maf_out.lzma'
+        compress_pickle.dump(maf_out, output_filepath, compression="lzma")
+        logging.info('done, saving maf_out at: '+output_filepath)
+    else:
+        logging.info('done, returning maf_out as object')
+        return maf_out
+       
 #%%
 def main():
     print('main process')

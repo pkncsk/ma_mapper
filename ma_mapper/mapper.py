@@ -1,4 +1,5 @@
 #%%
+import pandas as pd
 import numpy as np
 import sys
 #%%
@@ -9,6 +10,38 @@ def load_alignment_file(alignment_file):
     else:
         records = alignment_file
     return records
+
+def extract_metadata_from_alignment(alignment_file, save_to_file = False, output_file =None):
+    records = load_alignment_file(alignment_file)
+    dump_list = []
+    chrom_list = []
+    start_list = []
+    end_list = []
+    strand_list = []
+    for record in records:
+        metadata_list=record.name.split(sep='::')
+        for i in range(len(metadata_list)):
+            if metadata_list[i].startswith('chr') == False:
+                dump_list.append(metadata_list[i])
+            else:
+                chrom_list.append(metadata_list[i])
+                start_list.append(int(metadata_list[i+1]))
+                end_list.append(int(metadata_list[i+2]))
+                strand_list.append(metadata_list[i+3])
+                break
+    new_metadata_dict = {'chrom':chrom_list,'start':start_list,'end':end_list,'strand':strand_list,'id':dump_list}
+    new_metadata = pd.DataFrame(new_metadata_dict)
+    if save_to_file == True:
+        if output_file is not None:
+            output_filepath = output_file
+        else:
+            import os
+            output_filepath = os.getcwd() + '/metadata_aligned.txt'
+        new_metadata.to_csv(output_filepath, sep='\t', index= False)
+        print('save new metadata at', output_filepath)
+    else:
+        return new_metadata
+
 def parse_alignment(alignment_file, save_to_file=False, output_file=None):
     if output_file is None:
         output_file = alignment_file + '.parsed'
@@ -130,8 +163,8 @@ def map_data(data_file, sorted_parsed_array, filters= None):
             filters = filters
 
     canvas = np.zeros(sorted_parsed_array.shape, np.float32)
-    for index, row in enumerate(sorted_parsed_array):
-        canvas[index, row>0] = data_file[index]
+    for idx, row in enumerate(sorted_parsed_array):
+        canvas[idx, row>0] = data_file[idx]
     mapped_data = canvas
     if filters is not None:
         row_filter = filters[0]
@@ -139,7 +172,8 @@ def map_data(data_file, sorted_parsed_array, filters= None):
         mapped_data=mapped_data[np.ix_(row_filter,col_filter)]
     return mapped_data
 #%%
-from typing import Literal
+#from typing import Literal <- python3.8+
+from typing_extensions import Literal
 _METHOD = Literal['average',]
 _MODE = Literal['all','present']
 def normalise(mapped_data, method:_METHOD = 'average', mode:_MODE = 'present', outlier = None):

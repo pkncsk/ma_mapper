@@ -65,8 +65,7 @@ def fetch_sequence(metadata_input,source_fasta,output_filepath = None, custom_id
     for uniq_meta_id in meta_id:
         metadata_by_id = metadata[metadata.meta_id == uniq_meta_id]
         seq_strings = []
-        for idx, row in metadata_by_id.iterrows():
-        
+        for idx, row in metadata_by_id.iterrows():       
             chrom = row.iloc[0]
             start = row.iloc[1]
             end = row.iloc[2]

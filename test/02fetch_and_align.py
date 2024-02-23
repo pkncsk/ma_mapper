@@ -1,5 +1,5 @@
 #%%
-from importlib import metadata
+
 import sys
 import pandas as pd
 sys.path.append('/home/pc575/phd_project_development/dev/packaging_dir/ma_mapper/')
