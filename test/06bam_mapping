@@ -1,0 +1,110 @@
+#%%
+import sys
+import pandas as pd
+import numpy as np
+sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/dev/packaging_dir/ma_mapper/')
+from ma_mapper import mapper
+from ma_mapper import fetch_data
+#%%
+input_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/custom_id.fasta.aligned'
+aligned_parsed = mapper.parse_alignment(input_filepath, save_to_file= False)
+metadata_aligned = mapper.extract_metadata_from_alignment(input_filepath)
+#%%
+metadata_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/mer11a_coord_with_id.txt'
+bam_mapped_min, bam_mapped_max, bam_mapped_forward, bam_mapped_reverse=fetch_data.fetch_bam(metadata_input= metadata_filepath, bam_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/_housekeeping/data/KZFP-bam_hg38/znf808.sorted.bam', custom_id = True) 
+# %%
+metadata_df = pd.read_csv(metadata_filepath, sep='\t')
+original_order = metadata_df.iloc[:,4].unique()
+#%%
+bam_mapped_sorted_min = []
+bam_mapped_sorted_max = []
+bam_mapped_sorted_forward = []
+bam_mapped_sorted_reverse = []
+for idx, row in metadata_aligned.iterrows():
+    bam_mapped_sorted_min.append(bam_mapped_min[np.where(original_order == row.id)[0][0]])
+    bam_mapped_sorted_max.append(bam_mapped_max[np.where(original_order == row.id)[0][0]])
+    bam_mapped_sorted_forward.append(bam_mapped_forward[np.where(original_order == row.id)[0][0]])
+    bam_mapped_sorted_reverse.append(bam_mapped_reverse[np.where(original_order == row.id)[0][0]])
+#%%
+filters=mapper.create_filter(aligned_parsed)
+# %%
+aligned_bam_overlay_min=mapper.map_data(bam_mapped_sorted_min, aligned_parsed, filters = filters)
+aligned_bam_overlay_max=mapper.map_data(bam_mapped_sorted_max, aligned_parsed, filters = filters)
+aligned_bam_overlay_forward=mapper.map_data(bam_mapped_sorted_forward, aligned_parsed, filters = filters)
+aligned_bam_overlay_reverse=mapper.map_data(bam_mapped_sorted_reverse, aligned_parsed, filters = filters)
+# %%
+#%%
+import plotly.graph_objects as go
+subfamily = 'MER11A'
+fig = go.Figure()
+fig.add_trace(go.Heatmap(z= aligned_bam_overlay_min,
+                    colorscale='Greys',
+                    #colorbar=dict(tick0=0,dtick=1)
+))
+fig.update_coloraxes(showscale=False)
+fig.update_layout(xaxis_showgrid=False, xaxis_zeroline=False,violingap=0,violinmode='overlay',
+    title=subfamily + ' bam overlay (min)',
+    xaxis_title="Position (bp)",
+    yaxis_title="Sequences",
+    legend_title="base",
+    showlegend=False,
+    )
+fig.update_layout(showlegend=False,)
+fig.show()
+#%%
+import plotly.graph_objects as go
+subfamily = 'MER11A'
+fig = go.Figure()
+
+fig.add_trace(go.Heatmap(z= aligned_bam_overlay_max,
+                    colorscale='Greens',
+                    #colorbar=dict(tick0=0,dtick=1)
+))
+
+fig.update_coloraxes(showscale=False)
+fig.update_layout(xaxis_showgrid=False, xaxis_zeroline=False,violingap=0,violinmode='overlay',
+    title=subfamily + ' bam overlay (max)',
+    xaxis_title="Position (bp)",
+    yaxis_title="Sequences",
+    legend_title="base",
+    showlegend=False,
+    )
+fig.update_layout(showlegend=False,)
+fig.show()
+#%%
+import plotly.graph_objects as go
+subfamily = 'MER11A'
+fig = go.Figure()
+fig.add_trace(go.Heatmap(z= aligned_bam_overlay_reverse,
+                    colorscale='Blues', zauto = False,zmax = 5,
+                    #colorbar=dict(tick0=0,dtick=1)
+))
+fig.update_coloraxes(showscale=False)
+fig.update_layout(xaxis_showgrid=False, xaxis_zeroline=False,violingap=0,violinmode='overlay',
+    title=subfamily + ' bam overlay (reverse)',
+    xaxis_title="Position (bp)",
+    yaxis_title="Sequences",
+    legend_title="base",
+    showlegend=True,
+    )
+#fig.update_layout(showlegend=False,)
+fig.show()
+#%%
+import plotly.graph_objects as go
+subfamily = 'MER11A'
+fig = go.Figure()
+fig.add_trace(go.Heatmap(z= aligned_bam_overlay_forward,
+                    colorscale='Reds', zauto= False,zmax = 5,
+                    #colorbar=dict(tick0=0,dtick=1)
+))
+fig.update_coloraxes(showscale=False)
+fig.update_layout(xaxis_showgrid=False, xaxis_zeroline=False,violingap=0,violinmode='overlay',
+    title=subfamily + ' bam overlay (forward)',
+    xaxis_title="Position (bp)",
+    yaxis_title="Sequences",
+    legend_title="base",
+    showlegend=False,
+    )
+fig.update_layout(showlegend=False,)
+fig.show()
+# %%

@@ -36,7 +36,7 @@ fig.add_trace(go.Heatmap(z= aligned_maf_overlay,
 ))
 fig.update_coloraxes(showscale=False)
 fig.update_layout(xaxis_showgrid=False, xaxis_zeroline=False,violingap=0,violinmode='overlay',
-    title=subfamily + ' Alignment',
+    title=subfamily + ' maf overlay',
     xaxis_title="Position (bp)",
     yaxis_title="Sequences",
     legend_title="base",
