@@ -142,7 +142,7 @@ def fetch_bam(metadata_input, bam_input, output_dir = None, offset = 5, probe_le
         if isinstance(metadata_input, str):
             output_dir = '/'.join(str.split(metadata_input, sep ='/')[:-1])
         else:
-            output_dir = os.getcwd()     
+            output_dir = os.path.dirname(os.path.abspath(__file__))
     import logging
     log_path = output_dir+'bam_extract.log'
     #setup logger
@@ -237,7 +237,7 @@ def fetch_vcf(metadata_input, vcf_input, query_key = 'AF', output_dir = None, vc
         if isinstance(metadata_input, str):
             output_dir = '/'.join(str.split(metadata_input, sep ='/')[:-1])
         else:
-            output_dir = os.getcwd()
+            output_dir = os.path.dirname(os.path.abspath(__file__))
     import logging
     log_path = output_dir+'vcf_extract.log'
     #setup logger
@@ -341,7 +341,7 @@ def fetch_maf(metadata_input, maf_input,output_dir = None, separated_maf = False
         if isinstance(metadata_input, str):
             output_dir = '/'.join(str.split(metadata_input, sep ='/')[:-1])
         else: 
-            output_dir = os.getcwd()
+            output_dir = os.path.dirname(os.path.abspath(__file__))
     import logging
     log_path = output_dir+'/'+'maf_extract.log'
     #setup logger
@@ -435,7 +435,7 @@ def fetch_bed(metadata_input, bed_input, output_dir = None, save_to_file = False
         if isinstance(metadata_input, str):
             output_dir = '/'.join(str.split(metadata_input, sep ='/')[:-1])
         else:
-            output_dir = os.getcwd()     
+            output_dir = os.path.dirname(os.path.abspath(__file__))   
     import logging
     log_path = output_dir+'bed_extract.log'
     #setup logger

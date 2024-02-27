@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/dev/packaging_dir/ma_mapper/')
 from ma_mapper import mapper
-from ma_mapper import fetch_data
 from ma_mapper import fetch_sequence
 #%%
 input_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/custom_id.fasta.aligned'
@@ -12,7 +11,6 @@ aligned_parsed = mapper.parse_alignment(input_filepath, save_to_file= False)
 metadata_aligned = mapper.extract_metadata_from_alignment(input_filepath)
 # %%
 metadata_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/mer11a_coord_with_id.txt'
-maf_mapped=fetch_data.fetch_maf(metadata_input= metadata_filepath, maf_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/241genomes/241-mammalian-2020v2b.maf', separated_maf = True,target_species = 'Homo_sapiens', custom_id= True)
 #%%
 metadata_df = pd.read_csv(metadata_filepath, sep='\t')
 original_order = metadata_df.iloc[:,4].unique()
@@ -42,4 +40,17 @@ high_border_metadata.end = high_border_metadata.end+500
 #%%
 source_fasta = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/_housekeeping/data/hg38.fa'
 high_border_records=fetch_sequence.fetch_sequence(high_border_metadata,source_fasta, custom_id= False)
+# %%
+front_list = []
+back_list = []
+for idx, strand in enumerate(strand_list):
+    if strand == '+':
+        front_list.append(low_border_records[idx])
+        back_list.append(high_border_records[idx])
+    else:
+        front_list.append(high_border_records[idx])
+        back_list.append(low_border_records[idx])
+    
+# %%
+front_parsed = mapper.parse_alignment(front_list, save_to_file= False)
 # %%

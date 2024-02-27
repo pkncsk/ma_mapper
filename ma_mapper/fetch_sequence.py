@@ -4,7 +4,6 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 #from concurrent.futures import ProcessPoolExecutor
-import os
 #%%
 ######################run directly from windows
 #def parallel_init(metadata_var, records_var):
@@ -26,6 +25,7 @@ def extract_sequence(genoname, genostart, genoend, strand):
 
 def fetch_sequence(metadata_input,source_fasta,output_filepath = None, save_to_file=False, custom_id = False):
     global metadata
+    import os
     if isinstance(metadata_input, str):
         if (os.path.isfile(metadata_input) == True):
             metadata = pd.read_csv(metadata_input, delim_whitespace=True)
@@ -36,11 +36,11 @@ def fetch_sequence(metadata_input,source_fasta,output_filepath = None, save_to_f
 
     if output_filepath is None:
         if isinstance(metadata_input, str):
-            output_filepath = '/'.join(str.split(metadata_input, sep ='/')[:-1]) + '/seqrecords.fasta'
+            output_dir = '/'.join(str.split(metadata_input, sep ='/')[:-1]) + '/seqrecords.fasta'
         else:
-            output_filepath = os.getcwd()
+            output_dir = os.path.dirname(os.path.abspath(__file__))
     import logging
-    log_path = output_filepath+'/'+'seq_extract.log'
+    log_path = output_dir+'/'+'seq_extract.log'
     #setup logger
     logging.root.handlers = []
     logging.basicConfig(level=logging.DEBUG,

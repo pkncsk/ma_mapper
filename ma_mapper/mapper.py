@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 import sys
+import os
 #%%
 def load_alignment_file(alignment_file):
     if isinstance(alignment_file, str) == True:
@@ -36,7 +37,7 @@ def extract_metadata_from_alignment(alignment_file, save_to_file = False, output
             output_filepath = output_file
         else:
             import os
-            output_filepath = os.getcwd() + '/metadata_aligned.txt'
+            output_filepath = os.path.dirname(os.path.abspath(__file__)) + '/metadata_aligned.txt'
         new_metadata.to_csv(output_filepath, sep='\t', index= False)
         print('save new metadata at', output_filepath)
     else:
@@ -44,10 +45,12 @@ def extract_metadata_from_alignment(alignment_file, save_to_file = False, output
 
 def parse_alignment(alignment_file, save_to_file=False, output_file=None):
     if output_file is None:
-        output_file = alignment_file + '.parsed'
+        if isinstance(alignment_file, str):
+            output_file = alignment_file + '.parsed'
+        else:
+            output_file = os.path.dirname(os.path.abspath(__file__)) +'/'+ 'alignment.parsed'
     output_dir = '/'.join(str.split(output_file, sep ='/')[:-1])
     import logging
-    
     log_path = output_dir+'/parsed.log'
     #setup logger
     logging.root.handlers = []
@@ -59,8 +62,14 @@ def parse_alignment(alignment_file, save_to_file=False, output_file=None):
                         logging.StreamHandler()
                         ]
                     )
-    logging.info('parse alignment: '+ alignment_file)
-    records = load_alignment_file(alignment_file)
+    logging.info('parse alignment')
+    if isinstance(alignment_file, str):
+        if (os.path.isfile(alignment_file) == True):
+            records = load_alignment_file(alignment_file)
+        else:
+            print('alignment file not found')
+    else:
+        records = alignment_file
     #counting sequence records
     seq_count = 0
     for i, value in enumerate(records):
@@ -75,7 +84,13 @@ def parse_alignment(alignment_file, save_to_file=False, output_file=None):
             seq_id_list.append(content.name)
     #create parsed array
     parsed_array = np.zeros((seq_count, seq_length), dtype=np.uint8)
-    records = load_alignment_file(alignment_file)
+    if isinstance(alignment_file, str):
+        if (os.path.isfile(alignment_file) == True):
+            records = load_alignment_file(alignment_file)
+        else:
+            print('alignment file not found')
+    else:
+        records = alignment_file
     for i, value in enumerate(records):
         parsed_array[i, :] = np.array(str(value.seq).upper(), 'c').view(np.uint8)
     
