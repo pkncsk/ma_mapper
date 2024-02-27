@@ -36,9 +36,11 @@ def fetch_sequence(metadata_input,source_fasta,output_filepath = None, save_to_f
 
     if output_filepath is None:
         if isinstance(metadata_input, str):
-            output_dir = '/'.join(str.split(metadata_input, sep ='/')[:-1]) + '/seqrecords.fasta'
+            output_dir = '/'.join(str.split(metadata_input, sep ='/')[:-1]) 
         else:
             output_dir = os.path.dirname(os.path.abspath(__file__))
+    else:
+        output_dir = '/'.join(str.split(output_filepath, sep ='/')[:-1]) 
     import logging
     log_path = output_dir+'/'+'seq_extract.log'
     #setup logger
