@@ -133,7 +133,7 @@ def fetch_bam(metadata_input, bam_input, output_dir = None, offset = 5, probe_le
     normal = normal_array(width=probe_length, sigma=smoothing_length, odd=1)
     if isinstance(metadata_input, str):
         if (os.path.isfile(metadata_input) == True):
-            metadata = pd.read_csv(metadata_input, delim_whitespace=True)
+            metadata = pd.read_csv(metadata_input, sep='\t')
         else:
             print('metadata file not found')
     else:
@@ -228,7 +228,7 @@ def extract_vcf(vcf_file, chrom, start_list, end_list, strand, query_key):
 def fetch_vcf(metadata_input, vcf_input, query_key = 'AF', output_dir = None, vcf_format = None, save_to_file = False, custom_id = False):
     if isinstance(metadata_input, str):
         if (os.path.isfile(metadata_input) == True):
-            metadata = pd.read_csv(metadata_input, delim_whitespace=True)
+            metadata = pd.read_csv(metadata_input, sep='\t')
         else:
             print('metadata file not found')
     else:
@@ -332,7 +332,7 @@ def extract_maf(maf_file, chrom, start, end, strand, target_species = "Homo_sapi
 def fetch_maf(metadata_input, maf_input,output_dir = None, separated_maf = False, target_species = 'Homo_sapiens', coverage_count = False, save_to_file = False, custom_id = False):
     if isinstance(metadata_input, str):
         if os.path.isfile(metadata_input):
-            metadata = pd.read_csv(metadata_input, delim_whitespace=True)
+            metadata = pd.read_csv(metadata_input, sep='\t')
         else:
             print('metadata file not found')
     else:
@@ -426,7 +426,7 @@ def extract_bed(bed_file, chrom, start_list, end_list, strand):
 def fetch_bed(metadata_input, bed_input, output_dir = None, save_to_file = False, custom_id = False):
     if isinstance(metadata_input, str):
         if (os.path.isfile(metadata_input) == True):
-            metadata = pd.read_csv(metadata_input, delim_whitespace=True)
+            metadata = pd.read_csv(metadata_input, sep='\t')
         else:
             print('metadata file not found')
     else:

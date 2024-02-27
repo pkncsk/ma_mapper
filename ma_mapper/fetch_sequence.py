@@ -1,5 +1,4 @@
 #%%
-from tarfile import RECORDSIZE
 import pandas as pd
 from Bio import SeqIO
 from Bio.Seq import Seq
@@ -25,16 +24,23 @@ def extract_sequence(genoname, genostart, genoend, strand):
     #seq_record = SeqRecord(Seq(''.join(seq_string)),seqname , '', '')
     #return seq_record
 
-def fetch_sequence(metadata_input,source_fasta,output_filepath = None, custom_id = False):
+def fetch_sequence(metadata_input,source_fasta,output_filepath = None, save_to_file=False, custom_id = False):
     global metadata
-    if (os.path.isfile(metadata_input) == True):
-        metadata = pd.read_csv(metadata_input, delim_whitespace=True)
+    if isinstance(metadata_input, str):
+        if (os.path.isfile(metadata_input) == True):
+            metadata = pd.read_csv(metadata_input, delim_whitespace=True)
+        else:
+            print('metadata file not found')
     else:
         metadata = metadata_input
+
     if output_filepath is None:
-        output_filepath = '/'.join(str.split(metadata_input, sep ='/')[:-1]) + '/seqrecords.fasta'
+        if isinstance(metadata_input, str):
+            output_filepath = '/'.join(str.split(metadata_input, sep ='/')[:-1]) + '/seqrecords.fasta'
+        else:
+            output_filepath = os.getcwd()
     import logging
-    log_path = output_filepath+'.log'
+    log_path = output_filepath+'/'+'seq_extract.log'
     #setup logger
     logging.root.handlers = []
     logging.basicConfig(level=logging.DEBUG,
@@ -75,9 +81,13 @@ def fetch_sequence(metadata_input,source_fasta,output_filepath = None, custom_id
         seqname = '::'.join([uniq_meta_id,chrom,str(min(metadata_by_id.iloc[:,1])),str(max(metadata_by_id.iloc[:,2])),strand])
         seq_record = SeqRecord(Seq(''.join(seq_strings)),seqname , '', '')
         seq_records.append(seq_record)
-    with open(output_filepath, "w") as output_handle:
-        SeqIO.write(seq_records, output_handle, "fasta")
-        logging.info('done, saving te sequences at: '+output_filepath)   
+    if save_to_file == True:
+        with open(output_filepath, "w") as output_handle:
+            SeqIO.write(seq_records, output_handle, "fasta")
+            logging.info('done, saving te sequences at: '+output_filepath)
+    else:
+        logging.info('done, returning seq_records as object')
+        return seq_records
 #%%
 def main():
     source_fasta = '/home/pc575/phd_project_development/data/hg38_fasta/hg38.fa'
