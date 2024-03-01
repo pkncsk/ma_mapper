@@ -11,11 +11,11 @@ from functools import reduce
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.pyplot import gcf
 #%%
-input_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/l1pa2.fasta.aligned'
+input_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/l1pa8.fasta.aligned'
 aligned_parsed = mapper.parse_alignment(input_filepath, save_to_file= False)
 metadata_aligned = mapper.extract_metadata_from_alignment(input_filepath)
 # %%
-metadata_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/l1pa2_coord_with_id.txt'
+metadata_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/l1pa8_coord_with_id.txt'
 #%%
 metadata_df = pd.read_csv(metadata_filepath, sep='\t')
 original_order = metadata_df.iloc[:,4].unique()
@@ -39,7 +39,7 @@ temp_dict = {'chrom':chrom_list,'start':high_border_list,'end':high_border_list,
 high_border_metadata = pd.DataFrame(temp_dict)
 high_border_metadata.end = high_border_metadata.end+500
 #%%
-metadata_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/l1pa2_coord_with_id.txt'
+metadata_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/l1pa8_coord_with_id.txt'
 maf_mapped=fetch_data.fetch_maf(metadata_input= metadata_filepath, maf_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/241genomes/241-mammalian-2020v2b.maf', separated_maf = True,target_species = 'Homo_sapiens', custom_id= True)
 #%%
 metadata_df = pd.read_csv(metadata_filepath, sep='\t')
@@ -56,7 +56,7 @@ col_filter = filters[1]
 aligned_maf_overlay=mapper.map_data(maf_mapped_sorted, aligned_parsed, filters = filters)
 metadata_aligned_filtered=metadata_aligned.iloc[row_filter,:]
 #%% from age_div table
-subfamily = ['L1PA2']
+subfamily = ['L1PA8']
 input_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/combined_age_div/combined_age_and_div.txt'
 main_chr = ['chr1','chr2','chr3','chr4','chr5','chr6','chr7','chr8','chr9','chr10','chr11','chr12','chr13','chr14','chr15','chr16','chr17','chr18','chr19','chr20','chr21','chr22','chrX','chrY']
 age_div_table = pd.read_csv(input_filepath, sep='\t')
@@ -109,7 +109,7 @@ graphical_object_sorted.ax_col_dendrogram.set_position([col.x0, col.y0, col.widt
 for label in metadata_with_te_age.te_age.unique():
     graphical_object_sorted.ax_row_dendrogram.bar(0, 0, color=age_colorcode[label], label=label, linewidth=0)
 l1 = graphical_object_sorted.ax_row_dendrogram.legend(title='te_age', loc="upper right", bbox_to_anchor=(0.2, 0.8), bbox_transform=gcf().transFigure)
-graphical_object_sorted.ax_heatmap.set_title("L1PA2 MAF overlay")
+graphical_object_sorted.ax_heatmap.set_title("L1PA8 MAF overlay")
 plt.setp(graphical_object_sorted.ax_heatmap.set_xlabel("position (bp)"))
 plt.setp(graphical_object_sorted.ax_heatmap.set_ylabel("sequences"))
 plt.show()
@@ -164,7 +164,7 @@ graphical_object.ax_col_dendrogram.set_position([col.x0, col.y0, col.width*0.25,
 for label in metadata_with_te_age.te_age.unique():
     graphical_object.ax_row_dendrogram.bar(0, 0, color=age_colorcode[label], label=label, linewidth=0)
 l1 = graphical_object.ax_row_dendrogram.legend(title='te_age', loc="upper right", bbox_to_anchor=(0.2, 0.8), bbox_transform=gcf().transFigure)
-graphical_object.ax_heatmap.set_title("L1PA2 coverage overlay")
+graphical_object.ax_heatmap.set_title("L1PA8 coverage overlay")
 plt.setp(graphical_object.ax_heatmap.set_xlabel("position (bp)"))
 plt.setp(graphical_object.ax_heatmap.set_ylabel("sequences"))
 plt.show()
@@ -178,7 +178,7 @@ ax.margins(x=0, y=0)
 ax.set_ylim(0,1)
 ax.set_xlabel('position (bp)')
 ax.set_ylabel('normalised alt allele ratio')
-ax.set_title('L1PA2 MAF overlay')
+ax.set_title('L1PA8 MAF overlay')
 plt.show()
 #%%
 import scipy
@@ -223,7 +223,7 @@ graphical_object_sorted.ax_col_dendrogram.set_position([col.x0, col.y0, col.widt
 for label in metadata_with_te_age_sorted.te_age.unique():
     graphical_object_sorted.ax_row_dendrogram.bar(0, 0, color=age_colorcode[label], label=label, linewidth=0)
 l1 = graphical_object_sorted.ax_row_dendrogram.legend(title='te_age', loc="upper right", bbox_to_anchor=(0.2, 0.8), bbox_transform=gcf().transFigure)
-graphical_object_sorted.ax_heatmap.set_title("L1PA2 MAF overlay clustered")
+graphical_object_sorted.ax_heatmap.set_title("L1PA8 MAF overlay clustered")
 plt.setp(graphical_object_sorted.ax_heatmap.set_xlabel("position (bp)"))
 plt.setp(graphical_object_sorted.ax_heatmap.set_ylabel("sequences"))
 plt.show()
@@ -257,7 +257,7 @@ for label in metadata_with_te_age_sorted.te_age.unique():
     graphical_object_sorted.ax_row_dendrogram.bar(0, 0, color=age_colorcode[label], label=label, linewidth=0)
 l1 = graphical_object_sorted.ax_row_dendrogram.legend(title='te_age', loc="upper right", bbox_to_anchor=(0.2, 0.8), bbox_transform=gcf().transFigure)
 
-graphical_object_sorted.ax_heatmap.set_title("L1PA2 coverage overlay clustered")
+graphical_object_sorted.ax_heatmap.set_title("L1PA8 coverage overlay clustered")
 plt.setp(graphical_object_sorted.ax_heatmap.set_xlabel("position (bp)"))
 plt.setp(graphical_object_sorted.ax_heatmap.set_ylabel("sequences"))
 plt.show()

@@ -3,7 +3,7 @@ import sys
 import pandas as pd
 sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/dev/packaging_dir/ma_mapper/')
 #%% from age_div table
-subfamily = ['L1PA3']
+subfamily = ['L1PA8']
 input_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/combined_age_div/combined_age_and_div.txt'
 main_chr = ['chr1','chr2','chr3','chr4','chr5','chr6','chr7','chr8','chr9','chr10','chr11','chr12','chr13','chr14','chr15','chr16','chr17','chr18','chr19','chr20','chr21','chr22','chrX','chrY']
 age_div_table = pd.read_csv(input_filepath, sep='\t')
@@ -14,7 +14,7 @@ subfam_coord = subfam_table[['genoName','genoStart','genoEnd','strand']]
 subfam_coord['id'] = subfam_table.repName+'_'+subfam_table.internal_id.astype(str)
 #subfam_coord['id'] = 'n'+subfam_table.internal_id.astype(str) + '_' + subfam_table.index.astype(str)
 # %%
-subfam_coord.to_csv('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/l1pa3_coord_with_id.txt', sep='\t', index= False)
+subfam_coord.to_csv('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/l1pa8_coord_with_id.txt', sep='\t', index= False)
 #%%
 
 import sys
@@ -26,8 +26,8 @@ from ma_mapper import fetch_data
 #%%
 
 source_fasta = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/hg38_fasta/hg38.fa'
-metadata = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/l1pa3_coord_with_id.txt'
-fasta_file = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/l1pa3.fasta'
+metadata = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/l1pa8_coord_with_id.txt'
+fasta_file = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/l1pa8.fasta'
 
 fetch_sequence.fetch_sequence(metadata,source_fasta,output_filepath =fasta_file, save_to_file= True,custom_id= True)
 #%%
@@ -44,7 +44,7 @@ from matplotlib.pyplot import gcf
 sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/dev/packaging_dir/ma_mapper/')
 from ma_mapper import mapper
 #%%
-input_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/l1pa3.fasta.aligned'
+input_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/l1pa8.fasta.aligned'
 aligned_parsed = mapper.parse_alignment(input_filepath, save_to_file= False)
 metadata_aligned = mapper.extract_metadata_from_alignment(input_filepath)
 metadata_aligned['original_order'] = metadata_aligned.index
@@ -56,7 +56,7 @@ aligned_filtered=aligned_parsed[np.ix_(row_filter,col_filter)]
 metadata_aligned_filtered=metadata_aligned.iloc[row_filter,:]
 
 #%% from age_div table
-subfamily = ['L1PA3']
+subfamily = ['L1PA8']
 input_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/combined_age_div/combined_age_and_div.txt'
 main_chr = ['chr1','chr2','chr3','chr4','chr5','chr6','chr7','chr8','chr9','chr10','chr11','chr12','chr13','chr14','chr15','chr16','chr17','chr18','chr19','chr20','chr21','chr22','chrX','chrY']
 age_div_table = pd.read_csv(input_filepath, sep='\t')
@@ -92,16 +92,16 @@ for label in metadata_with_te_age.te_age.unique():
     graphical_object.ax_row_dendrogram.bar(0, 0, color=age_colorcode[label], label=label, linewidth=0)
 l1 = graphical_object.ax_row_dendrogram.legend(title='te_age', loc="upper right", bbox_to_anchor=(0.2, 0.8), bbox_transform=gcf().transFigure)
 
-graphical_object.ax_heatmap.set_title("L1PA3 alignment")
+graphical_object.ax_heatmap.set_title("L1PA8 alignment")
 plt.setp(graphical_object.ax_heatmap.set_xlabel("position (bp)"))
 plt.setp(graphical_object.ax_heatmap.set_ylabel("sequences"))
 plt.show()
 #%% EXTENDED
-input_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/l1pa3.fasta.aligned'
+input_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/l1pa8.fasta.aligned'
 aligned_parsed = mapper.parse_alignment(input_filepath, save_to_file= False)
 metadata_aligned = mapper.extract_metadata_from_alignment(input_filepath)
 # %%
-metadata_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/l1pa3_coord_with_id.txt'
+metadata_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/l1pa8_coord_with_id.txt'
 #%%
 metadata_df = pd.read_csv(metadata_filepath, sep='\t')
 original_order = metadata_df.iloc[:,4].unique()
@@ -166,7 +166,7 @@ fused_parsed_row_filtered = fused_parsed[np.ix_(row_filter,range(fused_parsed.sh
 #%%
 metadata_aligned_filtered=metadata_aligned.iloc[row_filter,:]
 #%% from age_div table
-subfamily = ['L1PA3']
+subfamily = ['L1PA8']
 input_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/combined_age_div/combined_age_and_div.txt'
 main_chr = ['chr1','chr2','chr3','chr4','chr5','chr6','chr7','chr8','chr9','chr10','chr11','chr12','chr13','chr14','chr15','chr16','chr17','chr18','chr19','chr20','chr21','chr22','chrX','chrY']
 age_div_table = pd.read_csv(input_filepath, sep='\t')
@@ -199,7 +199,7 @@ for label in metadata_with_te_age.te_age.unique():
     graphical_object.ax_row_dendrogram.bar(0, 0, color=age_colorcode[label], label=label, linewidth=0)
 l1 = graphical_object.ax_row_dendrogram.legend(title='te_age', loc="upper right", bbox_to_anchor=(0.2, 0.8), bbox_transform=gcf().transFigure)
 
-graphical_object.ax_heatmap.set_title("L1PA3 alignment")
+graphical_object.ax_heatmap.set_title("L1PA8 alignment")
 plt.setp(graphical_object.ax_heatmap.set_xlabel("position (bp)"))
 plt.setp(graphical_object.ax_heatmap.set_ylabel("sequences"))
 plt.show()

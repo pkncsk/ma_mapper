@@ -290,7 +290,7 @@ def fetch_vcf(metadata_input, vcf_input, query_key = 'AF', output_dir = None, vc
         return vcf_out
 #%%
 def extract_maf(maf_file, chrom, start, end, strand, target_species = "Homo_sapiens", coverage_count = False):
-    #print(target_species,chrom, start, end, strand)
+    print(target_species,chrom, start, end, strand)
     maf_id = target_species+'.'+chrom
     from Bio.AlignIO import MafIO
     index_maf = MafIO.MafIndex(maf_file+".mafindex", maf_file, maf_id) 
