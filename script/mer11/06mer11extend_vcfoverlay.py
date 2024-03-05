@@ -125,3 +125,23 @@ plt.setp(graphical_object_sorted.ax_heatmap.set_xlabel("position (bp)"))
 plt.setp(graphical_object_sorted.ax_heatmap.set_ylabel("sequences"))
 plt.show()
 #%%
+aligned_filtered=aligned_parsed[np.ix_(row_filter,col_filter)]
+normalisation_mask = np.count_nonzero(aligned_filtered, axis=0)
+border_count = np.empty(500, dtype=np.int)
+border_count.fill(len(vcf_front_list))
+normaliser=np.concatenate((border_count,normalisation_mask,border_count))
+fused_vcf_treated=np.nan_to_num(fused_vcf_mapped)
+sum_fused_maf_mapped = np.sum(fused_vcf_treated, axis = 0)
+fused_maf_averaged = sum_fused_maf_mapped/normaliser
+# %%
+plt.rcParams['figure.dpi'] = 600
+plt.rcParams['savefig.dpi'] = 600
+fig, ax = plt.subplots(figsize=(10,3))
+ax.fill_between(range(len(fused_maf_averaged)), fused_maf_averaged, color='grey')
+ax.margins(x=0, y=0)
+ax.set_ylim(0,1)
+ax.set_xlabel('position (bp)')
+ax.set_ylabel('averaged alt allele freq')
+ax.set_title('MER11 vcf overlay')
+plt.show()
+#%%

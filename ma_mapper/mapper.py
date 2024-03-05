@@ -187,6 +187,7 @@ def map_data(data_file, sorted_parsed_array, filters= None):
         mapped_data=mapped_data[np.ix_(row_filter,col_filter)]
     return mapped_data
 #%%
+#FIXME: wrong nonzero
 #from typing import Literal <- python3.8+
 from typing_extensions import Literal
 _METHOD = Literal['average',]

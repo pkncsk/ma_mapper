@@ -16,6 +16,12 @@ subfam_coord['id'] = subfam_table.repName+'_'+subfam_table.internal_id.astype(st
 # %%
 subfam_coord.to_csv('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/mer11_coord_with_id.txt', sep='\t', index= False)
 #%%
+subfam_coord_age = subfam_table[['genoName','genoStart','genoEnd','strand']]
+subfam_coord_age['id'] = subfam_table.repName+'_'+subfam_table.internal_id.astype(str)
+subfam_coord_age['te_age'] = subfam_table.te_age
+# %%
+subfam_coord_age.to_csv('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/mer11_coord_with_id_age.txt', sep='\t', index= False)
+#%%
 
 import sys
 import pandas as pd

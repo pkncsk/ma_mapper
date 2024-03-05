@@ -31,16 +31,24 @@ for uniq_meta_id in original_order:
     high_border_list.append(max(metadata_by_id.iloc[:,2]))
     strand_list.append(metadata_by_id.iloc[:,3].unique()[0])
 #%% make new metadata 
-temp_dict = {'chrom':chrom_list,'start':low_border_list,'end':low_border_list,'strand':strand_list,'id':original_order}
+#%%
+metadata_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/mer11_coord_with_id_age.txt'
+age_table_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/species241_info.tsv'
+maf_output=fetch_data.fetch_maf(metadata_input= metadata_filepath, maf_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/241genomes/241-mammalian-2020v2b.maf', separated_maf = True,target_species = 'Homo_sapiens', custom_id= True, age_depth=False, age_table_file= age_table_filepath, extract_age = True)
+#%% extract results
+age_list = []
+maf_mapped = []
+for row in maf_output:
+    age_list.append(row[0])
+    maf_mapped.append(row[1])
+#%%
+temp_dict = {'chrom':chrom_list,'start':low_border_list,'end':low_border_list,'strand':strand_list,'id':original_order,'te_age':age_list}
 low_border_metadata = pd.DataFrame(temp_dict)
 low_border_metadata.start = low_border_metadata.start-500
 # %%
-temp_dict = {'chrom':chrom_list,'start':high_border_list,'end':high_border_list,'strand':strand_list,'id':original_order}
+temp_dict = {'chrom':chrom_list,'start':high_border_list,'end':high_border_list,'strand':strand_list,'id':original_order,'te_age':age_list}
 high_border_metadata = pd.DataFrame(temp_dict)
 high_border_metadata.end = high_border_metadata.end+500
-#%%
-metadata_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/mer11_coord_with_id.txt'
-maf_mapped=fetch_data.fetch_maf(metadata_input= metadata_filepath, maf_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/241genomes/241-mammalian-2020v2b.maf', separated_maf = True,target_species = 'Homo_sapiens', custom_id= True)
 #%%
 metadata_df = pd.read_csv(metadata_filepath, sep='\t')
 original_order = metadata_df.iloc[:,4].unique()
@@ -68,9 +76,9 @@ subfam_age=subfam_table[['id','te_age','te_div']].drop_duplicates()
 metadata_with_te_age=metadata_aligned_filtered.merge(subfam_age, on = 'id', how ='left')
 
 # %%
-low_border_maf_mapped=fetch_data.fetch_maf(metadata_input= low_border_metadata, maf_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/241genomes/241-mammalian-2020v2b.maf', separated_maf = True,target_species = 'Homo_sapiens', custom_id= True)
+low_border_maf_mapped=fetch_data.fetch_maf(metadata_input= low_border_metadata, maf_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/241genomes/241-mammalian-2020v2b.maf', separated_maf = True,target_species = 'Homo_sapiens', custom_id= True, age_depth=True, age_table_file= age_table_filepath, age_list = age_list)
 # %%
-high_border_maf_mapped=fetch_data.fetch_maf(metadata_input= high_border_metadata, maf_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/241genomes/241-mammalian-2020v2b.maf', separated_maf = True,target_species = 'Homo_sapiens', custom_id= True)
+high_border_maf_mapped=fetch_data.fetch_maf(metadata_input= high_border_metadata, maf_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/241genomes/241-mammalian-2020v2b.maf', separated_maf = True,target_species = 'Homo_sapiens', custom_id= True, age_depth=True, age_table_file= age_table_filepath, age_list = age_list)
 #%%
 maf_front_list = []
 maf_back_list = []
@@ -115,7 +123,7 @@ l1 = graphical_object_sorted.ax_row_dendrogram.legend(title='te_age', loc="upper
 for label in metadata_with_te_age.subfam.unique():
     graphical_object_sorted.ax_col_dendrogram.bar(0, 0, color=subfam_colorcode[label], label=label, linewidth=0)
 l2 = graphical_object_sorted.ax_col_dendrogram.legend(title='subfamily', loc="upper right", bbox_to_anchor=(0.205, 0.6), bbox_transform=gcf().transFigure)
-graphical_object_sorted.ax_heatmap.set_title("MER11 MAF overlay")
+graphical_object_sorted.ax_heatmap.set_title("MER11 MAF overlay age_filtered")
 plt.setp(graphical_object_sorted.ax_heatmap.set_xlabel("position (bp)"))
 plt.setp(graphical_object_sorted.ax_heatmap.set_ylabel("sequences"))
 plt.show()
@@ -134,17 +142,17 @@ plt.rcParams['savefig.dpi'] = 600
 fig, ax = plt.subplots(figsize=(10,3))
 ax.fill_between(range(len(fused_maf_averaged)), fused_maf_averaged, color='grey')
 ax.margins(x=0, y=0)
-ax.set_ylim(0,1)
+ax.set_ylim(0,0.5)
 ax.set_xlabel('position (bp)')
 ax.set_ylabel('averaged alt allele ratio')
-ax.set_title('MER11 MAF overlay')
+ax.set_title('MER11 MAF overlay age_filtered')
 plt.show()
 #%%
 #numerator =np.sum(fused_maf_mapped, axis = 0)
 #denominator = np.count_nonzero(fused_maf_mapped, axis=0)
 #normalised_array = numerator/denominator
 #%%
-coverage_mapped=fetch_data.fetch_maf(metadata_input= metadata_filepath, maf_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/241genomes/241-mammalian-2020v2b.maf', separated_maf = True,target_species = 'Homo_sapiens', custom_id= True, coverage_count = True)
+coverage_mapped=fetch_data.fetch_maf(metadata_input= metadata_filepath, maf_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/241genomes/241-mammalian-2020v2b.maf', separated_maf = True,target_species = 'Homo_sapiens', custom_id= True, coverage_count = True, age_depth=False, age_table_file= age_table_filepath)
 #%%
 coverage_mapped_sorted = []
 for idx, row in metadata_aligned.iterrows():
@@ -152,9 +160,9 @@ for idx, row in metadata_aligned.iterrows():
 # %%
 aligned_coverage_overlay=mapper.map_data(coverage_mapped_sorted, aligned_parsed, filters = filters)
 #%%
-low_border_coverage_mapped=fetch_data.fetch_maf(metadata_input= low_border_metadata, maf_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/241genomes/241-mammalian-2020v2b.maf', separated_maf = True,target_species = 'Homo_sapiens', custom_id= True, coverage_count = True)
+low_border_coverage_mapped=fetch_data.fetch_maf(metadata_input= low_border_metadata, maf_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/241genomes/241-mammalian-2020v2b.maf', separated_maf = True,target_species = 'Homo_sapiens', custom_id= True, coverage_count = True, age_depth=False, age_table_file= age_table_filepath, age_list=age_list)
 # %%
-high_border_coverage_mapped=fetch_data.fetch_maf(metadata_input= high_border_metadata, maf_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/241genomes/241-mammalian-2020v2b.maf', separated_maf = True,target_species = 'Homo_sapiens', custom_id= True, coverage_count = True)
+high_border_coverage_mapped=fetch_data.fetch_maf(metadata_input= high_border_metadata, maf_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/241genomes/241-mammalian-2020v2b.maf', separated_maf = True,target_species = 'Homo_sapiens', custom_id= True, coverage_count = True, age_depth=True, age_table_file= age_table_filepath, age_list=age_list)
 #%%
 coverage_front_list = []
 coverage_back_list = []
@@ -199,7 +207,7 @@ l1 = graphical_object.ax_row_dendrogram.legend(title='te_age', loc="upper right"
 for label in metadata_with_te_age.subfam.unique():
     graphical_object.ax_col_dendrogram.bar(0, 0, color=subfam_colorcode[label], label=label, linewidth=0)
 l2 = graphical_object.ax_col_dendrogram.legend(title='subfamily', loc="upper right", bbox_to_anchor=(0.205, 0.6), bbox_transform=gcf().transFigure)
-graphical_object.ax_heatmap.set_title("MER11 coverage overlay")
+graphical_object.ax_heatmap.set_title("MER11 coverage overlay age_filter")
 plt.setp(graphical_object.ax_heatmap.set_xlabel("position (bp)"))
 plt.setp(graphical_object.ax_heatmap.set_ylabel("sequences"))
 plt.show()
@@ -249,7 +257,7 @@ l1 = graphical_object_sorted.ax_row_dendrogram.legend(title='te_age', loc="upper
 for label in metadata_with_te_age_sorted.subfam.unique():
     graphical_object_sorted.ax_col_dendrogram.bar(0, 0, color=subfam_colorcode[label], label=label, linewidth=0)
 l2 = graphical_object_sorted.ax_col_dendrogram.legend(title='subfamily', loc="upper right", bbox_to_anchor=(0.205, 0.6), bbox_transform=gcf().transFigure)
-graphical_object_sorted.ax_heatmap.set_title("MER11 MAF overlay clustered")
+graphical_object_sorted.ax_heatmap.set_title("MER11 MAF overlay clustered age_filter")
 plt.setp(graphical_object_sorted.ax_heatmap.set_xlabel("position (bp)"))
 plt.setp(graphical_object_sorted.ax_heatmap.set_ylabel("sequences"))
 plt.show()
@@ -303,7 +311,7 @@ axs[1].fill_between(range(len(fused_maf_averaged_mer11b)), fused_maf_averaged_me
 axs[1].set_title('MER11B')
 axs[2].fill_between(range(len(fused_maf_averaged_mer11c)), fused_maf_averaged_mer11c, color='grey')
 axs[2].set_title('MER11C')
-plt.setp(axs, ylim=(0,1), xmargin=0)
+plt.setp(axs, ylim=(0,0.1), xmargin=0)
 #fig.margins(x=0, y=0)
 #fig.set_ylim(0,1)
 #fig.set_xlabel('position (bp)')
@@ -345,8 +353,8 @@ l1 = graphical_object_sorted.ax_row_dendrogram.legend(title='te_age', loc="upper
 for label in metadata_with_te_age_sorted.subfam.unique():
     graphical_object_sorted.ax_col_dendrogram.bar(0, 0, color=subfam_colorcode[label], label=label, linewidth=0)
 l2 = graphical_object_sorted.ax_col_dendrogram.legend(title='subfamily', loc="upper right", bbox_to_anchor=(0.205, 0.6), bbox_transform=gcf().transFigure)
-graphical_object_sorted.ax_heatmap.set_title("MER11 coverage overlay clustered")
+graphical_object_sorted.ax_heatmap.set_title("MER11 coverage overlay clustered age_filtered")
 plt.setp(graphical_object_sorted.ax_heatmap.set_xlabel("position (bp)"))
 plt.setp(graphical_object_sorted.ax_heatmap.set_ylabel("sequences"))
 plt.show()
-# %%
+#%%

@@ -289,8 +289,18 @@ def fetch_vcf(metadata_input, vcf_input, query_key = 'AF', output_dir = None, vc
         logging.info('done, returning vcf_out as object')
         return vcf_out
 #%%
-def extract_maf(maf_file, chrom, start, end, strand, target_species = "Homo_sapiens", coverage_count = False):
-    print(target_species,chrom, start, end, strand)
+from typing_extensions import Literal
+_AGEARG = Literal[None,'extract','calibrate']
+def extract_maf(maf_file, chrom, start, end, strand,target_species = "Homo_sapiens", coverage_count = False,age=None, age_arg:_AGEARG = None, age_table_file = None):
+    #print(target_species,chrom, start, end, strand)
+    if age_arg is not None:
+        if isinstance(age_table_file, str):
+            if (os.path.isfile(age_table_file) == True):
+                species = pd.read_table(age_table_file, sep='\t')
+            else:
+                print('metadata file not found')
+        else:
+            species = age_table_file
     maf_id = target_species+'.'+chrom
     from Bio.AlignIO import MafIO
     index_maf = MafIO.MafIndex(maf_file+".mafindex", maf_file, maf_id) 
@@ -302,34 +312,45 @@ def extract_maf(maf_file, chrom, start, end, strand, target_species = "Homo_sapi
         results =index_maf.get_spliced(start,end,n_strand)
     collector = {}
     for seqrec in results:
-        #print(seqrec.id.split('.')[0])
         if seqrec.id.split('.')[0] == target_species:  
             collector[seqrec.id.split('.')[0]]= np.array(list(seqrec.seq.lower()))
+            age_measure = 0
             for seqrec in results:
                 if seqrec.id.split('.')[0] != target_species:
-                    #test_list.append(np.array(list(seqrec.seq)))
-                    collector[seqrec.id.split('.')[0]]= np.array(list(seqrec.seq.lower()))
-    array_transposed=np.array(list(collector.values())).transpose()
-    alt_freq_array=[]
-    for ref_pos in array_transposed:
-        (unique, counts) = np.unique(ref_pos, return_counts=True)
-        frequencies = dict(zip(unique, counts))
-        ref_allele=ref_pos[0]
-        total = 0
-        alt_count  = 0
-        for key in frequencies:
-            if key != '-':
-                total = total+frequencies[key]
-                if key != ref_allele:
-                    alt_count =alt_count+frequencies[key]
-        if coverage_count is True:
-            alt_freq = total
-        else:
-            alt_freq=alt_count/total
-        alt_freq_array.append(alt_freq)
-    return alt_freq_array
+                    if age_arg is None:
+                        collector[seqrec.id.split('.')[0]]= np.array(list(seqrec.seq.lower()))
+                    elif age_arg == 'calibrate':
+                        species_age = species[species.meta_name == seqrec.id.split('.')[0]]['Estimated Time (MYA)'].to_list()[0]
+                        if age >= species_age:
+                            collector[seqrec.id.split('.')[0]]= np.array(list(seqrec.seq.lower()))
+                    elif age_arg == 'extract':
+                        species_age = species[species.meta_name == seqrec.id.split('.')[0]]['Estimated Time (MYA)'].to_list()[0]
+                        if species_age >= age_measure:
+                            age_measure = species_age
+    if age_arg == 'extract':
+        return age_measure
+    else:
+        array_transposed=np.array(list(collector.values())).transpose()
+        alt_freq_array=[]
+        for ref_pos in array_transposed:
+            (unique, counts) = np.unique(ref_pos, return_counts=True)
+            frequencies = dict(zip(unique, counts))
+            ref_allele=ref_pos[0]
+            total = 0
+            alt_count  = 0
+            for key in frequencies:
+                if key != '-':
+                    total = total+frequencies[key]
+                    if key != ref_allele:
+                        alt_count =alt_count+frequencies[key]
+            if coverage_count is True:
+                alt_freq = total
+            else:
+                alt_freq=alt_count/total
+            alt_freq_array.append(alt_freq)
+        return alt_freq_array
 #%%
-def fetch_maf(metadata_input, maf_input,output_dir = None, separated_maf = False, target_species = 'Homo_sapiens', coverage_count = False, save_to_file = False, custom_id = False):
+def fetch_maf(metadata_input, maf_input,output_dir = None, separated_maf = False, target_species = 'Homo_sapiens', coverage_count = False, save_to_file = False, custom_id = False, age_arg:_AGEARG = None, age_table_file = None, age_list=None):
     if isinstance(metadata_input, str):
         if os.path.isfile(metadata_input):
             metadata = pd.read_csv(metadata_input, sep='\t')
@@ -378,9 +399,25 @@ def fetch_maf(metadata_input, maf_input,output_dir = None, separated_maf = False
         else:
             maf_file = maf_input
         maf_call_list.append(maf_file)
-    from Bio.AlignIO import MafIO
-    with ProcessPoolExecutor(max_workers=40) as executor:
-        results  = executor.map(extract_maf, maf_call_list, chrom_list, start_list, end_list, strand_list, repeat(target_species) ,repeat(coverage_count))
+    if age_arg is None:
+        logging.info('normal maf extraction without calibration')
+        with ProcessPoolExecutor(max_workers=40) as executor:
+            results  = executor.map(extract_maf, maf_call_list, chrom_list, start_list, end_list, strand_list, repeat(target_species) ,repeat(coverage_count))
+    elif age_arg == 'extract':
+        logging.info('extract age depth for further use')
+        with ProcessPoolExecutor(max_workers=40) as executor:
+            results  = executor.map(extract_maf, maf_call_list, chrom_list, start_list, end_list, strand_list, repeat(target_species) ,repeat(coverage_count), repeat(age_list), repeat(age_arg), repeat(age_table_file))
+    elif age_arg == 'calibrate':
+        if age_list is None:
+            logging.info('calibrate age: no age_list provided, fetching from metadata')
+            age_list = []
+            for uniq_meta_id in meta_id:
+                age_list.append(metadata_by_id.te_age.unique()[0])
+        else:
+            logging.info('calibrate age: using preexisting age_list')
+            age_list = age_list
+        with ProcessPoolExecutor(max_workers=40) as executor:
+            results  = executor.map(extract_maf, maf_call_list, chrom_list, start_list, end_list, strand_list, repeat(target_species) ,repeat(coverage_count), age_list, repeat(age_arg), repeat(age_table_file))
     maf_out = []
     for result in results:
         maf_out.append(result)
@@ -478,6 +515,82 @@ def fetch_bed(metadata_input, bed_input, output_dir = None, save_to_file = False
     else:
         logging.info('done, returning bed_out as object')
         return bed_out
+#%%
+def extract_bigwig(bigwig_file, chrom, start_list, end_list, strand):
+    bigwig_arrays = []
+    for i in range(len(start_list)):
+        # zero-based to one-based conversion [BED -> VCF]
+        start = start_list[i]
+        end = end_list[i]
+        import pyBigWig
+        bigwig = pyBigWig.open(bigwig_file)
+        bigwig_array = bigwig.values(chrom, start, end, numpy = True)
+        if strand == '-':
+            bigwig_array = np.flip(bigwig_array)
+        bigwig_arrays.append(bigwig_array)
+    if strand == '+':
+        bigwig_out = np.concatenate(bigwig_arrays)
+    else:
+        reverse_order=np.flip(bigwig_arrays, 0)
+        bigwig_out = np.concatenate(reverse_order)
+    return bigwig_out
+#%%
+def fetch_bigwig(metadata_input, bigwig_input, output_dir = None, save_to_file = False, custom_id = False):
+    if isinstance(metadata_input, str):
+        if (os.path.isfile(metadata_input) == True):
+            metadata = pd.read_csv(metadata_input, sep='\t')
+        else:
+            print('metadata file not found')
+    else:
+        metadata = metadata_input
+    if output_dir is None:
+        if isinstance(metadata_input, str):
+            output_dir = '/'.join(str.split(metadata_input, sep ='/')[:-1])
+        else:
+            output_dir = os.path.dirname(os.path.abspath(__file__))
+    import logging
+    log_path = output_dir+'bigwig_extract.log'
+    #setup logger
+    logging.root.handlers = []
+    logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                    datefmt='%m-%d %H:%M',
+                    handlers = [
+                        logging.FileHandler(log_path, mode = 'a'),
+                        logging.StreamHandler()
+                        ]
+                    )
+    logging.info('extract from bigwig target: '+ bigwig_input)
+    if custom_id == False:
+        meta_id = 'sample_n'+ metadata.index.astype(str)
+        metadata['meta_id'] = meta_id
+    else:
+        metadata['meta_id'] = metadata.iloc[:,4]
+        meta_id = metadata.iloc[:,4].unique()    
+    chrom_list = []
+    start_list = []
+    end_list = []
+    strand_list = []    
+    for uniq_meta_id in meta_id:
+        metadata_by_id = metadata[metadata.meta_id == uniq_meta_id]
+        chrom = metadata_by_id.iloc[:,0].unique()[0]
+        chrom_list.append(chrom)
+        start_list.append(metadata_by_id.iloc[:,1].to_list())
+        end_list.append(metadata_by_id.iloc[:,2].to_list())
+        strand_list.append(metadata_by_id.iloc[:,3].unique()[0])
+    with ProcessPoolExecutor(max_workers=40) as executor:
+        results  = executor.map(extract_bigwig, repeat(bigwig_input), chrom_list, start_list,end_list,strand_list)
+    bigwig_out = []
+    for result in results:
+        bigwig_out.append(result)
+    if save_to_file == True:
+        import compress_pickle
+        output_filepath = output_dir+'/bigwig_out.lzma'
+        compress_pickle.dump(bigwig_out, output_filepath, compression="lzma")
+        logging.info('done, saving bigwig_out at: '+output_filepath)
+    else:
+        logging.info('done, returning bigwig_out as object')
+        return bigwig_out
 #%%
 def main():
     print('main process')
