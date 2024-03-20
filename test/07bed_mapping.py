@@ -13,7 +13,7 @@ aligned_parsed = mapper.parse_alignment(input_filepath, save_to_file= False)
 metadata_aligned = mapper.extract_metadata_from_alignment(input_filepath)
 #%%
 metadata_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/mer11a_coord_with_id.txt'
-bed_mapped=fetch_data.fetch_bed(metadata_input=metadata_filepath, bed_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/_housekeeping/data/tfbs_homer/AP-1_bZIP_sorted.bed', custom_id=True)
+bed_mapped=fetch_data.fetch_bed(metadata_input=metadata_filepath, bed_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/_housekeeping/data/tfbs_homer/Gata6(Zf).bed', custom_id=True)
 #%%
 metadata_df = pd.read_csv(metadata_filepath, sep='\t')
 original_order = metadata_df.iloc[:,4].unique()
@@ -25,7 +25,6 @@ for idx, row in metadata_aligned.iterrows():
 filters=mapper.create_filter(aligned_parsed)
 #%%
 aligned_bed_overlay=mapper.map_data(bed_mapped_sorted, aligned_parsed, filters = filters)
-
 #%%
 import plotly.graph_objects as go
 subfamily = 'MER11A'
@@ -44,11 +43,12 @@ fig.update_layout(xaxis_showgrid=False, xaxis_zeroline=False,violingap=0,violinm
     )
 fig.update_layout(showlegend=False,)
 fig.show()
-#%%
+# %%
+bed_filepath ='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/_housekeeping/data/tfbs_homer/Gata6(Zf).bed'
 metadata_bed=pybedtools.BedTool.from_dataframe(metadata_df)
 bed_file = pybedtools.BedTool(bed_filepath)
 # %%
-metadata_bed.intersect(bed_file,wa = True, wb =True, s=True).head()
+temp_intersect=metadata_bed.intersect(bed_file,wa = True, wb =True, s=True)
 # %%
 for i in original_order:
     metadata_by_id = metadata_df[metadata_df.id == i]
@@ -88,4 +88,46 @@ else:
 metadata_by_id_bed=pybedtools.BedTool.from_dataframe(metadata_by_id)
 #%%
 metadata_bed.intersect(bed_file, wb =True, s=True).head()
+#%%
+meta_id=metadata_df.id.unique()
+metadata_for_bed=metadata_df.iloc[:,0:3]
+metadata_for_bed['name'] = metadata_df.id
+metadata_for_bed['score'] = 10
+metadata_for_bed['strand'] = metadata_df.strand
 # %%
+bed_filepath ='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/_housekeeping/data/tfbs_homer/Gata4(Zf).bed'
+metadata_bed=pybedtools.BedTool.from_dataframe(metadata_for_bed)
+bed_file = pybedtools.BedTool(bed_filepath)
+# %%
+temp_intersect=metadata_bed.intersect(bed_file,loj=True, wa = True, wb =True, s=True)
+intersect_df=temp_intersect.to_dataframe()
+#%%
+bed_out = []
+for unique_id in meta_id:
+    intersect_by_id=intersect_df[intersect_df.name == unique_id]
+    unique_start=intersect_by_id.start.unique()
+    strand=intersect_by_id.strand.unique()[0]
+    drawings = []
+    for start in unique_start:
+        intersect_by_id_by_start=intersect_by_id[intersect_by_id.start == start]
+        canvas_start = intersect_by_id_by_start.start.unique()[0]
+        canvas_end = intersect_by_id_by_start.end.unique()[0]
+        if(len(intersect_by_id_by_start.end.unique())>1):
+            print('multiple length frags')
+        canvas = np.zeros(canvas_end-canvas_start)
+        for idx,row in intersect_by_id_by_start.iterrows():
+            if int(row.thickEnd) != -1:
+                intersect_start = int(row.thickEnd)
+                intersect_end = int(row.itemRgb)
+                intersect_score = int(row.blockSizes)
+                intersect_start_position = intersect_start - canvas_start
+                intersect_end_postion = intersect_end - canvas_start +1
+                canvas[intersect_start_position:intersect_end_postion] += intersect_score
+        if strand == '-':
+            canvas = np.flip(canvas)
+        drawings.append(canvas)
+    if strand == '+':
+        bed_out.append(np.concatenate(drawings))
+    else:
+        reverse_order=np.flip(drawings, 0)
+        bed_out.append(np.concatenate(reverse_order))

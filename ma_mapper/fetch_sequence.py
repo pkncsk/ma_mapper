@@ -77,7 +77,7 @@ def fetch_sequence(metadata_input,source_fasta,output_filepath = None, save_to_f
             chrom = row.iloc[0]
             start = row.iloc[1]
             end = row.iloc[2]
-            strand = row.iloc[3]
+            strand = row.strand
             seq_string = extract_sequence(chrom, start, end, strand)
             seq_strings.append(seq_string)
         seqname = '::'.join([uniq_meta_id,chrom,str(min(metadata_by_id.iloc[:,1])),str(max(metadata_by_id.iloc[:,2])),strand])

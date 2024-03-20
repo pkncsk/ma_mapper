@@ -3,10 +3,10 @@
 import sys
 import pandas as pd
 import numpy as np
-sys.path.append('/home/pc575/phd_project_development/dev/packaging_dir/ma_mapper/')
+sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/dev/packaging_dir/ma_mapper/')
 from ma_mapper import mapper
 #%%
-input_filepath = '/home/pc575/phd_project_development/data/_ma_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/custom_id.fasta.aligned'
+input_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/custom_id.fasta.aligned'
 aligned_parsed = mapper.parse_alignment(input_filepath, save_to_file= False)
 #%%
 filters=mapper.create_filter(aligned_parsed)
@@ -21,10 +21,10 @@ five_color_scale = [[0, "grey"],
                     [0.4, "green"],
                     [0.4, "yellow"],
                     [0.6, "yellow"],
-                    [0.6, "red"],
-                    [0.8, "red"],
+                    [0.6, "blue"],
                     [0.8, "blue"],
-                    [1.0, "blue"]]
+                    [0.8, "red"],
+                    [1.0, "red"]]
 six_color_scale = [[0, "grey"],
                             [0.16666666666666666, "grey"],
 

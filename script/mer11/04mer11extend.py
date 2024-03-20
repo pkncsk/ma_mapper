@@ -60,7 +60,7 @@ for idx, strand in enumerate(strand_list):
 front_parsed = mapper.parse_alignment(front_list, save_to_file= False)
 back_parsed = mapper.parse_alignment(back_list, save_to_file= False)
 #%%
-filters=mapper.create_filter(aligned_parsed)
+filters=mapper.create_filter(aligned_parsed,row_threshold=0.1, col_threshold=0.1,col_content_threshold=0.1)
 row_filter = filters[0]
 col_filter = filters[1]
 aligned_col_filtered=aligned_parsed[np.ix_(range(len(aligned_parsed)),col_filter)]
@@ -98,10 +98,12 @@ row_color_subfam=metadata_with_te_age.subfam.map(subfam_colorcode)
 row_color_age=metadata_with_te_age.te_age.map(age_colorcode)
 row_colors=pd.DataFrame({'subfam':row_color_subfam,'te_age':row_color_age})
 
-map_color = ['grey','green','yellow','red','blue']
+map_color = ['grey','green','yellow','blue','red']
 custom_cmap = LinearSegmentedColormap.from_list('Custom', map_color, len(map_color))
 
 #%%
+plt.rcParams['figure.dpi'] = 600
+plt.rcParams['savefig.dpi'] = 600
 framed_alignment=pd.DataFrame(fused_parsed_row_filtered)
 graphical_object=sns.clustermap(framed_alignment,row_colors=row_colors, row_cluster=False, col_cluster=False, cmap =  custom_cmap,xticklabels =fused_parsed_row_filtered.shape[1]-1, yticklabels = 500, annot = False)
 graphical_object.fig.subplots_adjust(left=0.05)
@@ -121,5 +123,6 @@ l2 = graphical_object.ax_col_dendrogram.legend(title='subfamily', loc="upper rig
 graphical_object.ax_heatmap.set_title("MER11 alignment")
 plt.setp(graphical_object.ax_heatmap.set_xlabel("position (bp)"))
 plt.setp(graphical_object.ax_heatmap.set_ylabel("sequences"))
+plt.gcf().set_size_inches(24, 6)
 plt.show()
 # %%

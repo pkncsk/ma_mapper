@@ -433,7 +433,13 @@ def fetch_maf(metadata_input, maf_input,output_dir = None, separated_maf = False
 def extract_bed(bed_file, chrom, start_list, end_list, strand):
     drawings = []
     import pybedtools
-    bed_file = pybedtools.BedTool(bed_file)
+    if isinstance(bed_file, str):
+        if (os.path.isfile(bed_file) == True):
+            bed_file = pybedtools.BedTool(bed_file)
+        else:
+            print('bed file not found')
+    else:
+        bed_file = bed_file
     for i in range(len(start_list)):
         start = start_list[i]
         end = end_list[i]
@@ -444,14 +450,19 @@ def extract_bed(bed_file, chrom, start_list, end_list, strand):
         fragment_length = end - start
         canvas=np.zeros(fragment_length)
         for intersect in temp_intersect:
-            start_intersect = int(intersect[7])
-            end_intersect = int(intersect[8])
+            start_intersect = int(intersect[7]) #thickEnd
+            end_intersect = int(intersect[8]) #itemRgb
             score_intersect = float(intersect[10])
-            start_intersect_position = start_intersect - start
-            end_intersect_postion = end_intersect - start +1
+            if strand == '+':
+                start_intersect_position = start_intersect - start
+                end_intersect_postion = end_intersect - start
+                #canvas[start_intersect_position:end_intersect_postion] += np.full(end_intersect-start_intersect, score_intersect)
+            else:
+                start_intersect_position = end - end_intersect +1
+                end_intersect_postion = end - start_intersect +1
             canvas[start_intersect_position:end_intersect_postion] += score_intersect
-        if strand == '-':
-            canvas = np.flip(canvas)
+        #if strand == '-':
+            #canvas = np.flip(canvas)
         drawings.append(canvas)
     if strand == '+':
         bed_out = np.concatenate(drawings)
@@ -472,7 +483,15 @@ def fetch_bed(metadata_input, bed_input, output_dir = None, save_to_file = False
         if isinstance(metadata_input, str):
             output_dir = '/'.join(str.split(metadata_input, sep ='/')[:-1])
         else:
-            output_dir = os.path.dirname(os.path.abspath(__file__))   
+            output_dir = os.path.dirname(os.path.abspath(__file__))  
+    if isinstance(bed_input, str):
+        if (os.path.isfile(bed_input) == True):
+            import pybedtools
+            bed_file = pybedtools.BedTool(bed_input)
+        else:
+            print('bed file not found')
+    else:
+        bed_file = bed_input
     import logging
     log_path = output_dir+'bed_extract.log'
     #setup logger
@@ -503,7 +522,7 @@ def fetch_bed(metadata_input, bed_input, output_dir = None, save_to_file = False
         end_list.append(metadata_by_id.iloc[:,2].to_list())
         strand_list.append(metadata_by_id.iloc[:,3].unique()[0])
     with ProcessPoolExecutor(max_workers=40) as executor:
-        results  = executor.map(extract_bed, repeat(bed_input), chrom_list, start_list,end_list,strand_list)
+        results  = executor.map(extract_bed, repeat(bed_file), chrom_list, start_list,end_list,strand_list)
     bed_out = []
     for result in results:
         bed_out.append(result)

@@ -32,7 +32,7 @@ from ma_mapper import fetch_data
 #%%
 
 source_fasta = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/hg38_fasta/hg38.fa'
-metadata = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/mer11_coord_with_id.txt'
+metadata = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/mer11_coord_with_id_age.txt'
 fasta_file = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/mer11.fasta'
 
 fetch_sequence.fetch_sequence(metadata,source_fasta,output_filepath =fasta_file, save_to_file= True,custom_id= True)
@@ -55,7 +55,7 @@ aligned_parsed = mapper.parse_alignment(input_filepath, save_to_file= False)
 metadata_aligned = mapper.extract_metadata_from_alignment(input_filepath)
 metadata_aligned['original_order'] = metadata_aligned.index
 #%%
-filters=mapper.create_filter(aligned_parsed)
+filters=mapper.create_filter(aligned_parsed,row_threshold=0.1, col_threshold=0.1,col_content_threshold=0.1)
 row_filter = filters[0]
 col_filter = filters[1]
 aligned_filtered=aligned_parsed[np.ix_(row_filter,col_filter)]
@@ -80,10 +80,12 @@ row_color_subfam=metadata_with_te_age.subfam.map(subfam_colorcode)
 row_color_age=metadata_with_te_age.te_age.map(age_colorcode)
 row_colors=pd.DataFrame({'subfam':row_color_subfam,'te_age':row_color_age})
 
-map_color = ['grey','green','yellow','red','blue']
+map_color = ['grey','green','yellow','blue','red']
 custom_cmap = LinearSegmentedColormap.from_list('Custom', map_color, len(map_color))
 
 #%%
+plt.rcParams['figure.dpi'] = 600
+plt.rcParams['savefig.dpi'] = 600
 framed_alignment=pd.DataFrame(aligned_filtered)
 graphical_object=sns.clustermap(framed_alignment,row_colors=row_colors, row_cluster=False, col_cluster=False, cmap =  custom_cmap,xticklabels =aligned_filtered.shape[1]-1, yticklabels = 500, annot = False)
 graphical_object.fig.subplots_adjust(left=0.05)

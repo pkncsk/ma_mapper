@@ -2,11 +2,11 @@
 from Bio.AlignIO import MafIO
 import numpy as np
 #%% setting
-maf_file = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/241genomes/241-mammalian-2020v2b.maf.chrY'
+maf_file = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/241genomes/241-mammalian-2020v2b.maf.chr1'
 target_species = 'Homo_sapiens'
-chrom = 'chrY'
-start = [57150414]
-end = [57151452]
+chrom = 'chr1'
+start = [4381114]
+end = [4382190]
 strand = '-'
 coverage_count = False
 #%%
@@ -30,7 +30,7 @@ for seqrec in results:
             if seqrec.id.split('.')[0] != target_species:
                 #test_list.append(np.array(list(seqrec.seq)))
                 collector[seqrec.id.split('.')[0]]= np.array(list(seqrec.seq.lower()))
-                print(seqrec.id.split('.')[0],len(seqrec.seq.lower()),'\n',seqrec.seq.lower())
+                print(seqrec.id,len(seqrec.seq.lower()),'\n',seqrec.seq.lower())
 array_transposed=np.array(list(collector.values())).transpose()
 alt_freq_array=[]
 for ref_pos in array_transposed:
