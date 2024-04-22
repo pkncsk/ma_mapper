@@ -6,8 +6,7 @@ sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_projec
 from ma_mapper import mapper
 from ma_mapper import fetch_data
 import matplotlib.pyplot as plt
-import seaborn as sns
-from functools import reduce
+import seaborn as snsols import reduce
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.pyplot import gcf
 #%%
@@ -39,7 +38,6 @@ temp_dict = {'chrom':chrom_list,'start':high_border_list,'end':high_border_list,
 high_border_metadata = pd.DataFrame(temp_dict)
 high_border_metadata.end = high_border_metadata.end+500
 #%%
-metadata_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/mer11_coord_with_id.txt'
 bigwig_mapped=fetch_data.fetch_bigwig(metadata_input= metadata_filepath, bigwig_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/hg38_bigwig/241-mammalian-2020v2.bigWig', custom_id= True)
 #%%
 metadata_df = pd.read_csv(metadata_filepath, sep='\t')

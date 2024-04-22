@@ -189,7 +189,10 @@ def map_data(data_file, sorted_parsed_array, filters= None):
 #%%
 #FIXME: wrong nonzero
 #from typing import Literal <- python3.8+
-from typing_extensions import Literal
+if sys.version_info >= (3, 8, 0):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 _METHOD = Literal['average',]
 _MODE = Literal['all','present']
 def normalise(mapped_data, method:_METHOD = 'average', mode:_MODE = 'present', outlier = None):

@@ -20,7 +20,7 @@ chrom = 'chr1'
 start = [4380614]
 end = [4381114]
 strand = '-'
-coverage_count = True
+coverage_count = False
 age = 96.00
 #%%
 print(target_species,chrom, start, end, strand)
@@ -71,4 +71,27 @@ for ref_pos in array_transposed:
     else:
         alt_freq=alt_count/total
     alt_freq_array.append(alt_freq)
+# %%
+count_arg = 'human_ref'
+output_array  = []
+for ref_pos in array_transposed:
+    (unique, counts) = np.unique(ref_pos, return_counts=True)
+    frequencies = dict(zip(unique, counts))
+    ref_allele=ref_pos[0]
+    frequencies.pop('-', None)
+    total = sum(frequencies.values())
+    if count_arg == 'human_ref':
+        alt_count = total - frequencies[ref_allele]
+        alt_freq=alt_count/total
+        output_array.append(alt_freq)
+    elif count_arg == 'coverage':
+        output_array.append(total)
+    elif count_arg == 'common':
+        common_allele = max(frequencies, key=frequencies.get)
+        common_count = frequencies[common_allele]
+        common_freq = common_count/total
+        output_array.append(common_freq)
+# %%
+for i in output_array:
+    print(i)
 # %%

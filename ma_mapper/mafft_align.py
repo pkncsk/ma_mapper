@@ -1,6 +1,8 @@
 import subprocess
 
-def mafft_wrapper(input_filepath, nthread = None, nthreadtb = None, nthreadit =None, output_filepath = None, mafft_arg = '--quiet --memsave --treeout --reorder '):
+def mafft_wrapper(input_filepath, nthread = None, nthreadtb = None, nthreadit =None, output_filepath = None, mafft_arg = 
+                  #--quiet --memsave 
+                  '--treeout --reorder '):
     mafft_command = 'mafft '
     if nthread is not None:
         nthread_arg = '--thread '+ str(nthread) + ' ' 
@@ -8,7 +10,7 @@ def mafft_wrapper(input_filepath, nthread = None, nthreadtb = None, nthreadit =N
     if nthreadtb is not None:
         nthreadb_arg = '--threadb '+ str(nthread) + ' ' 
         mafft_command += nthreadb_arg
-    if nthreadtb is not None:
+    if nthreadit is not None:
         nthreadit_arg = '--threadit '+ str(nthread) + ' ' 
         mafft_command += nthreadb_arg
     if mafft_arg is not None:

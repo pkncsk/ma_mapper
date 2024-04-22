@@ -119,3 +119,8 @@ fig.update_layout(showlegend=False,)
 fig.show()
 
 # %%
+overlap_id=intersect_df[intersect_df.blockSizes != -1].name.to_list()
+# %%
+overlap_index=metadata_aligned[metadata_aligned.id.isin(overlap_id)].index
+nonoverlap_index=metadata_aligned[~metadata_aligned.id.isin(overlap_id)].index
+# %%

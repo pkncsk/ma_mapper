@@ -133,7 +133,7 @@ ax.set_ylabel('averaged alt allele ratio')
 ax.set_title('MER11 MAF overlay alignment age calibration')
 plt.show()
 #%%
-coverage_mapped=fetch_data.fetch_maf(metadata_input= metadata_filepath, maf_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/241genomes/241-mammalian-2020v2b.maf', separated_maf = True,target_species = 'Homo_sapiens', custom_id= True, coverage_count = True, age_arg='calibrate', age_table_file= age_table_filepath, age_list=age_list)
+coverage_mapped=fetch_data.fetch_maf(metadata_input= metadata_filepath, maf_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/241genomes/241-mammalian-2020v2b.maf', separated_maf = True,target_species = 'Homo_sapiens', custom_id= True, count_arg='coverage', age_arg='calibrate', age_table_file= age_table_filepath, age_list=age_list)
 #%%
 coverage_mapped_sorted = []
 for idx, row in metadata_aligned.iterrows():
@@ -141,9 +141,9 @@ for idx, row in metadata_aligned.iterrows():
 # %%
 aligned_coverage_overlay=mapper.map_data(coverage_mapped_sorted, aligned_parsed, filters = filters)
 #%%
-low_border_coverage_mapped=fetch_data.fetch_maf(metadata_input= low_border_metadata, maf_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/241genomes/241-mammalian-2020v2b.maf', separated_maf = True,target_species = 'Homo_sapiens', custom_id= True, coverage_count = True, age_arg='calibrate', age_table_file= age_table_filepath, age_list=age_list)
+low_border_coverage_mapped=fetch_data.fetch_maf(metadata_input= low_border_metadata, maf_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/241genomes/241-mammalian-2020v2b.maf', separated_maf = True,target_species = 'Homo_sapiens', custom_id= True, count_arg='coverage', age_arg='calibrate', age_table_file= age_table_filepath, age_list=age_list)
 # %%
-high_border_coverage_mapped=fetch_data.fetch_maf(metadata_input= high_border_metadata, maf_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/241genomes/241-mammalian-2020v2b.maf', separated_maf = True,target_species = 'Homo_sapiens', custom_id= True, coverage_count = True, age_arg='calibrate', age_table_file= age_table_filepath, age_list=age_list)
+high_border_coverage_mapped=fetch_data.fetch_maf(metadata_input= high_border_metadata, maf_input='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/241genomes/241-mammalian-2020v2b.maf', separated_maf = True,target_species = 'Homo_sapiens', custom_id= True, count_arg='coverage', age_arg='calibrate', age_table_file= age_table_filepath, age_list=age_list)
 #%%
 coverage_front_list = []
 coverage_back_list = []

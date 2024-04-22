@@ -1,5 +1,5 @@
 #%%
-
+import sys
 import math
 import numpy as np
 import pandas as pd
@@ -289,9 +289,13 @@ def fetch_vcf(metadata_input, vcf_input, query_key = 'AF', output_dir = None, vc
         logging.info('done, returning vcf_out as object')
         return vcf_out
 #%%
-from typing_extensions import Literal
+if sys.version_info >= (3, 8, 0):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 _AGEARG = Literal[None,'extract','calibrate']
-def extract_maf(maf_file, chrom, start, end, strand,target_species = "Homo_sapiens", coverage_count = False,age=None, age_arg:_AGEARG = None, age_table_file = None):
+_COUNTARG = Literal['human_ref','coverage','common']
+def extract_maf(maf_file, chrom, start, end, strand,target_species = "Homo_sapiens", count_arg:_COUNTARG = 'human_ref',age=None, age_arg:_AGEARG = None, age_table_file = None):
     #print(target_species,chrom, start, end, strand)
     if age_arg is not None:
         if isinstance(age_table_file, str):
@@ -331,26 +335,28 @@ def extract_maf(maf_file, chrom, start, end, strand,target_species = "Homo_sapie
         return age_measure
     else:
         array_transposed=np.array(list(collector.values())).transpose()
-        alt_freq_array=[]
+        output_array=[]
         for ref_pos in array_transposed:
             (unique, counts) = np.unique(ref_pos, return_counts=True)
             frequencies = dict(zip(unique, counts))
             ref_allele=ref_pos[0]
-            total = 0
-            alt_count  = 0
-            for key in frequencies:
-                if key != '-':
-                    total = total+frequencies[key]
-                    if key != ref_allele:
-                        alt_count =alt_count+frequencies[key]
-            if coverage_count is True:
-                alt_freq = total
-            else:
+            frequencies.pop('-', None)
+            total = sum(frequencies.values())
+            if count_arg == 'human_ref':
+                alt_count = total - frequencies[ref_allele]
                 alt_freq=alt_count/total
-            alt_freq_array.append(alt_freq)
-        return alt_freq_array
+                output_array.append(alt_freq)
+            elif count_arg == 'coverage':
+                output_array.append(total)
+            elif count_arg == 'common':
+                common_allele = max(frequencies, key=frequencies.get)
+                common_count = frequencies[common_allele]
+                common_freq = common_count/total
+                output_array.append(common_freq)
+
+        return output_array
 #%%
-def fetch_maf(metadata_input, maf_input,output_dir = None, separated_maf = False, target_species = 'Homo_sapiens', coverage_count = False, save_to_file = False, custom_id = False, age_arg:_AGEARG = None, age_table_file = None, age_list=None):
+def fetch_maf(metadata_input, maf_input,output_dir = None, separated_maf = False, target_species = 'Homo_sapiens', count_arg = 'human_ref', save_to_file = False, custom_id = False, age_arg:_AGEARG = None, age_table_file = None, age_list=None):
     if isinstance(metadata_input, str):
         if os.path.isfile(metadata_input):
             metadata = pd.read_csv(metadata_input, sep='\t')
@@ -402,11 +408,11 @@ def fetch_maf(metadata_input, maf_input,output_dir = None, separated_maf = False
     if age_arg is None:
         logging.info('normal maf extraction without calibration')
         with ProcessPoolExecutor(max_workers=40) as executor:
-            results  = executor.map(extract_maf, maf_call_list, chrom_list, start_list, end_list, strand_list, repeat(target_species) ,repeat(coverage_count))
+            results  = executor.map(extract_maf, maf_call_list, chrom_list, start_list, end_list, strand_list, repeat(target_species) ,repeat(count_arg))
     elif age_arg == 'extract':
         logging.info('extract age depth for further use')
         with ProcessPoolExecutor(max_workers=40) as executor:
-            results  = executor.map(extract_maf, maf_call_list, chrom_list, start_list, end_list, strand_list, repeat(target_species) ,repeat(coverage_count), repeat(age_list), repeat(age_arg), repeat(age_table_file))
+            results  = executor.map(extract_maf, maf_call_list, chrom_list, start_list, end_list, strand_list, repeat(target_species) ,repeat(count_arg), repeat(age_list), repeat(age_arg), repeat(age_table_file))
     elif age_arg == 'calibrate':
         if age_list is None:
             logging.info('calibrate age: no age_list provided, fetching from metadata')
@@ -417,7 +423,7 @@ def fetch_maf(metadata_input, maf_input,output_dir = None, separated_maf = False
             logging.info('calibrate age: using preexisting age_list')
             age_list = age_list
         with ProcessPoolExecutor(max_workers=40) as executor:
-            results  = executor.map(extract_maf, maf_call_list, chrom_list, start_list, end_list, strand_list, repeat(target_species) ,repeat(coverage_count), age_list, repeat(age_arg), repeat(age_table_file))
+            results  = executor.map(extract_maf, maf_call_list, chrom_list, start_list, end_list, strand_list, repeat(target_species) ,repeat(count_arg), age_list, repeat(age_arg), repeat(age_table_file))
     maf_out = []
     for result in results:
         maf_out.append(result)
