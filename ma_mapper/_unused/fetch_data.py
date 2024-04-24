@@ -90,38 +90,30 @@ def extract_bam(bam_file, chrom, start_list, end_list, strand, offset = 5, probe
         result_reverse.append(output_reverse)
     #failsafe in case of no mapped reads
     if len(result_min) != 0:
-        if strand == '+':
-            np_min = np.concatenate(result_min)
-        else: 
-            reverse_order_min=np.flip(result_min, 0)
-            np_min = np.concatenate(reverse_order_min)
+        if strand == '-':
+            result_min.reverse()
+        np_min = np.concatenate(result_min)
     else:
         np_min = np.zeros(np.sum(np.subtract(end_list,start_list)), dtype=np.uint8)
     
     if len(result_max) != 0:
-        if strand == '+':
-            np_max = np.concatenate(result_max)
-        else: 
-            reverse_order_max=np.flip(result_max, 0)
-            np_max = np.concatenate(reverse_order_max)
+        if strand == '-':
+            result_max.reverse()
+        np_max = np.concatenate(result_max)
     else:
         np_max = np.zeros(np.sum(np.subtract(end_list,start_list)), dtype=np.uint8)
     
     if len(result_forward) != 0:
-        if strand == '+':
-            np_forward = np.concatenate(result_forward)
-        else: 
-            reverse_order_forward=np.flip(result_forward, 0)
-            np_forward = np.concatenate(reverse_order_forward)
+        if strand == '-':
+            result_forward.reverse()
+        np_forward = np.concatenate(result_forward)
     else:
         np_forward = np.zeros(np.sum(np.subtract(end_list,start_list)), dtype=np.uint8)
 
     if len(result_reverse) != 0:
-        if strand == '+':
-            np_reverse = np.concatenate(result_reverse)
-        else: 
-            reverse_order_reverse=np.flip(result_reverse, 0)
-            np_reverse = np.concatenate(reverse_order_reverse)
+        if strand == '-':
+            result_reverse.reverse()
+        np_reverse = np.concatenate(result_reverse)
     else:
         np_reverse = np.zeros(np.sum(np.subtract(end_list,start_list)), dtype=np.uint8)
     return np_min, np_max, np_forward, np_reverse
@@ -218,11 +210,9 @@ def extract_vcf(vcf_file, chrom, start_list, end_list, strand, query_key):
             if strand == '-':
                 window = np.flip(window)
         windows.append(window)
-    if strand == '+':
-        window_out = np.concatenate(windows)
-    else:
-        reverse_order=np.flip(windows, 0)
-        window_out = np.concatenate(reverse_order)
+    if strand == '-':
+        windows.reverse()
+    window_out = np.concatenate(windows)
     return window_out
 #%%
 def fetch_vcf(metadata_input, vcf_input, query_key = 'AF', output_dir = None, vcf_format = None, save_to_file = False, custom_id = False):
@@ -294,7 +284,7 @@ if sys.version_info >= (3, 8, 0):
 else:
     from typing_extensions import Literal
 _AGEARG = Literal[None,'extract','calibrate']
-_COUNTARG = Literal['human_ref','coverage','common']
+_COUNTARG = Literal['human_ref','coverage','common', 'common_raw', 'total_raw']
 def extract_maf(maf_file, chrom, start, end, strand,target_species = "Homo_sapiens", count_arg:_COUNTARG = 'human_ref',age=None, age_arg:_AGEARG = None, age_table_file = None):
     #print(target_species,chrom, start, end, strand)
     if age_arg is not None:
@@ -340,7 +330,7 @@ def extract_maf(maf_file, chrom, start, end, strand,target_species = "Homo_sapie
             (unique, counts) = np.unique(ref_pos, return_counts=True)
             frequencies = dict(zip(unique, counts))
             ref_allele=ref_pos[0]
-            frequencies.pop('-', None)
+            #frequencies.pop('-', None) #->count deletion/insertion
             total = sum(frequencies.values())
             if count_arg == 'human_ref':
                 alt_count = total - frequencies[ref_allele]
@@ -353,7 +343,12 @@ def extract_maf(maf_file, chrom, start, end, strand,target_species = "Homo_sapie
                 common_count = frequencies[common_allele]
                 common_freq = common_count/total
                 output_array.append(common_freq)
-
+            elif count_arg == 'common_raw':
+                common_allele = max(frequencies, key=frequencies.get)
+                common_count = frequencies[common_allele]
+                output_array.append(common_count)
+            elif count_arg == 'total_raw':
+                output_array.append(total)
         return output_array
 #%%
 def fetch_maf(metadata_input, maf_input,output_dir = None, separated_maf = False, target_species = 'Homo_sapiens', count_arg = 'human_ref', save_to_file = False, custom_id = False, age_arg:_AGEARG = None, age_table_file = None, age_list=None):
@@ -470,11 +465,9 @@ def extract_bed(bed_file, chrom, start_list, end_list, strand):
         #if strand == '-':
             #canvas = np.flip(canvas)
         drawings.append(canvas)
-    if strand == '+':
-        bed_out = np.concatenate(drawings)
-    else:
-        reverse_order=np.flip(drawings, 0)
-        bed_out = np.concatenate(reverse_order)
+    if strand == '-':
+        drawings.reverse()
+    bed_out = np.concatenate(drawings)
     return bed_out
 #%%
 def fetch_bed(metadata_input, bed_input, output_dir = None, save_to_file = False, custom_id = False):
@@ -553,11 +546,9 @@ def extract_bigwig(bigwig_file, chrom, start_list, end_list, strand):
         if strand == '-':
             bigwig_array = np.flip(bigwig_array)
         bigwig_arrays.append(bigwig_array)
-    if strand == '+':
-        bigwig_out = np.concatenate(bigwig_arrays)
-    else:
-        reverse_order=np.flip(bigwig_arrays, 0)
-        bigwig_out = np.concatenate(reverse_order)
+    if strand == '-':
+        bigwig_arrays.reverse()
+    bigwig_out = np.concatenate(bigwig_arrays)
     return bigwig_out
 #%%
 def fetch_bigwig(metadata_input, bigwig_input, output_dir = None, save_to_file = False, custom_id = False):

@@ -1,37 +1,43 @@
-#%%
+#%% extract sequence
 import sys
 import pandas as pd
 sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/dev/packaging_dir/ma_mapper/')
 subfamily = ['THE1C']
-#%% from age_div table
-
-species_reference = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/combined_age_div/combined_age_and_div.txt'
-main_chr = ['chr1','chr2','chr3','chr4','chr5','chr6','chr7','chr8','chr9','chr10','chr11','chr12','chr13','chr14','chr15','chr16','chr17','chr18','chr19','chr20','chr21','chr22','chrX','chrY']
-age_div_table = pd.read_csv(species_reference, sep='\t')
-subfam_table=age_div_table[age_div_table.repName.isin(subfamily)]
-subfam_table = subfam_table[subfam_table.genoName.isin(main_chr)]
-subfam_coord = subfam_table[['genoName','genoStart','genoEnd','strand']]
-#subfam_coord['id'] = 'n'+subfam_table.internal_id.astype(str)
-subfam_coord['id'] = subfam_table.repName+'_'+subfam_table.internal_id.astype(str)
-#subfam_coord['id'] = 'n'+subfam_table.internal_id.astype(str) + '_' + subfam_table.index.astype(str)
-# %%
+from ma_mapper import sequence_alignment
 coord_file = '/home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/old_result_redo/coord_internal_id/'+subfamily[0]+'.txt'
-subfam_coord.to_csv(coord_file, sep='\t', index= False)
-#%%
+sequence_alignment.extract_subfamily_coord(subfamily, output_filepath= coord_file)
+#%% alignment
 import sys
-import pandas as pd
 sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/dev/packaging_dir/ma_mapper/')
-from ma_mapper import fetch_sequence
-from ma_mapper import mafft_align
-from ma_mapper import fetch_data
+from ma_mapper import sequence_alignment
 subfamily = ['THE1C']
-#%%
 source_fasta = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/hg38_fasta/hg38.fa'
 metadata = coord_file
 fasta_file = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/old_result_redo/alignment/'+subfamily[0]+'.fasta'
-fetch_sequence.fetch_sequence(metadata,source_fasta,output_filepath =fasta_file, save_to_file= True,custom_id= True)
+sequence_alignment.fetch_sequence(metadata,source_fasta,output_filepath =fasta_file, save_to_file= True,custom_id= True)
+sequence_alignment.mafft_align(fasta_file, nthread = 40)
 #%%
-mafft_align.mafft_wrapper(fasta_file, nthread = 40)
+import sys
+sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/dev/packaging_dir/ma_mapper/')
+
+import mypackage
+print("Package file:", mypackage.__file__)
+
+# Print the __package__ attribute of the package
+print("Package name:", mypackage.__package__)
+#%%
+import sys
+sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/dev/packaging_dir/ma_mapper/')
+subfamily = ['THE1C']
+import ma_mapper
+print("Package file:", ma_mapper.__file__)
+
+# Print the __package__ attribute of the package
+print("Package name:", ma_mapper.__package__)
+#%%
+alignment_file = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/old_result_redo/alignment/'+subfamily[0]+'.fasta.aligned'
+aligment_filtered, metadata_filtered= mapper.parse_and_filter(alignment_file)
+metadata_age = mapper.match_age_to_id_metadata(metadata_filtered)
 # %%
 import sys
 import numpy as np
@@ -44,18 +50,8 @@ from matplotlib.pyplot import gcf
 sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/dev/packaging_dir/ma_mapper/')
 from ma_mapper import mapper
 subfamily = ['THE1C']
-#%%
-alignment_file = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/old_result_redo/alignment/'+subfamily[0]+'.fasta.aligned'
-aligned_parsed = mapper.parse_alignment(alignment_file, save_to_file= False)
-metadata_aligned = mapper.extract_metadata_from_alignment(alignment_file)
-metadata_aligned['original_order'] = metadata_aligned.index
-#%%
-filters=mapper.create_filter(aligned_parsed)
-row_filter = filters[0]
-col_filter = filters[1]
-aligned_filtered=aligned_parsed[np.ix_(row_filter,col_filter)]
-metadata_aligned_filtered=metadata_aligned.iloc[row_filter,:]
-
+import logging
+logging.getLogger('matplotlib').setLevel(logging.WARNING)
 #%% from age_div table
 species_reference = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/combined_age_div/combined_age_and_div.txt'
 main_chr = ['chr1','chr2','chr3','chr4','chr5','chr6','chr7','chr8','chr9','chr10','chr11','chr12','chr13','chr14','chr15','chr16','chr17','chr18','chr19','chr20','chr21','chr22','chrX','chrY']
@@ -112,13 +108,13 @@ source_fasta = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/_housekeepi
 temp_dict = {'chrom':chrom_list,'start':low_border_list,'end':low_border_list,'strand':strand_list,'id':original_order}
 low_border_metadata = pd.DataFrame(temp_dict)
 low_border_metadata.start = low_border_metadata.start-500
-low_border_records=fetch_sequence.fetch_sequence(low_border_metadata,source_fasta, custom_id= False)
+low_border_records=sequence_alignment.fetch_sequence(low_border_metadata,source_fasta, custom_id= False)
 
 # %%
 temp_dict = {'chrom':chrom_list,'start':high_border_list,'end':high_border_list,'strand':strand_list,'id':original_order}
 high_border_metadata = pd.DataFrame(temp_dict)
 high_border_metadata.end = high_border_metadata.end+500
-high_border_records=fetch_sequence.fetch_sequence(high_border_metadata,source_fasta, custom_id= False)
+high_border_records=sequence_alignment.fetch_sequence(high_border_metadata,source_fasta, custom_id= False)
 # %%
 front_list = []
 back_list = []

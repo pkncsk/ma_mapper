@@ -4,7 +4,7 @@ import pandas as pd
 sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/dev/packaging_dir/ma_mapper/')
 from ma_mapper import mapper
 import numpy as np
-from ma_mapper import fetch_data
+from ma_mapper._unused import fetch_data
 #%%
 input_filepath = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/mer11.fasta.aligned'
 aligned_parsed = mapper.parse_alignment(input_filepath, save_to_file= False)

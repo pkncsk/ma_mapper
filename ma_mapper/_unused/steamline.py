@@ -3,8 +3,8 @@ import pandas as pd
 import numpy as np
 sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/dev/packaging_dir/ma_mapper/')
 from ma_mapper import mapper
-from ma_mapper import fetch_data
-from ma_mapper import fetch_sequence
+from ma_mapper._unused import fetch_data
+from ma_mapper import sequence_alignment
 #%%
 def metadata_extend(metadata_df, extension_length = 500, export_strand_list = False):
     original_order = metadata_df.iloc[:,4].unique()
@@ -38,8 +38,8 @@ def alignment_matrix(alignment_filepath, metadata_filepath, source_fasta, extens
     original_order = metadata_df.iloc[:,4].unique()
     low_border_metadata, high_border_metadata, strand_list= metadata_extend(metadata_df, extension_length, export_strand_list=True)
 
-    low_border_records=fetch_sequence.fetch_sequence(low_border_metadata,source_fasta, custom_id= False)
-    high_border_records=fetch_sequence.fetch_sequence(high_border_metadata,source_fasta, custom_id= False)
+    low_border_records=sequence_alignment.fetch_sequence(low_border_metadata,source_fasta, custom_id= False)
+    high_border_records=sequence_alignment.fetch_sequence(high_border_metadata,source_fasta, custom_id= False)
 
     front_list = []
     back_list = []

@@ -32,21 +32,25 @@ for seqrec in results:
                 collector[seqrec.id.split('.')[0]]= np.array(list(seqrec.seq.lower()))
                 print(seqrec.id,len(seqrec.seq.lower()),'\n',seqrec.seq.lower())
 array_transposed=np.array(list(collector.values())).transpose()
-alt_freq_array=[]
+count_arg = 'common'
+output_array=[]
 for ref_pos in array_transposed:
     (unique, counts) = np.unique(ref_pos, return_counts=True)
     frequencies = dict(zip(unique, counts))
     ref_allele=ref_pos[0]
-    total = 0
-    alt_count  = 0
-    for key in frequencies:
-        if key != '-':
-            total = total+frequencies[key]
-            if key != ref_allele:
-                alt_count =alt_count+frequencies[key]
-    if coverage_count is True:
-        alt_freq = total
-    else:
+    frequencies.pop('-', None)
+    total = sum(frequencies.values())
+    if count_arg == 'human_ref':
+        alt_count = total - frequencies[ref_allele]
         alt_freq=alt_count/total
-    alt_freq_array.append(alt_freq)
+        output_array.append(alt_freq)
+    elif count_arg == 'coverage':
+        output_array.append(total)
+    elif count_arg == 'common':
+        common_allele = max(frequencies, key=frequencies.get)
+        common_count = frequencies[common_allele]
+        common_freq = common_count/total
+        output_array.append(common_freq)
+# %%
+output_array
 # %%

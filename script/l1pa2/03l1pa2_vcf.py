@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/dev/packaging_dir/ma_mapper/')
 from ma_mapper import mapper
-from ma_mapper import fetch_data
+from ma_mapper._unused import fetch_data
 import matplotlib.pyplot as plt
 import seaborn as sns
 from functools import reduce

@@ -66,7 +66,8 @@ for unique_id in meta_id:
     if strand == '+':
         bed_out.append(np.concatenate(drawings))
     else:
-        reverse_order=np.flip(drawings, 0)
+        drawings.reverse()
+        reverse_order= drawings
         bed_out.append(np.concatenate(reverse_order))
 #%%
 bed_mapped_sorted = []
