@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 import sys
+import os
 from . import logger
 #%%
 def load_alignment_file(alignment_file):
@@ -196,21 +197,22 @@ def normalise(mapped_data, method:_METHOD = 'average', mode:_MODE = 'present', o
     normalised_array = numerator/denominator
     return normalised_array
 #steamline functions
-def parse_and_filter(alignment_file):
+def parse_and_filter(alignment_file,col_threshold = 0.50, col_content_threshold = 0.10, row_threshold = 0.50):
     aligned_parsed = parse_alignment(alignment_file, save_to_file= False)
     metadata_aligned = extract_metadata_from_alignment(alignment_file)
     metadata_aligned['original_order'] = metadata_aligned.index
-    filters=create_filter(aligned_parsed)
+    filters=create_filter(aligned_parsed, col_threshold = col_threshold, col_content_threshold = col_content_threshold, row_threshold = row_threshold)
     row_filter = filters[0]
     col_filter = filters[1]
     aligned_filtered=aligned_parsed[np.ix_(row_filter,col_filter)]
     metadata_aligned_filtered=metadata_aligned.iloc[row_filter,:]
     return aligned_filtered, metadata_aligned_filtered
 
-def match_age_to_id_metadata(metadata_df):
-    species_reference = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/combined_age_div/combined_age_and_div.txt'
-    main_chr = ['chr1','chr2','chr3','chr4','chr5','chr6','chr7','chr8','chr9','chr10','chr11','chr12','chr13','chr14','chr15','chr16','chr17','chr18','chr19','chr20','chr21','chr22','chrX','chrY']
-    age_div_table = pd.read_csv(species_reference, sep='\t')
+def match_age_to_id_metadata(metadata_df: pd.DataFrame, 
+                             reference_table:str|None = None) -> pd.DataFrame:
+    if reference_table is None:
+        reference_table = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/combined_age_div/combined_age_and_div.txt'
+    age_div_table = pd.read_csv(reference_table, sep='\t')
     age_div_table['id'] = age_div_table.repName+'_'+age_div_table.internal_id.astype(str)
     te_age=age_div_table[['id','te_age','te_div']].drop_duplicates()
     metadata_with_te_age=metadata_df.merge(te_age, on = 'id', how ='left')

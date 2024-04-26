@@ -16,28 +16,62 @@ metadata = coord_file
 fasta_file = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/old_result_redo/alignment/'+subfamily[0]+'.fasta'
 sequence_alignment.fetch_sequence(metadata,source_fasta,output_filepath =fasta_file, save_to_file= True,custom_id= True)
 sequence_alignment.mafft_align(fasta_file, nthread = 40)
-#%%
-import sys
-sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/dev/packaging_dir/ma_mapper/')
-
-import mypackage
-print("Package file:", mypackage.__file__)
-
-# Print the __package__ attribute of the package
-print("Package name:", mypackage.__package__)
-#%%
+#%% parse alignment
 import sys
 sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/dev/packaging_dir/ma_mapper/')
 subfamily = ['THE1C']
-import ma_mapper
-print("Package file:", ma_mapper.__file__)
-
-# Print the __package__ attribute of the package
-print("Package name:", ma_mapper.__package__)
-#%%
+from ma_mapper import mapper
 alignment_file = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/old_result_redo/alignment/'+subfamily[0]+'.fasta.aligned'
-aligment_filtered, metadata_filtered= mapper.parse_and_filter(alignment_file)
+alignment_filtered, metadata_filtered= mapper.parse_and_filter(alignment_file)
 metadata_age = mapper.match_age_to_id_metadata(metadata_filtered)
+#%%
+from ma_mapper import plot
+plot.overlay_plot([alignment_filtered])
+#%%
+plot.overlay_plot([alignment_filtered], metadata= metadata_age)
+#%%
+te_age = metadata_age.te_age
+age_unique=te_age.sort_values().unique()
+colors_hex = ['#000000','#252525','#525252',  '#737373',  '#969696',  '#bdbdbd', '#d9d9d9',  '#f0f0f0',  '#ffffff']
+
+
+#%%
+import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
+from matplotlib.colors import BoundaryNorm
+import os
+import sys
+import numpy as np
+age_unique = [-0.5, 0.  ,  6.7 ,  9.06, 15.76, 20.19, 29.44, 43.2 , 73.8 , 76.  ]
+plt.rcParams['figure.dpi'] = 600
+nucleotide_color =['grey','green','yellow','red','blue']
+nucleotide_labels = ['gap', 'A', 'C', 'T', 'G']
+align_cmap = ListedColormap(nucleotide_color)
+ai_blue = ['#000000','#252525','#525252',  '#737373',  '#969696',  '#bdbdbd', '#d9d9d9',  '#f0f0f0',  '#ffffff']
+ai_blue_cmap = ListedColormap(ai_blue)
+norm = BoundaryNorm(age_unique, len(ai_blue))
+fig = plt.figure(figsize=(8,5))
+grid = fig.add_gridspec(nrows = 12, ncols = 30, hspace=0)
+ax0 = fig.add_subplot(grid[0:10,0:21])
+ax1 =fig.add_subplot(grid[0:10,21])
+ax2 =fig.add_subplot(grid[5:10,23:24])
+ax3 = fig.add_subplot(grid[0:3,23:24])
+heatmap_core = ax0.imshow(alignment_filtered, aspect = 'auto',cmap= align_cmap, interpolation='nearest', vmax=5)
+ax0.set_yticks([])
+ax0.set_title('THE1C alignment')
+row_annot=ax1.imshow(te_age.values.reshape(-1, 1), aspect = 'auto',cmap= ai_blue_cmap, interpolation='nearest', norm=norm)
+ax1.set_xticks([])
+ax1.set_yticks([])
+cbar1 = fig.colorbar(row_annot, cax=ax2)
+cbar1.set_ticks([(age_unique[i] + age_unique[i+1]) / 2 for i in range(len(age_unique) - 1)])
+cbar1.set_ticklabels(age_unique[1:], fontsize = 'small')
+cbar1.ax.set_title('te_age', fontsize ='small')
+ax2.set_xticks([])
+cbar2 = fig.colorbar(heatmap_core, cax=ax3, ticks=[0.5, 1.5, 2.5, 3.5, 4.5], orientation='vertical')
+cbar2.set_ticklabels(nucleotide_labels, fontsize='small')
+cbar2.ax.set_title('nucleotide', fontsize='small')
+plt.tight_layout()
+plt.show()
 # %%
 import sys
 import numpy as np
