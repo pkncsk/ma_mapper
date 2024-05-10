@@ -6,7 +6,7 @@ sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_projec
 from ma_mapper import mapper
 from ma_mapper import fetch_data
 import matplotlib.pyplot as plt
-import seaborn as snsols import reduce
+import seaborn as snsols
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.pyplot import gcf
 #%%

@@ -29,7 +29,7 @@ def extract_subfamily_coord(subfamily,save_to_file = True, output_filepath = Non
     else:
         return subfam_coord
 
-def extract_sequence(genoname, genostart, genoend, strand):
+def extract_sequence(genoname, genostart, genoend,strand, records):
     #seqname = '::'.join([meta_id,genoname,str(genostart),str(genoend),strand])
     chromosome_extract=records[genoname]
     if strand == '+':
@@ -39,14 +39,6 @@ def extract_sequence(genoname, genostart, genoend, strand):
     return seq_string
     #seq_record = SeqRecord(Seq(''.join(seq_string)),seqname , '', '')
     #return seq_record
-
-def extract_sequence(genoname, genostart, genoend, strand):
-    chromosome_extract=records[genoname]
-    if strand == '+':
-        seq_string = str(chromosome_extract[genostart:genoend].seq)
-    else:
-        seq_string = str(chromosome_extract[genostart:genoend].seq.reverse_complement())
-    return seq_string
 
 def fetch_sequence(metadata_input,source_fasta,output_filepath = None, save_to_file=False, custom_id = False):
     import pandas as pd
@@ -64,12 +56,12 @@ def fetch_sequence(metadata_input,source_fasta,output_filepath = None, save_to_f
 
     if output_filepath is None:
         if isinstance(metadata_input, str):
-            output_filepath = '/'.join(str.split(metadata_input, sep ='/')[:-1]) 
+            output_filepath = '/'.join(str.split(metadata_input, sep ='/')[:-1]) + '.fasta'
         else:
-            output_filepath = os.path.dirname(os.path.abspath(__file__))
+            output_filepath = os.path.dirname(os.path.abspath(__file__)) +'/sequence.fasta'
     else:
-        output_filepath = '/'.join(str.split(output_filepath, sep ='/')[:-1]) 
-    global records
+        output_filepath = output_filepath
+    
     records = SeqIO.to_dict(SeqIO.parse(open(source_fasta), 'fasta'))
     seq_records = []
     
@@ -79,16 +71,17 @@ def fetch_sequence(metadata_input,source_fasta,output_filepath = None, save_to_f
     else:
         metadata['meta_id'] = metadata.iloc[:,4]
         meta_id = metadata.iloc[:,4].unique()
-
     for uniq_meta_id in meta_id:
         metadata_by_id = metadata[metadata.meta_id == uniq_meta_id]
         seq_strings = []
-        for idx, row in metadata_by_id.iterrows():       
+        for idx, row in metadata_by_id.iterrows():
+            #print(row)       
             chrom = row.chrom
             start = row.start
             end = row.end
             strand = row.strand
-            seq_string = extract_sequence(chrom, start, end, strand)
+            #print(chrom, start, end, strand)
+            seq_string = extract_sequence(chrom, start, end, strand, records)
             seq_strings.append(seq_string)
         seqname = '::'.join([uniq_meta_id,chrom,str(min(metadata_by_id.iloc[:,1])),str(max(metadata_by_id.iloc[:,2])),strand])
         seq_record = SeqRecord(Seq(''.join(seq_strings)),seqname , '', '')

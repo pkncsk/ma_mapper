@@ -4,7 +4,13 @@ import numpy as np
 import pandas as pd
 import pysam
 import os
+from . import logger
 #-> BAM file overlay 
+import sys
+if sys.version_info >= (3, 8, 0):
+    from typing import Literal, Tuple, List
+else:
+    from typing_extensions import Literal, Tuple, List
 def normal_array(width=1, sigma=1, odd=0):
     ''' Returns an array of the normal distribution of the specified width '''
     sigma2 = float(sigma) ** 2
@@ -15,15 +21,21 @@ def normal_array(width=1, sigma=1, odd=0):
     values = np.array(values)
     return values
 #%%
-def extract_bam(bam_file, chrom, start_list, end_list, strand, offset = 5, probe_length =100, smoothing_length= 100):
+_FORMAT = Literal['bam_max','bam_min','bam_forward','bam_reverse']
+def extract_bam(bam_file:str, 
+                chrom:str, 
+                start_list:List, 
+                end_list:List, 
+                strand:str, 
+                bam_format:_FORMAT,
+                offset:int = 5, 
+                probe_length:int =100, 
+                smoothing_length:int= 100)->np.ndarray:
     #print(chrom, start_list, end_list, strand)
     if isinstance(bam_file, str):
         bam_file = pysam.AlignmentFile(bam_file, "rb")
     normal = normal_array(width=probe_length, sigma=smoothing_length, odd=1)
-    result_min = []
-    result_max = []
-    result_forward = []
-    result_reverse = []
+    result_array = []
     for i in range(len(start_list)):
         start = start_list[i]
         end = end_list[i]
@@ -61,108 +73,76 @@ def extract_bam(bam_file, chrom, start_list, end_list, strand, offset = 5, probe
                 else:
                     profile_normals_forward[start_in_window:end_in_window] += normal
                     profile_reads_forward[read_position] += 1
-
-        output_min = np.minimum(profile_normals_forward, profile_normals_reverse)
-        output_max = np.maximum(profile_normals_forward, profile_normals_reverse)
-        output_forward = np.array(profile_reads_forward)
-        output_reverse = np.array(profile_reads_reverse)
+        if bam_format == 'bam_min':
+            output = np.minimum(profile_normals_forward, profile_normals_reverse)
+        elif bam_format == 'bam_max':
+            output = np.maximum(profile_normals_forward, profile_normals_reverse)
+        elif bam_format == 'bam_forward':
+            output = np.array(profile_reads_forward)
+        elif bam_format == 'bam_reverse':
+            output = np.array(profile_reads_reverse)
 
         if strand == '-':
-            output_min = np.flip(output_min)
-            output_max = np.flip(output_max)
-            output_forward = np.flip(output_forward)
-            output_reverse = np.flip(output_reverse)
+            output = np.flip(output)
 
-        output_min = output_min[probe_length:probe_length+fragment_length]
-        output_max = output_max[probe_length:probe_length+fragment_length]
-        output_forward = output_forward[probe_length:probe_length+fragment_length]
-        output_reverse = output_reverse[probe_length:probe_length+fragment_length]
+        output = output[probe_length:probe_length+fragment_length]
     
-        result_min.append(output_min)
-        result_max.append(output_max)
-        result_forward.append(output_forward)
-        result_reverse.append(output_reverse)
+        result_array.append(output)
+
     #failsafe in case of no mapped reads
-    if len(result_min) != 0:
+    if len(result_array) != 0:
         if strand == '-':
-            result_min.reverse()
-        np_min = np.concatenate(result_min)
+            result_array.reverse()
+        np_result = np.concatenate(result_array)
     else:
-        np_min = np.zeros(np.sum(np.subtract(end_list,start_list)), dtype=np.uint8)
-    
-    if len(result_max) != 0:
-        if strand == '-':
-            result_max.reverse()
-        np_max = np.concatenate(result_max)
-    else:
-        np_max = np.zeros(np.sum(np.subtract(end_list,start_list)), dtype=np.uint8)
-    
-    if len(result_forward) != 0:
-        if strand == '-':
-            result_forward.reverse()
-        np_forward = np.concatenate(result_forward)
-    else:
-        np_forward = np.zeros(np.sum(np.subtract(end_list,start_list)), dtype=np.uint8)
+        np_result = np.zeros(np.sum(np.subtract(end_list,start_list)), dtype=np.uint8)
 
-    if len(result_reverse) != 0:
-        if strand == '-':
-            result_reverse.reverse()
-        np_reverse = np.concatenate(result_reverse)
-    else:
-        np_reverse = np.zeros(np.sum(np.subtract(end_list,start_list)), dtype=np.uint8)
-    return np_min, np_max, np_forward, np_reverse
+    return np_result
 #%%
-def fetch_bam(metadata_input, bam_input, output_dir = None, offset = 5, probe_length =100, smoothing_length= 100, save_to_file = False, custom_id = False):
-    bam_file = pysam.AlignmentFile(bam_input, "rb")
-    global normal
-    normal = normal_array(width=probe_length, sigma=smoothing_length, odd=1)
-    if isinstance(metadata_input, str):
-        if (os.path.isfile(metadata_input) == True):
-            metadata = pd.read_csv(metadata_input, sep='\t')
+def fetch_bam(metadata: str|pd.DataFrame, 
+              bam_file:str,
+              bam_format:_FORMAT, 
+              output_dir:str = None, 
+              save_to_file:bool = False, 
+              custom_id:bool = False, 
+              **kwargs)->List:
+    bam_file = pysam.AlignmentFile(bam_file, "rb")
+
+    if isinstance(metadata, str):
+        if (os.path.isfile(metadata) == True):
+            metadata = pd.read_csv(metadata, sep='\t')
         else:
             print('metadata file not found')
     else:
-        metadata = metadata_input
+        metadata = metadata
     if output_dir is None:
-        if isinstance(metadata_input, str):
-            output_dir = '/'.join(str.split(metadata_input, sep ='/')[:-1])
+        if isinstance(metadata, str):
+            output_dir = '/'.join(str.split(metadata, sep ='/')[:-1])
         else:
             output_dir = os.path.dirname(os.path.abspath(__file__))
     if custom_id == False:
         meta_id = 'sample_n'+ metadata.index.astype(str)
         metadata['meta_id'] = meta_id
     else:
-        metadata['meta_id'] = metadata.iloc[:,4]
-        meta_id = metadata.iloc[:,4].unique()   
-    bam_min = list()
-    bam_max = list()
-    bam_forward = list()
-    bam_reverse = list()
+        metadata['meta_id'] = metadata.id
+        meta_id = metadata.id.unique()   
+    bam = []
     for uniq_meta_id in meta_id:
         metadata_by_id = metadata[metadata.meta_id == uniq_meta_id]
         chrom = metadata_by_id.iloc[:,0].unique()[0]
         start_list = metadata_by_id.iloc[:,1].to_list()
         end_list = metadata_by_id.iloc[:,2].to_list()
         strand = metadata_by_id.iloc[:,3].unique()[0]
-        np_min, np_max, np_forward, np_reverse = extract_bam(bam_file,chrom, start_list, end_list, strand, offset, probe_length, smoothing_length)
-        bam_min.append(np_min)
-        bam_max.append(np_max)
-        bam_forward.append(np_forward)
-        bam_reverse.append(np_reverse)
+        eb_kwargs = {key: value for key, value in kwargs.items() if key in ('offset','probe_length', 'smoothing_length')}
+        np_result = extract_bam(bam_file,chrom, start_list, end_list, strand, bam_format, **eb_kwargs)
+        bam.append(np_result)
+
     import compress_pickle
     if save_to_file == True:
-        output_filepath_min = output_dir+'/bam_min.lzma'
-        compress_pickle.dump(bam_min, output_filepath_min, compression="lzma")
-        print('done, saving bam_min at: '+output_filepath_min)
-        output_filepath_max = output_dir+'/bam_max.lzma'
-        compress_pickle.dump(bam_max, output_filepath_max, compression="lzma")
-        print('done, saving bam_max at: '+output_filepath_max)
-        output_filepath_forward = output_dir+'/bam_forward.lzma'
-        compress_pickle.dump(bam_forward, output_filepath_forward, compression="lzma")
-        print('done, saving bam_forward at: '+output_filepath_forward)
-        output_filepath_reverse = output_dir+'/bam_reverse.lzma'
-        compress_pickle.dump(bam_reverse, output_filepath_reverse, compression="lzma")
-        print('done, saving bam_reverse at: '+output_filepath_reverse)
+        output_filepath = output_dir+'/bam_'+bam_format+'.lzma'
+        compress_pickle.dump(bam, output_filepath, compression="lzma")
+        logger.info('done, saving bam_min at: '+output_filepath)
+
     else:
-        print('done, returning bam_min, bam_max, bam_forward, bam_reverse as objects')
-        return bam_min, bam_max, bam_forward, bam_reverse
+        logger.info('done, returning mapped bam as a list. format: %s', bam_format)
+        return bam

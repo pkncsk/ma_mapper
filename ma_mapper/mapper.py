@@ -1,9 +1,16 @@
 #%%
+from turtle import back
 import pandas as pd
+from . import sequence_alignment
 import numpy as np
 import sys
 import os
 from . import logger
+#from typing import Literal <- python3.8+
+if sys.version_info >= (3, 8, 0):
+    from typing import Literal, Tuple, List
+else:
+    from typing_extensions import Literal, Tuple, List
 #%%
 def load_alignment_file(alignment_file):
     if isinstance(alignment_file, str) == True:
@@ -44,7 +51,9 @@ def extract_metadata_from_alignment(alignment_file, save_to_file = False, output
     else:
         return new_metadata
 
-def parse_alignment(alignment_file, save_to_file=False, output_file=None):
+def parse_alignment(alignment_file:str, 
+                    save_to_file: bool =False, 
+                    output_file: str| None=None):
     if output_file is None:
         if isinstance(alignment_file, str):
             output_file = alignment_file + '.parsed'
@@ -56,7 +65,8 @@ def parse_alignment(alignment_file, save_to_file=False, output_file=None):
         if (os.path.isfile(alignment_file) == True):
             records = load_alignment_file(alignment_file)
         else:
-            print('alignment file not found')
+            logger.error(f"Alignment file '{alignment_file}' not found.")
+            raise FileNotFoundError(f"Alignment file '{alignment_file}' not found.")
     else:
         records = alignment_file
     #counting sequence records
@@ -155,33 +165,32 @@ def create_filter(parsed_array, col_threshold = 0.50, col_content_threshold = 0.
     else:
         return filters
 #%%
-def map_data(data_file, sorted_parsed_array, filters= None):
+def map_data(data_file:str,
+             sorted_parsed_array: np.ndarray, 
+             filters: bool = True,
+             custom_filters = None,
+             col_threshold: int = 0.50, 
+             col_content_threshold:int = 0.10, 
+             row_threshold:int = 0.50,)-> np.ndarray:
     if isinstance(data_file, str) == True:
         import compress_pickle
         data_file = compress_pickle.load(data_file)
-    if filters is not None:
-        if isinstance(filters,str) == True:
-            import pickle
-            filters = pickle.load(open(filters)) 
-        else:
-            filters = filters
-
     canvas = np.zeros(sorted_parsed_array.shape, np.float32)
     for idx, row in enumerate(sorted_parsed_array):
         canvas[idx, row>0] = data_file[idx]
     mapped_data = canvas
-    if filters is not None:
+    if filters:
+        if custom_filters is None: 
+            filters=create_filter(sorted_parsed_array, col_threshold = col_threshold, col_content_threshold = col_content_threshold, row_threshold = row_threshold)
+        else:
+            filters = custom_filters
         row_filter = filters[0]
         col_filter = filters[1]
         mapped_data=mapped_data[np.ix_(row_filter,col_filter)]
     return mapped_data
 #%%
 #FIXME: wrong nonzero
-#from typing import Literal <- python3.8+
-if sys.version_info >= (3, 8, 0):
-    from typing import Literal
-else:
-    from typing_extensions import Literal
+
 _METHOD = Literal['average',]
 _MODE = Literal['all','present']
 def normalise(mapped_data, method:_METHOD = 'average', mode:_MODE = 'present', outlier = None):
@@ -196,17 +205,72 @@ def normalise(mapped_data, method:_METHOD = 'average', mode:_MODE = 'present', o
             denominator = np.shape(mapped_data)[0] 
     normalised_array = numerator/denominator
     return normalised_array
+
+def fetch_flank_sequence(metadata: pd.DataFrame,
+                    source_fasta: str|None = None,
+                    metadata_out:bool = False, 
+                    extension_length:int = 500) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    if source_fasta is None:
+        source_fasta = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/_housekeeping/data/hg38.fa'
+
+    front_metadata = metadata.reset_index(drop=True).copy()
+    front_metadata.end = front_metadata.start
+    front_metadata.start = front_metadata.start - extension_length
+    
+    back_metadata = metadata.reset_index(drop=True).copy()
+    back_metadata.start = back_metadata.end 
+    back_metadata.end = back_metadata.end + extension_length
+    if metadata_out:
+        return front_metadata, back_metadata
+    else:
+        front_seq = sequence_alignment.fetch_sequence(front_metadata, source_fasta, custom_id=False)
+        back_seq = sequence_alignment.fetch_sequence(front_metadata, source_fasta, custom_id=False)
+        
+        front_list = []
+        back_list = []
+
+        for i, row in metadata.reset_index().iterrows():
+            if row.strand == '+':
+                front_list.append(front_seq[i])
+                back_list.append(back_seq[i])
+            else:
+                front_list.append(back_seq[i])
+                back_list.append(front_seq[i])
+        front_parsed=parse_alignment(front_list)
+        back_parsed =parse_alignment(back_list)
+        return front_parsed, back_parsed
 #steamline functions
-def parse_and_filter(alignment_file,col_threshold = 0.50, col_content_threshold = 0.10, row_threshold = 0.50):
-    aligned_parsed = parse_alignment(alignment_file, save_to_file= False)
+def parse_and_filter(alignment_file: str,
+                     filters:bool = True,
+                     extension_length:int | None = None,
+                     preprocess_out:bool = False,
+                     **kwargs)-> Tuple[np.ndarray, pd.DataFrame]:
+    
+    aligned_parsed = parse_alignment(alignment_file)
     metadata_aligned = extract_metadata_from_alignment(alignment_file)
     metadata_aligned['original_order'] = metadata_aligned.index
-    filters=create_filter(aligned_parsed, col_threshold = col_threshold, col_content_threshold = col_content_threshold, row_threshold = row_threshold)
-    row_filter = filters[0]
-    col_filter = filters[1]
-    aligned_filtered=aligned_parsed[np.ix_(row_filter,col_filter)]
-    metadata_aligned_filtered=metadata_aligned.iloc[row_filter,:]
-    return aligned_filtered, metadata_aligned_filtered
+    if filters:
+        cf_kwargs = {key: value for key, value in kwargs.items() if key in ('col_threshold','col_content_threshold', 'row_threshold')}
+        filters=create_filter(aligned_parsed, **cf_kwargs)
+        row_filter = filters[0]
+        col_filter = filters[1]
+        aligned_filtered=aligned_parsed[np.ix_(row_filter,col_filter)]
+        metadata_aligned_filtered=metadata_aligned.iloc[row_filter,:]
+    else:
+        aligned_filtered = aligned_parsed
+        metadata_aligned_filtered = metadata_aligned
+    #print(metadata_aligned_filtered.dtypes)
+    if extension_length is not None:
+        ffs_kwargs = {key: value for key, value in kwargs.items() if key in ('source_fasta')}
+        front_parsed, back_parsed= fetch_flank_sequence(metadata = metadata_aligned_filtered, extension_length=extension_length, **ffs_kwargs)
+        alignment_output = np.hstack((front_parsed, aligned_filtered, back_parsed))
+    else:
+        alignment_output = aligned_filtered
+    
+    if preprocess_out:
+        return aligned_parsed, metadata_aligned, filters
+    else:
+        return alignment_output, metadata_aligned_filtered
 
 def match_age_to_id_metadata(metadata_df: pd.DataFrame, 
                              reference_table:str|None = None) -> pd.DataFrame:
@@ -217,3 +281,65 @@ def match_age_to_id_metadata(metadata_df: pd.DataFrame,
     te_age=age_div_table[['id','te_age','te_div']].drop_duplicates()
     metadata_with_te_age=metadata_df.merge(te_age, on = 'id', how ='left')
     return metadata_with_te_age
+
+_FORMAT = Literal['bam_max','bam_min','bam_forward','bam_reverse','bigwig','bed']
+def map_and_overlay(aligment:str,
+            metadata:str,
+            data_file:str,
+            data_format:_FORMAT,
+            filters:bool = True,
+            extension_length: int|None = None,
+            *args,**kwargs,
+            )->Tuple[np.ndarray,pd.DataFrame,np.ndarray,np.ndarray,np.ndarray,np.ndarray]:
+
+    alignment_parsed, metadata_aligned, filters  = parse_and_filter(alignment_file=aligment, preprocess_out=True, **kwargs)
+    
+    if data_format in ['bam_max','bam_min','bam_forward','bam_reverse']:
+        from . import extract_bam
+        output=extract_bam.fetch_bam(metadata= metadata, bam_file=data_file,bam_format=data_format, custom_id=True,**kwargs)
+    elif data_format in ['bigwig']:
+        from . import extract_bigwig
+        output=extract_bigwig.fetch_bigwig(metadata=metadata, bigwig=data_file, custom_id=True,**kwargs)
+    elif data_format in ['bed']:
+        from . import extract_bed
+        output=extract_bed.fetch_bed(metadata=metadata, bed=data_file, custom_id=True,**kwargs)
+    metadata_df = pd.read_csv(metadata, sep='\t')
+    source_order = metadata_df.iloc[:,4].unique()
+    output_sorted = []
+    for idx, row in metadata_aligned.iterrows():
+        output_sorted.append(output[np.where(source_order == row.id)[0][0]])
+    
+    md_kwargs = {key: value for key, value in kwargs.items() if key in ('col_threshold','col_content_threshold', 'row_threshold')} 
+    overlay = map_data(data_file=output_sorted, sorted_parsed_array = alignment_parsed, custom_filters=filters, **md_kwargs)
+    
+    row_filter = filters[0]
+    col_filter = filters[1]
+    metadata_filtered=metadata_aligned.iloc[row_filter,:]
+
+    if extension_length is not None:
+        ffs_kwargs = {key: value for key, value in kwargs.items() if key in ('source_fasta')} 
+        front_metadata, back_metadata = fetch_flank_sequence(metadata_filtered, metadata_out=True, extension_length=extension_length, **ffs_kwargs)
+        if data_format in ['bam_max','bam_min','bam_forward','bam_reverse']:
+            
+            front_output=extract_bam.fetch_bam(metadata= front_metadata, bam_file=data_file,bam_format=data_format, **kwargs)
+            back_output=extract_bam.fetch_bam(metadata= back_metadata, bam_file=data_file,bam_format=data_format, **kwargs)
+        elif data_format in ['bigwig']:
+            front_output=extract_bigwig.fetch_bigwig(metadata=front_metadata, bigwig=data_file,**kwargs)
+            back_output=extract_bigwig.fetch_bigwig(metadata=back_metadata, bigwig=data_file,**kwargs)
+        elif data_format in ['bed']:
+            front_output=extract_bed.fetch_bigwig(metadata=front_metadata, bed=data_file,**kwargs)
+            back_output=extract_bed.fetch_bigwig(metadata=back_metadata, bed=data_file,**kwargs)
+        front_overlay = []
+        back_overlay = []
+        for i, row in metadata_filtered.iterrows():
+            if row.strand == '+':
+                front_overlay.append(front_output[i])
+                back_overlay.append(back_output[i])
+            else:
+                front_overlay.append(back_output[i])
+                back_overlay.append(front_output[i])
+        overlay_output = np.hstack((front_overlay,overlay,back_overlay))
+    else:
+        overlay_output = overlay
+
+    return overlay_output
