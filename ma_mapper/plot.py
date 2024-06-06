@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from matplotlib.colors import LinearSegmentedColormap, ListedColormap, BoundaryNorm
+from matplotlib.colors import ListedColormap, BoundaryNorm
 import matplotlib
 import os
 import sys
@@ -40,6 +40,8 @@ def overlay_plot(list_of_overlays: list,
                  show_nucleotide_legend:bool = False,
                  show_data_legend:bool = False,
                  data_label: List|None = None,
+                 xlim: List|None = None,
+                 ylim: List|None = None,
                  **kwargs) -> None:
     plt.rcParams['figure.dpi'] = image_res
     
@@ -56,7 +58,10 @@ def overlay_plot(list_of_overlays: list,
     heatmap_grid = fig.add_subplot(grid[mainplot_grid_params[0]:mainplot_grid_params[1],mainplot_grid_params[2]:mainplot_grid_params[3]])
     heatmap_grid.set_yticks([])
     heatmap_grid.set_title(plot_title)
-
+    if xlim is not None:
+        heatmap_grid.set_xlim(xlim[0],xlim[1])
+    if ylim is not None:
+        heatmap_grid.set_ylim(ylim[0],ylim[1])
     if nucleotide_color == 'dna':
         nucleotide_labels = ['gap', 'A', 'C', 'T', 'G']
         nucleotide_color_list = ['grey','green','yellow','red','blue']
@@ -96,7 +101,7 @@ def overlay_plot(list_of_overlays: list,
         if data_label is None:
             data_label = []
             for i in range(len(list_of_overlays)-1):
-                data_label.append('layer_'+ str(i))
+                data_label.append(f'layer_{str(i)}')
         data_legend.set_ticklabels(data_label, fontsize = 'small')
         data_legend.ax.set_title('data', fontsize ='small')
 
@@ -111,14 +116,16 @@ def overlay_plot(list_of_overlays: list,
 
     if metadata is not None:
         if metadata is str:
-            metadata=pd.read_csv(metadata)
+            metadata_local=pd.read_csv(metadata)
+        else:
+            metadata_local = metadata
         if age_annotation:
-            if 'te_age' not in metadata:
+            if 'te_age' not in metadata_local:
                 logger.warning('cannot find te_age in metadata, trying to find from reference_table')
                 reference_tbl = kwargs.get('reference_table', None)
-                metadata_age = mapper.match_age_to_id_metadata(metadata, reference_tbl)
+                metadata_age = mapper.match_age_to_id_metadata(metadata_local, reference_tbl)
             else:
-                metadata_age = metadata
+                metadata_age = metadata_local
             
                 age_annot_grid_params = (0,10,21,22)
                 age_annot_legend_params = (5,10,23,24)
@@ -144,5 +151,5 @@ def overlay_plot(list_of_overlays: list,
         plt.show()
     else: 
         if output_filepath is None:
-            output_filepath = os.path.dirname(os.path.abspath(__file__)) + '/overlay.png'
+            output_filepath = f'{os.path.dirname(os.path.abspath(__file__))}/overlay.png'
         fig.write_image(output_filepath)

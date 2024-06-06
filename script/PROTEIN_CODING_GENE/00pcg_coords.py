@@ -45,13 +45,13 @@ for idx in gencode_protcoding.index:
                 continue
             elif (cdsEnd<int(start_list[i])) & (cdsEnd<int(end_list[i])):
                 continue
-            elif int(start_list[i]) < cdsStart < int(end_list[i]):
+            elif int(start_list[i]) <= cdsStart < int(end_list[i]):
                 cds_start_list.append(cdsStart)
                 cds_end_list.append(int(end_list[i]))
-            elif (int(start_list[i])>cdsStart) & (int(end_list[i])<cdsEnd):
+            elif (int(start_list[i])>cdsStart) & (int(end_list[i])<=cdsEnd):
                 cds_start_list.append(int(start_list[i]))
                 cds_end_list.append(int(end_list[i]))
-            elif int(start_list[i]) < cdsEnd < int(end_list[i]):
+            elif int(start_list[i]) < cdsEnd <= int(end_list[i]):
                 cds_start_list.append(int(start_list[i]))
                 cds_end_list.append(int(cdsEnd))
                 break
@@ -64,6 +64,8 @@ for idx in gencode_protcoding.index:
         seq_string = sequence_alignment.extract_sequence(chrom, start, end, strand, records)
         seq_strings.append(seq_string)
         seqname = '::'.join([metadata_id,chrom,str(cdsStart),str(cdsEnd),strand])
+    if strand == '-':
+        seq_strings.reverse()
     seq_record = SeqRecord(Seq(''.join(seq_strings)),seqname , '', '')
     seq_records.append(seq_record)
 
@@ -100,7 +102,8 @@ for idx in gencode_protcoding.index:
                 test_length.extend(back)
                 #print(i, leftover, cds_end_list[i]-leftover, cds_end_list[i])
                 break
-output_filepath = '/home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/old_result_redo/alignment/pcg_sliced.fasta'
+
+output_filepath = '/home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/old_result_redo/alignment/pcg.fasta'
 with open(output_filepath, "w") as output_handle:
     SeqIO.write(seq_records, output_handle, "fasta")   
 testgene_coord = pd.DataFrame(test_length, columns=['chrom','start','end','strand','id'])
@@ -110,7 +113,7 @@ testgene_coord.to_csv(output_filepath, index=False,sep='\t')
 set_length = 500 #front 500 back 500
 test_length = []
 seq_records = []
-gene_by_idx=gencode_protcoding[gencode_protcoding['#name']=='ENST00000216139.10']
+gene_by_idx=gencode_protcoding[gencode_protcoding['#name']=='ENST00000699311.1']
 metadata_id=gene_by_idx['#name'].values[0]
 print(metadata_id)
 start_list=gene_by_idx.exonStarts.str.split(',').values[0]
@@ -126,17 +129,17 @@ if cdsEnd == cdsStart:
 for i in range(len(start_list)):
     if start_list[i]:
         #remove out of bound first
-        if (int(start_list[i])<cdsStart) & (int(end_list[i])<cdsStart):
+        if (int(start_list[i])<=cdsStart) & (int(end_list[i])<=cdsStart):
             continue
         elif (cdsEnd<int(start_list[i])) & (cdsEnd<int(end_list[i])):
             continue
-        elif int(start_list[i]) < cdsStart < int(end_list[i]):
+        elif int(start_list[i]) <= cdsStart < int(end_list[i]):
             cds_start_list.append(cdsStart)
             cds_end_list.append(int(end_list[i]))
-        elif (int(start_list[i])>cdsStart) & (int(end_list[i])<cdsEnd):
+        elif (int(start_list[i])> cdsStart) & (int(end_list[i])<=cdsEnd):
             cds_start_list.append(int(start_list[i]))
             cds_end_list.append(int(end_list[i]))
-        elif int(start_list[i]) < cdsEnd < int(end_list[i]):
+        elif int(start_list[i]) < cdsEnd <= int(end_list[i]):
             cds_start_list.append(int(start_list[i]))
             cds_end_list.append(int(cdsEnd))
             break
@@ -149,6 +152,8 @@ for idx in range(len(cds_start_list)):
     seq_string = sequence_alignment.extract_sequence(chrom, start, end, strand, records)
     seq_strings.append(seq_string)
     seqname = '::'.join([metadata_id,chrom,str(cdsStart),str(cdsEnd),strand])
+if strand == '-':
+    seq_strings.reverse()
 seq_record = SeqRecord(Seq(''.join(seq_strings)),seqname , '', '')
 seq_records.append(seq_record)
 
@@ -185,4 +190,20 @@ if pcs_length >=1000:
             test_length.extend(back)
             print(i, leftover, cds_end_list[i]-leftover, cds_end_list[i])
             break
+# %%
+gencode_protcoding[gencode_protcoding['#name']=='ENST00000699311.1']
+# %%
+seq_strings=[]
+for idx in range(len(test_length)):
+    chrom = test_length[idx][0]
+    start = test_length[idx][1]
+    end = test_length[idx][2]
+    strand = test_length[idx][3]
+    seq_string = sequence_alignment.extract_sequence(chrom, start, end, strand, records)
+    seq_strings.append(seq_string)
+    seqname = '::'.join([metadata_id,chrom,str(cdsStart),str(cdsEnd),strand])
+if strand == '-':
+    seq_strings.reverse()
+seq_record = SeqRecord(Seq(''.join(seq_strings)),seqname , '', '')
+seq_records.append(seq_record)
 # %%

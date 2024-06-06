@@ -14,9 +14,9 @@ metadata_age = mapper.match_age_to_id_metadata(metadata_filtered)
 coord_file = '/home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/old_result_redo/coord_internal_id/'+subfamily[0]+'.txt'
 #%%
 bam_file = '/home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/KZFP-bam_hg38/znf267.sorted.bam'
-bam_forward=mapper.map_and_overlay(alignment_file, coord_file, bam_file, data_format='bam_forward')
-bam_reverse=mapper.map_and_overlay(alignment_file, coord_file, bam_file, data_format='bam_reverse')
-bam_min=mapper.map_and_overlay(alignment_file, coord_file, bam_file, data_format='bam_min')
+bam_forward=mapper.map_and_overlay(alignment_file, coord_file, bam_file, data_format='read_forward')
+bam_reverse=mapper.map_and_overlay(alignment_file, coord_file, bam_file, data_format='read_reverse')
+bam_min=mapper.map_and_overlay(alignment_file, coord_file, bam_file, data_format='read_min')
 #%%
 bigwig_file = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/hg38_bigwig/241-mammalian-2020v2.bigWig'
 phylop=mapper.map_and_overlay(alignment_file, coord_file, bigwig_file, data_format='bigwig')
@@ -223,3 +223,82 @@ ax.fill_between(range(clock.shape[1]), np.nansum(clock, axis=0)/normaliser, colo
 ax.hlines(y=2, xmin=0,xmax=len(p_value))
 ax.margins(x=0, y=0)
 #%%
+from matplotlib.colors import ListedColormap, BoundaryNorm
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+if sys.version_info >= (3, 8, 0):
+    from typing import Literal, Tuple, List
+else:
+    from typing_extensions import Literal, Tuple, List
+#%%
+_NUCARG = Literal['dna', 'white']
+_PLOTMODE = Literal['separate','overlay']
+def plot_heatmap(data: List|np.ndarray|None = None,
+                 save_to_file: bool = False,
+                 output_filepath: str | None = None, 
+                 image_res: int = 600, 
+                 data_cmap: List|None = None,
+                 data_vmin: List|None = None,
+                 data_vmax: List|None = None,
+                 plot_title: str = 'alignment_plot',
+                 data_label: List|None = None,
+                 xlim: List|None = None,
+                 ylim: List|None = None,
+                 plot_mode:_PLOTMODE='overlay',
+                 alignment: np.ndarray|None=None,
+                 nucleotide_color:_NUCARG = 'dna',
+                 figsize:List=[10,10], 
+                 show_plot:bool = False, **kwargs):
+    plt.rcParams['figure.dpi'] = image_res
+    plt.ioff()
+    def overlay_heatmap_handler(heatmap_axes, overlay, cmap, idx, data_vmax,data_vmin):        
+        if data_vmax is not None and data_vmin is not None:
+            heatmap=heatmap_axes.imshow(overlay, aspect='auto', cmap=cmap, vmax=data_vmax[idx], vmin=data_vmin[idx])
+        elif data_vmax is not None:
+            heatmap=heatmap_axes.imshow(overlay, aspect='auto', cmap=cmap, vmax=data_vmax[idx])
+        elif data_vmin is not None:
+            heatmap=heatmap_axes.imshow(overlay, aspect='auto', cmap=cmap, vmin=data_vmin[idx])
+        else:
+            heatmap=heatmap_axes.imshow(overlay, aspect='auto', cmap=cmap)
+
+    
+    fig, ax = plt.subplots(figsize=(figsize[0],figsize[1]))
+    if alignment is not None:
+        if nucleotide_color == 'dna':
+            nucleotide_labels = ['gap', 'A', 'C', 'T', 'G']
+            nucleotide_color_list = ['grey','green','yellow','red','blue']
+            align_cmap = ListedColormap(nucleotide_color_list)
+        elif nucleotide_color == 'white':
+            align_cmap =ListedColormap(['grey','white','white','white','white'])
+        heatmap = ax.imshow(alignment, aspect = 'auto',cmap= align_cmap, interpolation='nearest', vmin=0,vmax=5)
+    
+    if data is not None:
+        
+        for idx, overlay in enumerate(data):
+            ncolors = 256
+            if data_cmap is not None:
+                overlay_color = data_cmap[idx]
+            else:
+                overlay_color = 'Blues'
+            overlay_cmap = plt.get_cmap(overlay_color)(range(ncolors))
+            overlay_cmap[:,-1] = np.linspace(0,1.0,ncolors)
+            overlay_cmap_alpha = ListedColormap(colors=overlay_cmap)
+            heatmap=overlay_heatmap_handler(ax, overlay, overlay_cmap_alpha, idx, data_vmax, data_vmin)
+
+    
+
+    
+    heatmap = ax.imshow(data, **kwargs)
+    if show_plot==True:
+        plt.ion()  # Turn interactive mode back on
+        plt.show(fig)
+        return fig
+    else:
+        plt.ion()
+        return heatmap
+#%%
+def plot_legend()
+#%%
+heatmap=plot_heatmap(phylop, show_plot=True, aspect = 'auto')
+# %%

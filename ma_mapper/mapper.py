@@ -45,9 +45,9 @@ def extract_metadata_from_alignment(alignment_file, save_to_file = False, output
             output_filepath = output_file
         else:
             import os
-            output_filepath = os.path.dirname(os.path.abspath(__file__)) + '/metadata_aligned.txt'
+            output_filepath =f'{os.path.dirname(os.path.abspath(__file__))}/metadata_aligned.txt'
         new_metadata.to_csv(output_filepath, sep='\t', index= False)
-        print('save new metadata at', output_filepath)
+        logger.info('save new metadata at', output_filepath)
     else:
         return new_metadata
 
@@ -56,9 +56,9 @@ def parse_alignment(alignment_file:str,
                     output_file: str| None=None):
     if output_file is None:
         if isinstance(alignment_file, str):
-            output_file = alignment_file + '.parsed'
+            output_file = f'{alignment_file}.parsed'
         else:
-            output_file = os.path.dirname(os.path.abspath(__file__)) +'/'+ 'alignment.parsed'
+            output_file = f'{os.path.dirname(os.path.abspath(__file__))}/alignment.parsed'
     output_dir = '/'.join(str.split(output_file, sep ='/')[:-1])
     logger.info('parse alignment')
     if isinstance(alignment_file, str):
@@ -87,7 +87,7 @@ def parse_alignment(alignment_file:str,
         if (os.path.isfile(alignment_file) == True):
             records = load_alignment_file(alignment_file)
         else:
-            print('alignment file not found')
+            logger.error('alignment file not found')
     else:
         records = alignment_file
     for i, value in enumerate(records):
@@ -101,13 +101,13 @@ def parse_alignment(alignment_file:str,
         import h5py
         with h5py.File(output_file, 'w') as hf:
             hf.create_dataset("parsed_array",  data=result_array, compression="lzf")
-        logger.info('done, saving parsed array at: '+output_file)
+        logger.info('done, saving parsed array at: ',output_file)
     else: 
         return result_array
 #%%
 def import_parsed_array(parsed_array_file):
     import h5py
-    with h5py.File(import_parsed_array+'/parsed_array.h5', 'r') as hf:
+    with h5py.File(f'{import_parsed_array}/parsed_array.h5', 'r') as hf:
         parsed_array = hf['result_array'][:]  
     return parsed_array
 #%%#FIXME: find a better way to sort your alignment (and why does it need to be sorted?)
@@ -175,7 +175,13 @@ def map_data(data_file:str,
     if isinstance(data_file, str) == True:
         import compress_pickle
         data_file = compress_pickle.load(data_file)
-    canvas = np.zeros(sorted_parsed_array.shape, np.float32)
+    def check_list_type(data, type_check):
+        return all(isinstance(item, type_check) for sublist in data for item in sublist)
+    if check_list_type(sorted_parsed_array, (int, float, type(np.nan))):
+        canvas = np.zeros(sorted_parsed_array.shape, np.float32)
+    else:
+        canvas = np.zeros(sorted_parsed_array.shape, dtype=object)
+    
     for idx, row in enumerate(sorted_parsed_array):
         canvas[idx, row>0] = data_file[idx]
     mapped_data = canvas
@@ -189,24 +195,34 @@ def map_data(data_file:str,
         mapped_data=mapped_data[np.ix_(row_filter,col_filter)]
     return mapped_data
 #%%
-#FIXME: wrong nonzero
-
-_METHOD = Literal['average',]
-_MODE = Literal['all','present']
-def normalise(mapped_data, method:_METHOD = 'average', mode:_MODE = 'present', outlier = None):
-    #if isinstance(mapped_data, str) == True:
-    if outlier is not None:
-        mapped_data[mapped_data >= outlier] = 0
+def base_count(alignment:pd.DataFrame):
+    alignment_transposed = alignment.transpose()
+    output_array = []
+    for idx, ref_count in enumerate(alignment_transposed):
+        (unique, counts) = np.unique(ref_count, return_counts=True)
+        frequencies = dict(zip(unique, counts))
+        base_count = []
+        for base in [0,1,2,3,4]:
+            nucl_count = frequencies.get(base,0)
+            base_count.append(nucl_count)
+        output_array.append(base_count)
+    base_count=np.array(output_array).transpose()
+    return base_count
+#FIXED: wrong nonzero
+_NORM_METHOD = Literal['average',]
+def normalise(alignment: str|pd.DataFrame,
+              mapped_data: pd.DataFrame, 
+              method:_NORM_METHOD = 'average', 
+              ):
     if method == 'average':
-        numerator =np.sum(mapped_data, axis = 0)
-        if mode == 'present':
-            denominator = np.count_nonzero(mapped_data, axis=0)
-        else:
-            denominator = np.shape(mapped_data)[0] 
-    normalised_array = numerator/denominator
-    return normalised_array
+        normalizer = np.count_nonzero(alignment, axis=0)
+        data_sum = np.nansum(mapped_data, axis=0)
+        if method == 'average':
+            normalised_data = data_sum/normalizer 
+    
+    return normalised_data
 
-def fetch_flank_sequence(metadata: pd.DataFrame,
+def flank_sequence_io(metadata: pd.DataFrame,
                     source_fasta: str|None = None,
                     metadata_out:bool = False, 
                     extension_length:int = 500) -> Tuple[pd.DataFrame, pd.DataFrame]:
@@ -223,8 +239,8 @@ def fetch_flank_sequence(metadata: pd.DataFrame,
     if metadata_out:
         return front_metadata, back_metadata
     else:
-        front_seq = sequence_alignment.fetch_sequence(front_metadata, source_fasta, custom_id=False)
-        back_seq = sequence_alignment.fetch_sequence(front_metadata, source_fasta, custom_id=False)
+        front_seq = sequence_alignment.sequence_io(front_metadata, source_fasta, custom_id=False)
+        back_seq = sequence_alignment.sequence_io(front_metadata, source_fasta, custom_id=False)
         
         front_list = []
         back_list = []
@@ -262,7 +278,7 @@ def parse_and_filter(alignment_file: str,
     #print(metadata_aligned_filtered.dtypes)
     if extension_length is not None:
         ffs_kwargs = {key: value for key, value in kwargs.items() if key in ('source_fasta')}
-        front_parsed, back_parsed= fetch_flank_sequence(metadata = metadata_aligned_filtered, extension_length=extension_length, **ffs_kwargs)
+        front_parsed, back_parsed= flank_sequence_io(metadata = metadata_aligned_filtered, extension_length=extension_length, **ffs_kwargs)
         alignment_output = np.hstack((front_parsed, aligned_filtered, back_parsed))
     else:
         alignment_output = aligned_filtered
@@ -272,8 +288,15 @@ def parse_and_filter(alignment_file: str,
     else:
         return alignment_output, metadata_aligned_filtered
 
-def match_age_to_id_metadata(metadata_df: pd.DataFrame, 
+def match_age_to_id_metadata(metadata: pd.DataFrame|str, 
                              reference_table:str|None = None) -> pd.DataFrame:
+    if isinstance(metadata, str):
+        if os.path.isfile(metadata):
+            metadata_df = pd.read_csv(metadata, sep='\t')
+        else:
+            logger.error('metadata file not found')
+    elif isinstance(metadata, pd.DataFrame):
+        metadata_df = metadata
     if reference_table is None:
         reference_table = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/combined_age_div/combined_age_and_div.txt'
     age_div_table = pd.read_csv(reference_table, sep='\t')
@@ -294,15 +317,20 @@ def map_and_overlay(aligment:str,
 
     alignment_parsed, metadata_aligned, filters  = parse_and_filter(alignment_file=aligment, preprocess_out=True, **kwargs)
     
-    if data_format in ['bam_max','bam_min','bam_forward','bam_reverse']:
+    if data_format in ['read_max','read_min','read_forward','read_reverse', 'normal_max','normal_min','normal_forward','normal_reverse']:
         from . import extract_bam
-        output=extract_bam.fetch_bam(metadata= metadata, bam_file=data_file,bam_format=data_format, custom_id=True,**kwargs)
+        output=extract_bam.bam_io(metadata= metadata, bam_file=data_file,bam_format=data_format, custom_id=True,**kwargs)
     elif data_format in ['bigwig']:
         from . import extract_bigwig
-        output=extract_bigwig.fetch_bigwig(metadata=metadata, bigwig=data_file, custom_id=True,**kwargs)
+        output=extract_bigwig.bigwig_io(metadata=metadata, bigwig=data_file, custom_id=True,**kwargs)
     elif data_format in ['bed']:
         from . import extract_bed
-        output=extract_bed.fetch_bed(metadata=metadata, bed=data_file, custom_id=True,**kwargs)
+        output=extract_bed.bed_io(metadata=metadata, bed=data_file, custom_id=True,**kwargs)
+    elif data_format in ['maf']:
+        from . import extract_maf
+        output=extract_maf.maf_io(metadata=metadata, maf=data_file,custom_id=True,**kwargs)
+    else:
+        logger.error('dataformat field unspecified')
     metadata_df = pd.read_csv(metadata, sep='\t')
     source_order = metadata_df.iloc[:,4].unique()
     output_sorted = []
@@ -318,17 +346,20 @@ def map_and_overlay(aligment:str,
 
     if extension_length is not None:
         ffs_kwargs = {key: value for key, value in kwargs.items() if key in ('source_fasta')} 
-        front_metadata, back_metadata = fetch_flank_sequence(metadata_filtered, metadata_out=True, extension_length=extension_length, **ffs_kwargs)
+        front_metadata, back_metadata = flank_sequence_io(metadata_filtered, metadata_out=True, extension_length=extension_length, **ffs_kwargs)
         if data_format in ['bam_max','bam_min','bam_forward','bam_reverse']:
             
-            front_output=extract_bam.fetch_bam(metadata= front_metadata, bam_file=data_file,bam_format=data_format, **kwargs)
-            back_output=extract_bam.fetch_bam(metadata= back_metadata, bam_file=data_file,bam_format=data_format, **kwargs)
+            front_output=extract_bam.bam_io(metadata= front_metadata, bam_file=data_file,bam_format=data_format, **kwargs)
+            back_output=extract_bam.bam_io(metadata= back_metadata, bam_file=data_file,bam_format=data_format, **kwargs)
         elif data_format in ['bigwig']:
-            front_output=extract_bigwig.fetch_bigwig(metadata=front_metadata, bigwig=data_file,**kwargs)
-            back_output=extract_bigwig.fetch_bigwig(metadata=back_metadata, bigwig=data_file,**kwargs)
+            front_output=extract_bigwig.bigwig_io(metadata=front_metadata, bigwig=data_file,**kwargs)
+            back_output=extract_bigwig.bigwig_io(metadata=back_metadata, bigwig=data_file,**kwargs)
         elif data_format in ['bed']:
-            front_output=extract_bed.fetch_bigwig(metadata=front_metadata, bed=data_file,**kwargs)
-            back_output=extract_bed.fetch_bigwig(metadata=back_metadata, bed=data_file,**kwargs)
+            front_output=extract_bed.bed_io(metadata=front_metadata, bed=data_file,**kwargs)
+            back_output=extract_bed.bed_io(metadata=back_metadata, bed=data_file,**kwargs)
+        elif data_format in ['maf']:
+            front_output=extract_maf.maf_io(metadata=front_metadata, maf=data_file,custom_id=True,**kwargs)
+            back_output=extract_maf.maf_io(metadata=back_metadata, bed=data_file,**kwargs)
         front_overlay = []
         back_overlay = []
         for i, row in metadata_filtered.iterrows():

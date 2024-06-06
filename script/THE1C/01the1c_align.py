@@ -5,7 +5,7 @@ sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_projec
 subfamily = ['THE1C']
 from ma_mapper import sequence_alignment
 coord_file = '/home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/old_result_redo/coord_internal_id/'+subfamily[0]+'.txt'
-sequence_alignment.extract_subfamily_coord(subfamily, output_filepath= coord_file)
+sequence_alignment.extract_subfamily_coord(subfamily, output_filepath= coord_file, species_reference='/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/combined_age_div/combined_age_and_div.txt')
 #%% alignment
 import sys
 sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/dev/packaging_dir/ma_mapper/')

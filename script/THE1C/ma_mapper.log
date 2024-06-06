@@ -440,3 +440,277 @@
 2024-05-09 19:37:46,505 ma_mapper INFO parse alignment
 2024-05-09 19:38:33,208 ma_mapper INFO parse alignment
 2024-05-09 19:38:45,434 ma_mapper INFO parse alignment
+2024-05-10 07:17:22,188 ma_mapper INFO parse alignment
+2024-05-10 07:17:35,866 ma_mapper INFO parse alignment
+2024-05-10 07:17:54,066 ma_mapper INFO done, returning mapped bam as a list. format: bam_forward
+2024-05-10 07:28:11,591 ma_mapper INFO parse alignment
+2024-05-10 07:35:30,324 ma_mapper INFO parse alignment
+2024-05-10 07:39:59,334 ma_mapper INFO parse alignment
+2024-05-10 07:40:11,735 ma_mapper INFO parse alignment
+2024-05-10 07:41:09,018 ma_mapper INFO parse alignment
+2024-05-10 07:41:21,266 ma_mapper INFO parse alignment
+2024-05-10 07:41:37,692 ma_mapper INFO done, returning mapped bam as a list. format: bam_forward
+2024-05-10 07:41:39,295 ma_mapper INFO parse alignment
+2024-05-10 07:41:54,352 ma_mapper INFO done, returning mapped bam as a list. format: bam_reverse
+2024-05-10 07:41:55,958 ma_mapper INFO parse alignment
+2024-05-10 07:42:11,032 ma_mapper INFO done, returning mapped bam as a list. format: bam_min
+2024-05-10 08:05:38,964 ma_mapper INFO parse alignment
+2024-05-10 08:05:52,353 ma_mapper INFO parse alignment
+2024-05-10 08:12:15,253 ma_mapper INFO parse alignment
+2024-05-10 08:12:27,631 ma_mapper INFO parse alignment
+2024-05-10 08:13:23,452 ma_mapper INFO parse alignment
+2024-05-10 08:13:35,776 ma_mapper INFO parse alignment
+2024-05-10 08:13:45,534 ma_mapper INFO done, returning mapped bam as a list. format: bam_forward
+2024-05-10 08:23:14,302 ma_mapper INFO parse alignment
+2024-05-10 08:23:28,051 ma_mapper INFO parse alignment
+2024-05-10 08:23:42,268 ma_mapper INFO done, returning mapped bam as a list. format: bam_forward
+2024-05-10 08:23:43,915 ma_mapper INFO parse alignment
+2024-05-10 08:23:53,544 ma_mapper INFO done, returning mapped bam as a list. format: bam_reverse
+2024-05-10 08:24:49,108 ma_mapper INFO parse alignment
+2024-05-10 08:25:01,500 ma_mapper INFO parse alignment
+2024-05-10 08:25:11,140 ma_mapper INFO done, returning mapped bam as a list. format: bam_forward
+2024-05-10 08:25:12,801 ma_mapper INFO parse alignment
+2024-05-10 08:25:22,354 ma_mapper INFO done, returning mapped bam as a list. format: bam_reverse
+2024-05-10 08:49:18,275 ma_mapper INFO parse alignment
+2024-05-10 08:49:30,776 ma_mapper INFO parse alignment
+2024-05-10 08:49:40,396 ma_mapper INFO done, returning mapped bam as a list. format: bam_forward
+2024-05-10 08:49:42,058 ma_mapper INFO parse alignment
+2024-05-10 08:49:51,657 ma_mapper INFO done, returning mapped bam as a list. format: bam_reverse
+2024-05-10 09:02:15,121 ma_mapper INFO parse alignment
+2024-05-10 09:02:27,653 ma_mapper INFO parse alignment
+2024-05-10 09:04:28,439 ma_mapper INFO parse alignment
+2024-05-10 09:04:48,315 ma_mapper INFO parse alignment
+2024-05-10 09:10:36,765 ma_mapper INFO parse alignment
+2024-05-10 09:10:51,070 ma_mapper INFO parse alignment
+2024-05-10 09:15:33,427 ma_mapper INFO parse alignment
+2024-05-10 09:15:50,509 ma_mapper INFO parse alignment
+2024-05-10 09:16:07,900 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-05-10 09:16:09,717 ma_mapper INFO parse alignment
+2024-05-10 09:16:20,447 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-05-10 09:16:22,290 ma_mapper INFO parse alignment
+2024-05-10 09:16:33,278 ma_mapper INFO done, returning mapped bam as a list. format: read_min
+2024-05-10 10:26:41,486 ma_mapper INFO parse alignment
+2024-05-10 10:26:55,635 ma_mapper INFO parse alignment
+2024-05-10 10:27:00,695 ma_mapper ERROR dataformat field unspecified
+2024-05-10 10:27:28,021 ma_mapper INFO parse alignment
+2024-05-10 10:27:40,364 ma_mapper INFO parse alignment
+2024-05-10 10:27:55,338 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-05-10 10:27:57,018 ma_mapper INFO parse alignment
+2024-05-10 10:28:06,618 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-05-10 10:28:08,309 ma_mapper INFO parse alignment
+2024-05-10 10:28:18,012 ma_mapper INFO done, returning mapped bam as a list. format: read_min
+2024-05-10 10:28:20,539 ma_mapper INFO parse alignment
+2024-05-10 10:29:40,014 ma_mapper INFO done, returning bigwig_out as object
+2024-05-10 10:30:01,575 ma_mapper INFO parse alignment
+2024-05-10 10:30:07,369 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/AP-1(bZIP).bed
+2024-05-10 10:30:29,504 ma_mapper INFO done, returning bed_out as object
+2024-05-10 10:30:31,312 ma_mapper INFO parse alignment
+2024-05-10 10:30:36,403 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/NFkB-p65.bed
+2024-05-10 10:30:59,055 ma_mapper INFO done, returning bed_out as object
+2024-05-10 10:31:00,830 ma_mapper INFO parse alignment
+2024-05-10 10:31:05,908 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/BMAL1.bed
+2024-05-10 10:31:34,252 ma_mapper INFO done, returning bed_out as object
+2024-05-10 10:31:36,006 ma_mapper INFO parse alignment
+2024-05-10 10:31:41,127 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/CLOCK.bed
+2024-05-10 10:32:02,226 ma_mapper INFO done, returning bed_out as object
+2024-05-10 10:32:40,630 ma_mapper INFO parse alignment
+2024-05-10 10:32:53,336 ma_mapper INFO parse alignment
+2024-05-10 10:33:02,920 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-05-10 10:33:04,573 ma_mapper INFO parse alignment
+2024-05-10 10:33:14,232 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-05-10 10:33:15,995 ma_mapper INFO parse alignment
+2024-05-10 10:33:25,709 ma_mapper INFO done, returning mapped bam as a list. format: read_min
+2024-05-10 10:33:27,530 ma_mapper INFO parse alignment
+2024-05-10 10:33:35,632 ma_mapper INFO done, returning bigwig_out as object
+2024-05-10 10:33:37,445 ma_mapper INFO parse alignment
+2024-05-10 10:33:42,576 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/AP-1(bZIP).bed
+2024-05-10 10:34:03,210 ma_mapper INFO done, returning bed_out as object
+2024-05-10 10:34:04,967 ma_mapper INFO parse alignment
+2024-05-10 10:34:10,091 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/NFkB-p65.bed
+2024-05-10 10:34:30,921 ma_mapper INFO done, returning bed_out as object
+2024-05-10 10:34:32,679 ma_mapper INFO parse alignment
+2024-05-10 10:34:37,787 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/BMAL1.bed
+2024-05-10 10:35:06,046 ma_mapper INFO done, returning bed_out as object
+2024-05-10 10:35:07,789 ma_mapper INFO parse alignment
+2024-05-10 10:35:12,893 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/CLOCK.bed
+2024-05-10 10:35:33,288 ma_mapper INFO done, returning bed_out as object
+2024-05-11 08:34:11,650 ma_mapper INFO parse alignment
+2024-05-11 08:34:27,714 ma_mapper INFO parse alignment
+2024-05-11 09:05:34,695 ma_mapper INFO parse alignment
+2024-05-11 09:05:48,964 ma_mapper INFO parse alignment
+2024-05-11 09:06:27,739 ma_mapper INFO parse alignment
+2024-05-11 09:06:41,090 ma_mapper INFO parse alignment
+2024-05-11 09:07:07,346 ma_mapper INFO parse alignment
+2024-05-11 09:07:20,656 ma_mapper INFO parse alignment
+2024-05-11 09:09:13,389 ma_mapper INFO parse alignment
+2024-05-11 09:09:27,141 ma_mapper INFO parse alignment
+2024-05-11 09:12:42,274 ma_mapper INFO parse alignment
+2024-05-11 09:12:55,688 ma_mapper INFO parse alignment
+2024-05-11 09:36:40,550 ma_mapper INFO parse alignment
+2024-05-11 09:36:54,027 ma_mapper INFO parse alignment
+2024-05-11 09:51:54,759 ma_mapper INFO parse alignment
+2024-05-11 09:54:31,652 ma_mapper INFO parse alignment
+2024-05-11 09:59:31,616 ma_mapper INFO parse alignment
+2024-05-11 09:59:45,498 ma_mapper INFO parse alignment
+2024-05-11 10:01:32,131 ma_mapper INFO parse alignment
+2024-05-11 10:01:45,580 ma_mapper INFO parse alignment
+2024-05-11 10:03:23,372 ma_mapper INFO parse alignment
+2024-05-11 10:03:37,872 ma_mapper INFO parse alignment
+2024-05-11 10:18:23,990 ma_mapper INFO parse alignment
+2024-05-11 10:21:07,592 ma_mapper INFO parse alignment
+2024-05-11 10:21:34,732 ma_mapper INFO parse alignment
+2024-05-11 10:21:48,281 ma_mapper INFO parse alignment
+2024-05-11 10:22:18,403 ma_mapper INFO parse alignment
+2024-05-11 10:22:31,855 ma_mapper INFO parse alignment
+2024-05-11 10:22:37,089 ma_mapper INFO extract from maf target: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/241genomes/241-mammalian-2020v2b.maf
+2024-05-11 10:22:39,137 ma_mapper INFO calibrate age: using preexisting age_list
+2024-05-11 10:42:44,928 ma_mapper INFO done, returning maf_out as object
+2024-05-11 11:41:52,227 ma_mapper INFO parse alignment
+2024-05-11 11:42:07,953 ma_mapper INFO parse alignment
+2024-05-11 11:42:13,164 ma_mapper INFO extract from maf target: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/241genomes/241-mammalian-2020v2b.maf
+2024-05-11 11:42:15,205 ma_mapper INFO calibrate age: no age_list provided, fetching from metadata
+2024-05-11 11:42:15,207 ma_mapper INFO no te_age infomation from metadata, running match_age_to_id_metadata()
+2024-05-11 12:02:21,229 ma_mapper INFO done, returning maf_out as object
+2024-05-11 12:08:46,867 ma_mapper INFO parse alignment
+2024-05-11 12:09:00,311 ma_mapper INFO parse alignment
+2024-05-11 12:09:15,897 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-05-11 12:09:17,608 ma_mapper INFO parse alignment
+2024-05-11 12:09:27,504 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-05-11 12:09:29,221 ma_mapper INFO parse alignment
+2024-05-11 12:09:39,205 ma_mapper INFO done, returning mapped bam as a list. format: read_min
+2024-05-11 12:09:41,008 ma_mapper INFO parse alignment
+2024-05-11 12:10:53,900 ma_mapper INFO done, returning bigwig_out as object
+2024-05-11 12:10:55,725 ma_mapper INFO parse alignment
+2024-05-11 12:11:01,775 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/AP-1(bZIP).bed
+2024-05-11 12:11:24,793 ma_mapper INFO done, returning bed_out as object
+2024-05-11 12:11:26,680 ma_mapper INFO parse alignment
+2024-05-11 12:11:31,993 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/NFkB-p65.bed
+2024-05-11 12:11:55,913 ma_mapper INFO done, returning bed_out as object
+2024-05-11 12:11:57,689 ma_mapper INFO parse alignment
+2024-05-11 12:12:02,993 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/BMAL1.bed
+2024-05-11 12:12:32,068 ma_mapper INFO done, returning bed_out as object
+2024-05-11 12:12:33,823 ma_mapper INFO parse alignment
+2024-05-11 12:12:39,229 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/CLOCK.bed
+2024-05-11 12:13:00,290 ma_mapper INFO done, returning bed_out as object
+2024-05-12 02:51:43,836 ma_mapper INFO parse alignment
+2024-05-12 02:51:58,053 ma_mapper INFO parse alignment
+2024-05-12 02:52:14,284 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-05-12 02:52:15,974 ma_mapper INFO parse alignment
+2024-05-12 02:52:25,614 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-05-12 02:52:27,335 ma_mapper INFO parse alignment
+2024-05-12 02:52:37,028 ma_mapper INFO done, returning mapped bam as a list. format: read_min
+2024-05-12 02:52:38,784 ma_mapper INFO parse alignment
+2024-05-12 02:54:06,552 ma_mapper INFO done, returning bigwig_out as object
+2024-05-12 02:54:08,315 ma_mapper INFO parse alignment
+2024-05-12 02:54:14,055 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/AP-1(bZIP).bed
+2024-05-12 02:54:36,014 ma_mapper INFO done, returning bed_out as object
+2024-05-12 02:54:37,792 ma_mapper INFO parse alignment
+2024-05-12 02:54:42,887 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/NFkB-p65.bed
+2024-05-12 02:55:05,415 ma_mapper INFO done, returning bed_out as object
+2024-05-12 02:55:07,143 ma_mapper INFO parse alignment
+2024-05-12 02:55:12,261 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/BMAL1.bed
+2024-05-12 02:55:40,448 ma_mapper INFO done, returning bed_out as object
+2024-05-12 02:55:42,203 ma_mapper INFO parse alignment
+2024-05-12 02:55:47,322 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/CLOCK.bed
+2024-05-12 02:56:07,211 ma_mapper INFO done, returning bed_out as object
+2024-05-12 04:07:17,889 ma_mapper INFO parse alignment
+2024-05-12 04:08:13,029 ma_mapper INFO parse alignment
+2024-05-12 04:08:25,964 ma_mapper INFO parse alignment
+2024-05-12 04:08:31,323 ma_mapper INFO extract from maf target: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/241genomes/241-mammalian-2020v2b.maf
+2024-05-12 04:08:33,331 ma_mapper INFO calibrate age: no age_list provided, fetching from metadata
+2024-05-12 04:08:33,332 ma_mapper INFO no te_age infomation from metadata, running match_age_to_id_metadata()
+2024-05-12 04:23:37,250 ma_mapper INFO done, returning maf_out as object
+2024-05-12 09:03:12,050 ma_mapper INFO parse alignment
+2024-05-12 09:03:18,721 ma_mapper INFO extract from maf target: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/241genomes/241-mammalian-2020v2b.maf
+2024-05-12 09:03:20,801 ma_mapper INFO calibrate age: no age_list provided, fetching from metadata
+2024-05-12 09:03:20,802 ma_mapper INFO no te_age infomation from metadata, running match_age_to_id_metadata()
+2024-05-12 12:15:12,817 ma_mapper INFO parse alignment
+2024-05-12 12:15:27,471 ma_mapper INFO parse alignment
+2024-05-12 12:15:42,294 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-05-12 12:15:43,959 ma_mapper INFO parse alignment
+2024-05-12 12:15:53,660 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-05-12 12:15:55,314 ma_mapper INFO parse alignment
+2024-05-12 12:16:05,146 ma_mapper INFO done, returning mapped bam as a list. format: read_min
+2024-05-12 12:16:57,941 ma_mapper INFO parse alignment
+2024-05-12 12:18:01,864 ma_mapper INFO done, returning bigwig_out as object
+2024-05-12 12:18:57,949 ma_mapper INFO parse alignment
+2024-05-12 12:19:03,863 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/AP-1(bZIP).bed
+2024-05-12 12:19:25,025 ma_mapper INFO done, returning bed_out as object
+2024-05-12 12:19:26,855 ma_mapper INFO parse alignment
+2024-05-12 12:19:32,044 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/NFkB-p65.bed
+2024-05-12 12:19:56,868 ma_mapper INFO done, returning bed_out as object
+2024-05-12 12:19:58,609 ma_mapper INFO parse alignment
+2024-05-12 12:20:03,838 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/BMAL1.bed
+2024-05-12 12:20:32,355 ma_mapper INFO done, returning bed_out as object
+2024-05-12 12:20:34,084 ma_mapper INFO parse alignment
+2024-05-12 12:20:39,336 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/CLOCK.bed
+2024-05-12 12:21:01,220 ma_mapper INFO done, returning bed_out as object
+2024-05-13 10:32:52,591 ma_mapper INFO parse alignment
+2024-05-13 10:33:07,475 ma_mapper INFO parse alignment
+2024-05-13 10:33:23,639 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-05-13 10:33:25,336 ma_mapper INFO parse alignment
+2024-05-13 10:33:35,114 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-05-13 10:33:36,806 ma_mapper INFO parse alignment
+2024-05-13 10:33:46,667 ma_mapper INFO done, returning mapped bam as a list. format: read_min
+2024-05-13 10:33:48,434 ma_mapper INFO parse alignment
+2024-05-13 10:35:22,071 ma_mapper INFO done, returning bigwig_out as object
+2024-05-13 10:35:23,823 ma_mapper INFO parse alignment
+2024-05-13 10:35:29,881 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/AP-1(bZIP).bed
+2024-05-13 10:35:50,682 ma_mapper INFO done, returning bed_out as object
+2024-05-13 10:35:52,533 ma_mapper INFO parse alignment
+2024-05-13 10:35:57,728 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/NFkB-p65.bed
+2024-05-13 10:36:20,176 ma_mapper INFO done, returning bed_out as object
+2024-05-13 10:36:21,948 ma_mapper INFO parse alignment
+2024-05-13 10:36:27,160 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/BMAL1.bed
+2024-05-13 10:36:56,323 ma_mapper INFO done, returning bed_out as object
+2024-05-13 10:36:58,070 ma_mapper INFO parse alignment
+2024-05-13 10:37:03,292 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/CLOCK.bed
+2024-05-13 10:37:23,600 ma_mapper INFO done, returning bed_out as object
+2024-05-13 10:49:21,816 ma_mapper INFO parse alignment
+2024-05-13 10:49:34,898 ma_mapper INFO parse alignment
+2024-05-13 10:49:44,627 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-05-13 10:49:46,310 ma_mapper INFO parse alignment
+2024-05-13 10:49:56,007 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-05-13 10:49:57,689 ma_mapper INFO parse alignment
+2024-05-13 10:50:07,431 ma_mapper INFO done, returning mapped bam as a list. format: read_min
+2024-05-13 10:50:09,150 ma_mapper INFO parse alignment
+2024-05-13 10:50:26,020 ma_mapper INFO done, returning bigwig_out as object
+2024-05-13 10:50:27,741 ma_mapper INFO parse alignment
+2024-05-13 10:50:33,103 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/AP-1(bZIP).bed
+2024-05-13 10:50:53,436 ma_mapper INFO done, returning bed_out as object
+2024-05-13 10:50:55,241 ma_mapper INFO parse alignment
+2024-05-13 10:51:00,370 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/NFkB-p65.bed
+2024-05-13 10:51:23,949 ma_mapper INFO done, returning bed_out as object
+2024-05-13 10:51:25,691 ma_mapper INFO parse alignment
+2024-05-13 10:51:30,784 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/BMAL1.bed
+2024-05-13 10:51:58,997 ma_mapper INFO done, returning bed_out as object
+2024-05-13 10:52:00,752 ma_mapper INFO parse alignment
+2024-05-13 10:52:06,072 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/CLOCK.bed
+2024-05-13 10:52:25,538 ma_mapper INFO done, returning bed_out as object
+2024-05-13 16:01:22,555 ma_mapper INFO parse alignment
+2024-05-13 16:01:37,165 ma_mapper INFO parse alignment
+2024-05-13 16:01:54,011 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-05-13 16:01:55,684 ma_mapper INFO parse alignment
+2024-05-13 16:02:05,474 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-05-13 16:02:07,139 ma_mapper INFO parse alignment
+2024-05-13 16:02:16,825 ma_mapper INFO done, returning mapped bam as a list. format: read_min
+2024-05-13 16:02:18,585 ma_mapper INFO parse alignment
+2024-05-13 16:03:44,770 ma_mapper INFO done, returning bigwig_out as object
+2024-05-13 16:03:46,512 ma_mapper INFO parse alignment
+2024-05-13 16:03:52,359 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/AP-1(bZIP).bed
+2024-05-13 16:04:13,495 ma_mapper INFO done, returning bed_out as object
+2024-05-13 16:04:15,263 ma_mapper INFO parse alignment
+2024-05-13 16:04:20,373 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/NFkB-p65.bed
+2024-05-13 16:04:42,710 ma_mapper INFO done, returning bed_out as object
+2024-05-13 16:04:44,409 ma_mapper INFO parse alignment
+2024-05-13 16:04:49,495 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/BMAL1.bed
+2024-05-13 16:05:16,485 ma_mapper INFO done, returning bed_out as object
+2024-05-13 16:05:18,173 ma_mapper INFO parse alignment
+2024-05-13 16:05:23,280 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/CLOCK.bed
+2024-05-13 16:05:42,842 ma_mapper INFO done, returning bed_out as object
+2024-05-13 16:30:01,333 ma_mapper INFO parse alignment
+2024-05-13 16:30:30,150 ma_mapper INFO parse alignment
+2024-05-13 16:30:35,225 ma_mapper INFO extract from maf target: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/241genomes/241-mammalian-2020v2b.maf
+2024-05-13 16:30:37,129 ma_mapper INFO calibrate age: no age_list provided, fetching from metadata
+2024-05-13 16:30:37,130 ma_mapper INFO no te_age infomation from metadata, running match_age_to_id_metadata()
+2024-05-30 11:23:13,608 ma_mapper INFO parse alignment

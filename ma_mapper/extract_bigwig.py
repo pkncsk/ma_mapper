@@ -27,42 +27,41 @@ def extract_bigwig(bigwig_file, chrom, start_list, end_list, strand):
     bigwig_out = np.concatenate(bigwig_arrays)
     return bigwig_out
 #%%
-def fetch_bigwig(metadata, bigwig, output_dir = None, save_to_file = False, custom_id = False):
+def bigwig_io(metadata, bigwig, output_dir = None, save_to_file = False, custom_id = False):
     if isinstance(metadata, str):
         if (os.path.isfile(metadata) == True):
-            metadata = pd.read_csv(metadata, sep='\t')
+            metadata_local = pd.read_csv(metadata, sep='\t')
         else:
             logger.error('metadata file not found')
     else:
-        metadata = metadata
+        metadata_local = metadata
     if output_dir is None:
         if isinstance(metadata, str):
             output_dir = '/'.join(str.split(metadata, sep ='/')[:-1])
         else:
             output_dir = os.path.dirname(os.path.abspath(__file__))
     if custom_id == False:
-        meta_id = 'sample_n'+ metadata.index.astype(str)
-        metadata['meta_id'] = meta_id
+        meta_id = [f'sample_n{index}' for index in metadata_local.index.astype(str)]
+        metadata_local['meta_id'] = meta_id
     else:
-        metadata['meta_id'] = metadata.iloc[:,4]
-        meta_id = metadata.iloc[:,4].unique()    
-    grouped = metadata.groupby('meta_id')
+        metadata_local['meta_id'] = metadata_local.iloc[:,4]
+        meta_id = metadata_local.meta_id.unique()    
+    grouped = metadata_local.groupby('meta_id', sort=False)
 
     chrom_list = grouped.apply(lambda x: x.iloc[:,0].unique()[0], include_groups=False).tolist()
     start_list = grouped.apply(lambda x: x.iloc[:,1].tolist(), include_groups=False).tolist()
     end_list = grouped.apply(lambda x: x.iloc[:,2].tolist(), include_groups=False).tolist()
     strand_list = grouped.apply(lambda x: x.iloc[:,3].unique()[0], include_groups=False).tolist()
-    
-    with ProcessPoolExecutor(max_workers=40) as executor:
-        results  = executor.map(extract_bigwig, repeat(bigwig), chrom_list, start_list,end_list,strand_list)
-    bigwig_out = []
-    for result in results:
-        bigwig_out.append(result)
+    with pyBigWig.open(bigwig) as bigwig_file:
+        bigwig_out = []
+        for i  in range(len(chrom_list)):
+            bigwig_out.append(extract_bigwig(bigwig_file, chrom_list[i], start_list[i], end_list[i], strand_list[i]))
+
     if save_to_file == True:
         import compress_pickle
-        output_filepath = output_dir+'/bigwig_out.lzma'
+        output_filepath = f'{output_dir}/bigwig_out.lzma'
         compress_pickle.dump(bigwig_out, output_filepath, compression="lzma")
-        logger.info('done, saving bigwig_out at: '+output_filepath)
+        logger.info('done, saving bigwig_out at: ',output_filepath)
     else:
         logger.info('done, returning bigwig_out as object')
         return bigwig_out

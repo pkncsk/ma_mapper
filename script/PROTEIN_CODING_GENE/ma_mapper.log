@@ -54,3 +54,39 @@
 2024-05-10 03:29:10,443 ma_mapper INFO parse alignment
 2024-05-10 03:29:21,918 ma_mapper INFO parse alignment
 2024-05-10 04:00:28,884 ma_mapper INFO parse alignment
+2024-05-10 04:28:49,947 ma_mapper INFO parse alignment
+2024-05-10 04:29:34,034 ma_mapper INFO done, returning bigwig_out as object
+2024-05-10 04:30:14,505 ma_mapper INFO done, returning bigwig_out as object
+2024-05-10 04:31:16,017 ma_mapper INFO parse alignment
+2024-05-10 04:31:52,942 ma_mapper INFO done, returning bigwig_out as object
+2024-05-10 11:36:24,219 ma_mapper INFO parse alignment
+2024-05-10 11:36:51,154 ma_mapper INFO parse alignment
+2024-05-10 12:02:03,039 ma_mapper INFO parse alignment
+2024-05-10 12:04:10,715 ma_mapper INFO parse alignment
+2024-05-10 12:07:48,343 ma_mapper INFO parse alignment
+2024-05-10 12:07:49,396 ma_mapper INFO parse alignment
+2024-05-10 12:13:58,598 ma_mapper INFO parse alignment
+2024-05-10 12:14:42,333 ma_mapper INFO parse alignment
+2024-05-10 12:14:54,295 ma_mapper INFO parse alignment
+2024-05-10 12:16:49,429 ma_mapper INFO done, returning bigwig_out as object
+2024-05-10 14:31:31,473 ma_mapper INFO parse alignment
+2024-05-10 14:31:44,791 ma_mapper INFO parse alignment
+2024-05-10 14:33:48,294 ma_mapper INFO done, returning bigwig_out as object
+2024-05-10 14:34:41,718 ma_mapper INFO done, returning bigwig_out as object
+2024-05-10 14:35:00,802 ma_mapper INFO done, returning bigwig_out as object
+2024-05-10 15:58:02,308 ma_mapper INFO parse alignment
+2024-05-10 16:17:46,233 ma_mapper INFO parse alignment
+2024-05-10 17:46:02,500 ma_mapper INFO parse alignment
+2024-05-10 17:48:06,807 ma_mapper INFO parse alignment
+2024-05-10 17:51:48,030 ma_mapper INFO parse alignment
+2024-05-10 17:51:49,104 ma_mapper INFO parse alignment
+2024-05-10 17:54:59,136 ma_mapper INFO parse alignment
+2024-05-10 17:55:11,013 ma_mapper INFO parse alignment
+2024-05-10 17:57:06,956 ma_mapper INFO done, returning bigwig_out as object
+2024-05-10 17:58:00,668 ma_mapper INFO done, returning bigwig_out as object
+2024-05-10 17:58:18,865 ma_mapper INFO done, returning bigwig_out as object
+2024-05-10 18:29:06,599 ma_mapper INFO parse alignment
+2024-05-10 18:29:18,724 ma_mapper INFO parse alignment
+2024-05-10 18:29:56,939 ma_mapper INFO done, returning bigwig_out as object
+2024-05-10 18:30:36,629 ma_mapper INFO done, returning bigwig_out as object
+2024-05-10 18:30:50,825 ma_mapper INFO done, returning bigwig_out as object
