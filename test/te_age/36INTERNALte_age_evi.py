@@ -8,17 +8,19 @@ sys.path.append('/home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_deve
 import config_hg38 as config
 #%%
 def filter_e_for_age(subfamily, e_cutoff = 1e-3):
-    e_table = pd.read_csv(config.e_value_folder+'/'+subfamily+'.txt',sep = '\t', low_memory=False)
-    output_filepath = config.te_age_folder+'/'+subfamily+'.txt'
+    e_table = pd.read_csv(f'{config.e_value_folder}/{subfamily}.txt',sep = '\t', low_memory=False)
+    output_filepath = f'{config.te_age_folder}/{subfamily}.txt'
     if (os.path.isfile(output_filepath) == False):
         print('start',subfamily)
         internal_id=e_table.internal_id.unique()
+        print(f'total: {len(internal_id)}')
         id_list = []
         age_list = []
         nosig_match = []
         segmental = []
         unclassified = []
         for idx in internal_id:
+            print(idx)
             id_list.append(idx)
             e_table_by_id=e_table[e_table.internal_id==idx]
             if e_table_by_id.shape[0] == 1:
@@ -55,16 +57,16 @@ def filter_e_for_age(subfamily, e_cutoff = 1e-3):
 
         if nosig_match:
             nosig_match_df=pd.concat(nosig_match)
-            nosig_filepath=config.te_age_human_insertion_folder+'/'+subfamily+'.txt'
+            nosig_filepath=f'{config.te_age_human_insertion_folder}/{subfamily}.txt'
             nosig_match_df.to_csv(nosig_filepath, sep='\t', index=False)
         if segmental:
             segmental_df=pd.concat(segmental)
-            segmental_filepath=config.te_age_segmental_folder+'/'+subfamily+'.txt'
+            segmental_filepath=f'{config.te_age_segmental_folder}/{subfamily}.txt'
             segmental_df.to_csv(segmental_filepath, sep='\t', index=False)
         
         if unclassified:
             unclassified_df=pd.concat(unclassified)
-            unclassified_filepath=config.te_age_segmental_folder+'/'+subfamily+'.txt'
+            unclassified_filepath=f'{config.te_age_segmental_folder}/{subfamily}.txt'
             unclassified_df.to_csv(unclassified_filepath, sep='\t', index=False)
         
         print('done',subfamily)
@@ -72,8 +74,8 @@ def filter_e_for_age(subfamily, e_cutoff = 1e-3):
         print('already done', subfamily)
 # %%
 def main():
-    for subfamily in ['MER11A']:
-    #for subfamily in config.subfamily_list:
+    #for subfamily in ['THE1C']:
+    for subfamily in config.subfamily_list:
         filter_e_for_age(subfamily)
 # %%
 if __name__ == '__main__':

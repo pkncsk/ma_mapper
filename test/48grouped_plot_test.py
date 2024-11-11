@@ -1,4 +1,4 @@
-from configparser import Interpolation
+#%%
 import sys
 from tabnanny import verbose
 sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/dev/packaging_dir/ma_mapper/')
@@ -8,12 +8,12 @@ from ma_mapper import plots
 from ma_mapper import custom_cmap
 import numpy as np
 #%%
-subfamily = ['THE1C']
-alignment_file = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/old_result_redo/alignment/'+subfamily[0]+'.fasta.aligned'
+subfamily = 'THE1C'
+alignment_file = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/old_result_redo/alignment/'+subfamily+'.fasta.aligned'
 alignment_filtered, metadata_filtered= mapper.parse_and_filter(alignment_file)
 metadata_age = mapper.match_age_to_id_metadata(metadata_filtered, reference_table='/home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/combined_age_div/combined_te_age_div.txt')
 # %%
-coord_file = '/home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/old_result_redo/coord_internal_id/'+subfamily[0]+'.txt'
+coord_file = '/home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/old_result_redo/coord_internal_id/'+'.txt'
 #%%
 #%%
 bigwig_file = '/home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/zoonomia447/hg38.phyloP447way.bw'
@@ -42,50 +42,57 @@ xlim = None
 plt.rcParams['savefig.dpi'] = 600
 plt.rcParams['figure.dpi'] = 600
 fig = plt.figure(figsize=(10,10))
+
+from ma_mapper import custom_cmap
 grid = fig.add_gridspec(nrows = 100, ncols = 100, hspace=0)
 total=len(zero_indices) + len(nonzero_indices)
 nonzero_grid=round(len(nonzero_indices)/total * 50)
-
 heatmap_g1 = fig.add_subplot(grid[0:nonzero_grid,20:70])
-heatmap_g2 = fig.add_subplot(grid[nonzero_grid:50,20:70])
-bar = fig.add_subplot(grid[50:60,20:70])
-bar2 = fig.add_subplot(grid[60:70,20:70])
-bar3 = fig.add_subplot(grid[70:80,20:70])
-cbar = fig.add_subplot(grid[0:50, 70:72])
-cbar2 = fig.add_subplot(grid[0:50, 77:79])
-cbar_anno =fig.add_subplot(grid[0:50,10:12])
-anno = fig.add_subplot(grid[0:50,18:20])
+#########################################################
+phylop_447_bind=phylop_447[nonzero_indices]
+alignemnt_bind=alignment_filtered[nonzero_indices]
+phylop_447_bind[alignemnt_bind == 0] = np.nan
+phylop_447_nonbind=phylop_447[zero_indices]
+alignemnt_nonbind=alignment_filtered[zero_indices]
+phylop_447_nonbind[alignemnt_nonbind == 0] = np.nan
+#########################################################
 heatmap_g1.tick_params(axis='both', which='major', labelsize=8)
-heatmap_g2.tick_params(axis='both', which='major', labelsize=8)
-bar.tick_params(axis='both', which='major', labelsize=8)
-cbar.tick_params(axis='both', which='major', labelsize=8)
-cbar2.tick_params(axis='both', which='major', labelsize=8)
-bar2.tick_params(axis='both', which='major', labelsize=8)
-bar3.tick_params(axis='both', which='major', labelsize=8)
-anno.tick_params(axis='both', which='major', labelsize=8)
-cbar_anno.tick_params(axis='both', which='major', labelsize=8)
-from ma_mapper import custom_cmap
-plots.plot_heatmap(phylop_447[nonzero_indices], cmap=custom_cmap.vlag_r_mpl,vmax=0.5,vmin=-0.5, matplot_axes = heatmap_g1)
+plots.plot_heatmap(phylop_447_bind, cmap=custom_cmap.vlag_r_mpl,vmax=0.5,vmin=-0.5, matplot_axes = heatmap_g1)
 heatmap_g1.xaxis.set_major_locator(MaxNLocator(integer=True))
 heatmap_g1.set_yticks([])
 heatmap_g1.set_title('phyloP_447 THE1C grouped by AP1 motif')
 plots.plot_heatmap(ap1[nonzero_indices], cmap = 'Greens',matplot_axes = heatmap_g1,vmin=0, vmax=1, opacity=0.5,)
-plots.plot_heatmap(phylop_447[zero_indices], cmap=custom_cmap.vlag_r_mpl,vmax=0.5,vmin=-0.5, matplot_axes = heatmap_g2)
+
+
+heatmap_g2 = fig.add_subplot(grid[nonzero_grid:50,20:70])
+heatmap_g2.tick_params(axis='both', which='major', labelsize=8)
+plots.plot_heatmap(phylop_447_nonbind, cmap=custom_cmap.vlag_r_mpl,vmax=0.5,vmin=-0.5, matplot_axes = heatmap_g2)
 heatmap_g2.xaxis.set_major_locator(MaxNLocator(integer=True))
 heatmap_g2.set_yticks([])
 plots.plot_heatmap(ap1[zero_indices], cmap = 'Greens',matplot_axes = heatmap_g2,vmin=0, vmax=1, opacity=0.5,)
-anno.set_xticks([])
-plots.plot_bar(phylop_447[nonzero_indices], alignment=alignment_filtered[nonzero_indices],mode='average', matplot_axes=bar,color='blue',opacity=0.5)
-plots.plot_bar(phylop_447[zero_indices], alignment=alignment_filtered[zero_indices],mode='average', matplot_axes=bar,color ='red',opacity=0.5)
+
+
+bar = fig.add_subplot(grid[50:60,20:70])
+bar.tick_params(axis='both', which='major', labelsize=8)
+plots.plot_bar(phylop_447_bind, alignment=alignemnt_bind,mode='average', matplot_axes=bar,color='blue',opacity=0.5)
+plots.plot_bar(phylop_447_nonbind, alignment=alignemnt_nonbind,mode='average', matplot_axes=bar,color ='red',opacity=0.5)
 plots.plot_bar(ap1, alignment=alignment_filtered,mode='average', matplot_axes=bar,color='green',opacity=0.5, ylim=bar.get_ylim())
 
-plots.plot_bar(np.nanmean(phylop_447[nonzero_indices],axis=0)-np.nanmean(phylop_447[zero_indices],axis=0), alignment=alignment_filtered,mode='1D', matplot_axes=bar2)
+bar2 = fig.add_subplot(grid[60:70,20:70])
+bar2.tick_params(axis='both', which='major', labelsize=8)
+plots.plot_bar(np.nanmedian(phylop_447_bind,axis=0)-np.nanmedian(phylop_447_nonbind,axis=0), alignment=alignment_filtered,mode='1D', matplot_axes=bar2)
 plots.plot_bar(ap1, alignment=alignment_filtered,mode='average', matplot_axes=bar2,color='green',opacity=0.2, ylim=bar2.get_ylim())
 
-plots.plot_bar(np.log(np.nanmean(phylop_447[nonzero_indices],axis=0)/np.nanmean(phylop_447[zero_indices],axis=0)), alignment=alignment_filtered,mode='1D', matplot_axes=bar3)
+bar3 = fig.add_subplot(grid[70:80,20:70])
+bar3.tick_params(axis='both', which='major', labelsize=8)
+plots.plot_bar(np.log(np.nanmedian(phylop_447_bind,axis=0)/np.nanmedian(phylop_447_nonbind,axis=0)), alignment=alignment_filtered,mode='1D', matplot_axes=bar3)
 plots.plot_bar(ap1, alignment=alignment_filtered,mode='average', matplot_axes=bar3,color='green',opacity=0.2, ylim=bar3.get_ylim())
 
+cbar = fig.add_subplot(grid[0:50, 70:72])
+cbar.tick_params(axis='both', which='major', labelsize=8)
 plots.plot_colorbar(cmap=custom_cmap.vlag_r_mpl,data=phylop_447, vmax=0.5,vmin=-0.5,matplot_axes=cbar, step = 0.1)
+cbar2 = fig.add_subplot(grid[0:50, 77:79])
+cbar2.tick_params(axis='both', which='major', labelsize=8)
 plots.plot_colorbar(cmap='Greens',data=ap1,matplot_axes=cbar2, step = 0.1,vmin=0,vmax=1)
 import matplotlib.ticker as ticker
 def format_func(value, tick_number):
@@ -97,6 +104,10 @@ formatter = ticker.FuncFormatter(format_func)
 
 heatmap_g1.margins(x=0, y=0)
 heatmap_g2.margins(x=0, y=0)
+
+anno = fig.add_subplot(grid[0:50,18:20])
+anno.tick_params(axis='both', which='major', labelsize=8)
+anno.set_xticks([])
 anno_sort = metadata_age.iloc[np.concatenate((nonzero_indices,zero_indices))].te_age.fillna(0)
 annot_plot = anno_sort.values
 annot_uniq=anno_sort.sort_values().unique()
@@ -117,6 +128,8 @@ tick_positions = (boundaries[:-1] + boundaries[1:]) / 2
 age_annot= anno.imshow(annot_plot.reshape(-1, 1),aspect = 'auto', cmap=annot_cmap, norm=norm)
 anno.set_title('age', fontsize='small')
 # Create a colorbar with ticks at the calculated positions
+cbar_anno =fig.add_subplot(grid[0:50,10:12])
+cbar_anno.tick_params(axis='both', which='major', labelsize=8)
 anno_cbar=fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=annot_cmap),
              cax=cbar_anno, orientation='vertical', ticks= tick_positions)
 anno_cbar.ax.set_yticklabels([str(val) for val in annot_uniq])
@@ -125,7 +138,7 @@ cbar_anno.yaxis.set_ticks_position('left')
 import scipy
 bar4 = fig.add_subplot(grid[80:90,20:70])
 bar4.tick_params(axis='both', which='major', labelsize=8)
-stat_v, p_value = scipy.stats.mannwhitneyu(phylop_447[nonzero_indices],phylop_447[zero_indices], axis =0,nan_policy='omit',alternative='greater')
+stat_v, p_value = scipy.stats.mannwhitneyu(phylop_447_bind,phylop_447_nonbind, axis =0,nan_policy='omit',alternative='greater')
 plots.plot_bar(-np.log(p_value), alignment=alignment_filtered,mode='1D', matplot_axes=bar4)
 plots.plot_bar(ap1, alignment=alignment_filtered,mode='average', matplot_axes=bar4,color='green',opacity=0.2, ylim=bar4.get_ylim())
 cbar.set_title('phyloP', fontsize='small')

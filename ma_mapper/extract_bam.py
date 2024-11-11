@@ -21,7 +21,7 @@ def normal_array(width=1, sigma=1, odd=0):
     values = np.array(values)
     return values
 #%%
-_FORMAT = Literal['read_max','read_min','read_forward','read_reverse', 'normal_max','normal_min','normal_forward','normal_reverse']
+_FORMAT = Literal['read_max','read_min','read_forward','read_reverse', 'normal_max','normal_min','normal_forward','normal_reverse','read_sum']
 def _extract_bam(bam_file:str, 
                 chrom:str, 
                 start_list:List, 
@@ -40,6 +40,7 @@ def _extract_bam(bam_file:str,
         start = start_list[i]
         end = end_list[i]
         fragment_length = end - start
+        print(fragment_length)
         profile_normals_forward = np.zeros(fragment_length + (2*probe_length), dtype=np.float16)
         profile_normals_reverse = np.zeros(fragment_length + (2*probe_length), dtype=np.float16)
         profile_reads_forward = np.zeros(fragment_length + (2*probe_length), dtype=np.uint8)
@@ -89,6 +90,8 @@ def _extract_bam(bam_file:str,
             output = np.array(profile_reads_forward)
         elif bam_format == 'read_reverse':
             output = np.array(profile_reads_reverse)
+        elif bam_format == 'read_sum':
+            output = np.add(profile_reads_forward, profile_reads_reverse)
 
         if strand == '-':
             output = np.flip(output)
@@ -165,7 +168,8 @@ def extract_bam(bam_file:str, chrom:str, start_list:List, end_list:List, strand:
             output = np.array(profile_reads_forward)
         elif bam_format == 'read_reverse':
             output = np.array(profile_reads_reverse)
-
+        elif bam_format == 'read_sum':
+            output = np.add(profile_reads_forward, profile_reads_reverse)
         if strand == '-':
             output = np.flip(output)
 
@@ -183,6 +187,7 @@ def bam_io(metadata: str|pd.DataFrame,
               output_dir:str = None, 
               save_to_file:bool = False, 
               custom_id:bool = False,
+              custom_prefix = 'entry',
               io:_IO = 'optimized',
               mode:_MODE = 'optimized', 
               **kwargs)->List:
@@ -190,7 +195,7 @@ def bam_io(metadata: str|pd.DataFrame,
 
     if isinstance(metadata, str):
         if (os.path.isfile(metadata) == True):
-            metadata_local = pd.read_csv(metadata, sep='\t')
+            metadata_local = pd.read_csv(metadata, sep='\t', header=None)
         else:
             logger.error('metadata file not found')
     else:
@@ -201,10 +206,10 @@ def bam_io(metadata: str|pd.DataFrame,
         else:
             output_dir = os.path.dirname(os.path.abspath(__file__))
     if custom_id == False:
-        meta_id = [f'sample_n{index}' for index in metadata_local.index.astype(str)]
+        meta_id = [f'{custom_prefix}_{index}' for index in metadata_local.index.astype(str)]
         metadata_local['meta_id'] = meta_id
     else:
-        metadata_local['meta_id'] = metadata_local.id
+        metadata_local['meta_id'] = metadata_local.iloc[:,3]
         meta_id = metadata_local.meta_id.unique()
 
     with pysam.AlignmentFile(bam_file, "rb") as bam_file:
@@ -214,7 +219,7 @@ def bam_io(metadata: str|pd.DataFrame,
             chrom_list = grouped.apply(lambda x: x.iloc[:,0].unique()[0], include_groups=False).tolist()
             start_list = grouped.apply(lambda x: x.iloc[:,1].tolist(), include_groups=False).tolist()
             end_list = grouped.apply(lambda x: x.iloc[:,2].tolist(), include_groups=False).tolist()
-            strand_list = grouped.apply(lambda x: x.iloc[:,3].unique()[0], include_groups=False).tolist()
+            strand_list = grouped.apply(lambda x: x.iloc[:,5].unique()[0], include_groups=False).tolist()
             bam = []
             for i  in range(len(chrom_list)):
                 if mode == 'legacy':
@@ -229,16 +234,15 @@ def bam_io(metadata: str|pd.DataFrame,
                 chrom = metadata_by_id.iloc[:,0].unique()[0]
                 start_list = metadata_by_id.iloc[:,1].to_list()
                 end_list = metadata_by_id.iloc[:,2].to_list()
-                strand = metadata_by_id.iloc[:,3].unique()[0]
+                strand = metadata_by_id.iloc[:,5].unique()[0]
                 if mode == 'legacy':
                     np_result = _extract_bam(bam_file, chrom, start_list, end_list, strand, bam_format, **eb_kwargs)
                 elif mode == 'optimized':
                     np_result = extract_bam(bam_file,chrom, start_list, end_list, strand, bam_format, **eb_kwargs)
                 bam.append(np_result)
-        
 
-    import compress_pickle
     if save_to_file == True:
+        import compress_pickle
         output_filepath = f'{output_dir}/bam_{bam_format}.lzma'
         compress_pickle.dump(bam, output_filepath, compression="lzma")
         logger.info('done, saving bam_min at: ',output_filepath)

@@ -18,6 +18,7 @@ def extract_bigwig(bigwig_file, chrom, start_list, end_list, strand):
         # zero-based to one-based conversion [BED -> VCF]
         start = start_list[i]
         end = end_list[i]
+        #print(start,end)
         bigwig_array = bigwig.values(chrom, start, end, numpy = True)
         if strand == '-':
             bigwig_array = np.flip(bigwig_array)
@@ -27,31 +28,35 @@ def extract_bigwig(bigwig_file, chrom, start_list, end_list, strand):
     bigwig_out = np.concatenate(bigwig_arrays)
     return bigwig_out
 #%%
-def bigwig_io(metadata, bigwig, output_dir = None, save_to_file = False, custom_id = False):
+def bigwig_io(metadata, 
+              bigwig, 
+              output_filepath = None, 
+              save_to_file = False, 
+              custom_id = False,
+              custom_prefix='entry'):
     if isinstance(metadata, str):
         if (os.path.isfile(metadata) == True):
-            metadata_local = pd.read_csv(metadata, sep='\t')
+            metadata_local = pd.read_csv(metadata, sep='\t', header=None)
         else:
             logger.error('metadata file not found')
     else:
         metadata_local = metadata
-    if output_dir is None:
+    if output_filepath is None:
         if isinstance(metadata, str):
-            output_dir = '/'.join(str.split(metadata, sep ='/')[:-1])
+            output_filepath = '/'.join(str.split(metadata, sep ='/')[:-1])
         else:
-            output_dir = os.path.dirname(os.path.abspath(__file__))
+            output_filepath = os.path.dirname(os.path.abspath(__file__))
     if custom_id == False:
-        meta_id = [f'sample_n{index}' for index in metadata_local.index.astype(str)]
+        meta_id = [f'{custom_prefix}_{index}' for index in metadata_local.index.astype(str)]
         metadata_local['meta_id'] = meta_id
     else:
-        metadata_local['meta_id'] = metadata_local.iloc[:,4]
+        metadata_local['meta_id'] = metadata_local.iloc[:,3]
         meta_id = metadata_local.meta_id.unique()    
     grouped = metadata_local.groupby('meta_id', sort=False)
-
     chrom_list = grouped.apply(lambda x: x.iloc[:,0].unique()[0], include_groups=False).tolist()
     start_list = grouped.apply(lambda x: x.iloc[:,1].tolist(), include_groups=False).tolist()
     end_list = grouped.apply(lambda x: x.iloc[:,2].tolist(), include_groups=False).tolist()
-    strand_list = grouped.apply(lambda x: x.iloc[:,3].unique()[0], include_groups=False).tolist()
+    strand_list = grouped.apply(lambda x: x.iloc[:,5].unique()[0], include_groups=False).tolist()
     with pyBigWig.open(bigwig) as bigwig_file:
         bigwig_out = []
         for i  in range(len(chrom_list)):
@@ -59,7 +64,6 @@ def bigwig_io(metadata, bigwig, output_dir = None, save_to_file = False, custom_
 
     if save_to_file == True:
         import compress_pickle
-        output_filepath = f'{output_dir}/bigwig_out.lzma'
         compress_pickle.dump(bigwig_out, output_filepath, compression="lzma")
         logger.info('done, saving bigwig_out at: ',output_filepath)
     else:

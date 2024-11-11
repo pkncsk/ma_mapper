@@ -152,7 +152,7 @@ def BLAST_StoP(alignment_score, m,n ,lambda_ ,K, H, alpha, beta, gapped):
     #p_value = 1 - math.exp(-E)
     return p_value, E
 #%%
-subfamily='MER11A'
+subfamily='THE1C'
 input_folder = config.internal_id_folder
 output_folder = config.e_value_folder
 if os.path.isdir(output_folder) == False:
@@ -165,7 +165,7 @@ output_filepath = f'{output_folder}/{subfamily_filename}.txt'
 operation_log_path = f'{output_folder}/op_log.log'
 #setup logger
 #%%
-internal_id = 'THE1C_JOIN_9172'
+internal_id = 'THE1C_SINGLE_2007'
 internal_id_tbl_subset = internal_id_tbl[internal_id_tbl.internal_id == internal_id]
 subset_index=internal_id_tbl_subset.rmsk_index.to_list()
 rmsk_subset=config.filtered_table[config.filtered_table.index.isin(subset_index)]

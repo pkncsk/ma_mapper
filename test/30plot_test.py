@@ -419,7 +419,7 @@ fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap),
 fig, ax = plt.subplots(figsize=(10,1), layout='constrained')
 
 #%%
-from ma_mapper import plot
+from ma_mapper._unused import plot
 plot.overlay_plot([alignment_filtered,phylop,bam_forward, bam_reverse,ap1,nfkb,bmal,clock], metadata= metadata_age, nucleotide_color='white',data_vmin=[-0.5,0,0,0,0,0,0],data_vmax = [0.5,0.1,0.1,1,1,1,1],data_cmap=['RdBu','Purples','Oranges','Blues','Reds','Greens','copper'], plot_title='ChIPexo_znf276_tfbs', show_data_legend=True,data_label=['phyloP','ChIP_forward','ChIP_reverse','AP1','nfkB-p65','BMAL','CLOCK'])
 #%%
 #%%

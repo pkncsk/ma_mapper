@@ -13,7 +13,7 @@ def extract_vcf(vcf_file, chrom, start_list, end_list, strand, query_key):
         start = start_list[i] +1
         end = end_list[i]
         genome_position = f'{chrom}:{start}-{end}'
-        window = np.zeros(end-start +1, dtype=object) #offset the +1 at the start
+        window = np.zeros(end-start +1, dtype=float) #offset the +1 at the start
         try:
             vcf = cyvcf2.VCF(vcf_file)
         except OSError:
@@ -24,19 +24,19 @@ def extract_vcf(vcf_file, chrom, start_list, end_list, strand, query_key):
                 try:
                     window[relative_position] +=  variant.INFO[query_key]
                 except KeyError:
-                    window[relative_position] +=  0
+                    window[relative_position] +=  0.0
             if strand == '-':
                 window = np.flip(window)
         windows.append(window)
     if strand == '-':
         windows.reverse()
     window_out = np.concatenate(windows)
-    return window_out
+    return window_out.astype(float)
 #%%
-def vcf_io(metadata, vcf, query_key = 'AF', output_dir = None, vcf_format = None, save_to_file = False, custom_id = False):
+def vcf_io(metadata, vcf, query_key = 'AF', output_dir = None, vcf_format = None, save_to_file = False, custom_id = False, custom_prefix='entry'):
     if isinstance(metadata, str):
         if (os.path.isfile(metadata) == True):
-            metadata_local = pd.read_csv(metadata, sep='\t')
+            metadata_local = pd.read_csv(metadata, sep='\t', header=None)
         else:
             logger.error('metadata file not found')
     else:
@@ -48,21 +48,21 @@ def vcf_io(metadata, vcf, query_key = 'AF', output_dir = None, vcf_format = None
             output_dir = os.path.dirname(os.path.abspath(__file__))
 
     if custom_id == False:
-        meta_id = [f'sample_n{index}' for index in metadata_local.index.astype(str)]
+        meta_id = [f'{custom_prefix}_{index}' for index in metadata_local.index.astype(str)]
         metadata_local['meta_id'] = meta_id
     else:
-        metadata_local['meta_id'] = metadata_local.iloc[:,4]
+        metadata_local['meta_id'] = metadata_local.iloc[:,3]
         meta_id = metadata_local.meta_id.unique()
 
     grouped = metadata_local.groupby('meta_id', sort=False)
     chrom_list = grouped.apply(lambda x: x.iloc[:,0].unique()[0], include_groups=False).tolist()
     start_list = grouped.apply(lambda x: x.iloc[:,1].tolist(), include_groups=False).tolist()
     end_list = grouped.apply(lambda x: x.iloc[:,2].tolist(), include_groups=False).tolist()
-    strand_list = grouped.apply(lambda x: x.iloc[:,3].unique()[0], include_groups=False).tolist()    
+    strand_list = grouped.apply(lambda x: x.iloc[:,5].unique()[0], include_groups=False).tolist()
     vcf_call_list = []
     for chrom in chrom_list:
         if vcf_format == 'gnomad':
-            vcf_file = f'{vcf}gnomad.genomes.v3.1.1.sites.{chrom}.vcf.gz'
+            vcf_file = f'{vcf}/gnomad.genomes.v3.1.1.sites.{chrom}.vcf.gz'
         else:
             vcf_file = vcf
         vcf_call_list.append(vcf_file)

@@ -21,6 +21,8 @@ age_ref_table = pd.DataFrame(data=config.age_ref_table_template)
 # %%
 age_div_df=pd.read_csv(f'/home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/combined_age_div_evi/combined_te_age_div.txt', sep='\t')
 age_div_df['div_percent'] = age_div_df['te_div']
+age_div_df['div_fraction'] = age_div_df['div_percent']/100
+age_div_df['div_age'] = age_div_df['div_fraction']/1e-8
 age_div_df['length'] =  age_div_df.genoEnd - age_div_df.genoStart
 bins = [-0.1]
 genomesize = 3049315783

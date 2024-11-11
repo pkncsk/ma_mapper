@@ -1,0 +1,672 @@
+2024-06-06 08:57:31,147 ma_mapper INFO parse alignment
+2024-06-06 08:58:50,963 ma_mapper INFO parse alignment
+2024-06-06 08:59:28,934 ma_mapper INFO parse alignment
+2024-06-06 08:59:39,514 ma_mapper INFO parse alignment
+2024-06-06 09:00:24,337 ma_mapper INFO parse alignment
+2024-06-06 09:13:48,755 ma_mapper INFO parse alignment
+2024-06-06 09:55:00,451 ma_mapper INFO parse alignment
+2024-06-06 10:01:56,324 ma_mapper INFO parse alignment
+2024-06-06 10:24:43,272 ma_mapper INFO parse alignment
+2024-06-06 10:24:47,314 ma_mapper INFO parse alignment
+2024-06-06 10:29:39,936 ma_mapper INFO parse alignment
+2024-06-06 10:29:51,066 ma_mapper INFO parse alignment
+2024-06-06 10:33:26,376 ma_mapper INFO parse alignment
+2024-06-06 10:37:48,059 ma_mapper INFO parse alignment
+2024-06-06 10:38:13,738 ma_mapper INFO parse alignment
+2024-06-06 10:38:30,431 ma_mapper INFO parse alignment
+2024-06-06 10:39:07,767 ma_mapper INFO parse alignment
+2024-06-06 10:39:07,823 ma_mapper INFO parse alignment
+2024-06-06 11:01:12,972 ma_mapper INFO parse alignment
+2024-06-06 11:01:37,930 ma_mapper INFO parse alignment
+2024-06-06 11:02:31,477 ma_mapper INFO parse alignment
+2024-06-06 20:42:25,881 ma_mapper INFO parse alignment
+2024-06-06 20:42:27,549 ma_mapper INFO parse alignment
+2024-06-06 20:43:03,400 ma_mapper INFO done, returning bigwig_out as object
+2024-06-06 20:55:27,502 ma_mapper INFO parse alignment
+2024-06-06 20:55:29,041 ma_mapper INFO parse alignment
+2024-06-06 20:55:32,704 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-06 20:55:34,772 ma_mapper INFO parse alignment
+2024-06-06 20:55:38,375 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-06 20:55:40,447 ma_mapper INFO parse alignment
+2024-06-06 20:55:56,872 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-06 20:55:58,893 ma_mapper INFO parse alignment
+2024-06-06 20:56:01,514 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-06 21:09:19,991 ma_mapper INFO parse alignment
+2024-06-06 21:09:23,787 ma_mapper INFO parse alignment
+2024-06-06 21:09:44,614 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-06 21:09:46,771 ma_mapper INFO parse alignment
+2024-06-06 21:09:50,545 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-06 21:09:52,686 ma_mapper INFO parse alignment
+2024-06-06 21:10:00,338 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-06 21:10:02,449 ma_mapper INFO parse alignment
+2024-06-06 21:10:05,201 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-06 21:28:24,059 ma_mapper INFO parse alignment
+2024-06-06 21:31:07,896 ma_mapper INFO parse alignment
+2024-06-06 21:31:09,476 ma_mapper INFO parse alignment
+2024-06-06 21:31:13,345 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-06 21:31:15,880 ma_mapper INFO parse alignment
+2024-06-06 21:31:19,849 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-06 21:31:22,310 ma_mapper INFO parse alignment
+2024-06-06 21:31:25,049 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-06 21:31:27,234 ma_mapper INFO parse alignment
+2024-06-06 21:31:29,939 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-06 23:20:14,457 ma_mapper INFO parse alignment
+2024-06-06 23:20:50,476 ma_mapper INFO done, returning bigwig_out as object
+2024-06-06 23:35:28,245 ma_mapper INFO parse alignment
+2024-06-06 23:35:46,765 ma_mapper INFO parse alignment
+2024-06-06 23:36:07,530 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-06 23:36:10,250 ma_mapper INFO parse alignment
+2024-06-06 23:36:14,746 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-06 23:36:33,476 ma_mapper INFO parse alignment
+2024-06-06 23:36:49,273 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-06 23:36:52,051 ma_mapper INFO parse alignment
+2024-06-06 23:36:55,218 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-06 23:38:14,404 ma_mapper INFO parse alignment
+2024-06-06 23:38:16,924 ma_mapper INFO done, returning bigwig_out as object
+2024-06-06 23:48:00,491 ma_mapper INFO parse alignment
+2024-06-06 23:48:03,624 ma_mapper INFO parse alignment
+2024-06-06 23:48:10,749 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-06 23:48:13,225 ma_mapper INFO parse alignment
+2024-06-06 23:48:17,604 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-06 23:48:20,110 ma_mapper INFO parse alignment
+2024-06-06 23:48:23,340 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-06 23:48:25,771 ma_mapper INFO parse alignment
+2024-06-06 23:48:28,949 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-06 23:48:31,430 ma_mapper INFO parse alignment
+2024-06-06 23:48:33,912 ma_mapper INFO done, returning bigwig_out as object
+2024-06-06 23:57:53,450 ma_mapper INFO parse alignment
+2024-06-06 23:57:55,505 ma_mapper INFO parse alignment
+2024-06-06 23:57:58,198 ma_mapper INFO done, returning bigwig_out as object
+2024-06-06 23:59:50,097 ma_mapper INFO parse alignment
+2024-06-06 23:59:52,596 ma_mapper INFO parse alignment
+2024-06-06 23:59:55,266 ma_mapper INFO done, returning bigwig_out as object
+2024-06-07 00:19:33,845 ma_mapper INFO parse alignment
+2024-06-07 00:21:10,322 ma_mapper INFO parse alignment
+2024-06-07 00:21:19,941 ma_mapper INFO parse alignment
+2024-06-07 00:25:12,245 ma_mapper INFO parse alignment
+2024-06-07 00:40:00,559 ma_mapper INFO parse alignment
+2024-06-07 00:41:23,544 ma_mapper INFO parse alignment
+2024-06-07 00:41:33,362 ma_mapper INFO parse alignment
+2024-06-07 00:55:18,341 ma_mapper INFO parse alignment
+2024-06-07 00:55:54,294 ma_mapper INFO parse alignment
+2024-06-07 00:56:03,930 ma_mapper INFO parse alignment
+2024-06-07 00:56:57,211 ma_mapper INFO parse alignment
+2024-06-07 00:57:32,450 ma_mapper INFO parse alignment
+2024-06-07 00:57:42,105 ma_mapper INFO parse alignment
+2024-06-07 00:58:41,234 ma_mapper INFO parse alignment
+2024-06-07 00:58:50,975 ma_mapper INFO parse alignment
+2024-06-07 00:59:13,414 ma_mapper INFO parse alignment
+2024-06-07 00:59:23,037 ma_mapper INFO parse alignment
+2024-06-07 00:59:52,643 ma_mapper INFO parse alignment
+2024-06-07 01:00:02,272 ma_mapper INFO parse alignment
+2024-06-07 01:00:23,037 ma_mapper INFO parse alignment
+2024-06-07 01:00:28,235 ma_mapper INFO done, returning bigwig_out as object
+2024-06-07 01:02:22,811 ma_mapper INFO parse alignment
+2024-06-07 01:02:24,912 ma_mapper INFO parse alignment
+2024-06-07 01:02:27,540 ma_mapper INFO done, returning bigwig_out as object
+2024-06-07 01:06:06,340 ma_mapper INFO parse alignment
+2024-06-07 01:06:08,351 ma_mapper INFO parse alignment
+2024-06-07 01:06:10,938 ma_mapper INFO done, returning bigwig_out as object
+2024-06-07 01:07:28,729 ma_mapper INFO parse alignment
+2024-06-07 01:17:11,759 ma_mapper INFO parse alignment
+2024-06-07 01:17:13,034 ma_mapper INFO parse alignment
+2024-06-07 01:17:32,311 ma_mapper INFO parse alignment
+2024-06-07 01:21:31,787 ma_mapper INFO parse alignment
+2024-06-07 01:32:34,828 ma_mapper INFO parse alignment
+2024-06-07 01:33:47,002 ma_mapper INFO parse alignment
+2024-06-07 01:34:02,964 ma_mapper INFO parse alignment
+2024-06-07 01:34:04,353 ma_mapper INFO parse alignment
+2024-06-07 01:36:22,419 ma_mapper INFO parse alignment
+2024-06-07 02:09:15,231 ma_mapper INFO parse alignment
+2024-06-07 02:09:27,154 ma_mapper INFO parse alignment
+2024-06-07 02:13:26,940 ma_mapper INFO parse alignment
+2024-06-07 02:13:29,840 ma_mapper INFO parse alignment
+2024-06-07 02:18:38,671 ma_mapper INFO parse alignment
+2024-06-07 02:18:41,572 ma_mapper INFO parse alignment
+2024-06-07 02:19:16,519 ma_mapper INFO done, returning bigwig_out as object
+2024-06-07 02:20:56,333 ma_mapper INFO parse alignment
+2024-06-07 02:20:58,177 ma_mapper INFO parse alignment
+2024-06-07 02:21:20,343 ma_mapper INFO parse alignment
+2024-06-07 02:21:24,088 ma_mapper INFO parse alignment
+2024-06-07 02:21:45,777 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-07 02:21:48,299 ma_mapper INFO parse alignment
+2024-06-07 02:21:53,792 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-07 02:21:56,494 ma_mapper INFO parse alignment
+2024-06-07 02:22:11,450 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-07 02:22:13,952 ma_mapper INFO parse alignment
+2024-06-07 02:22:18,190 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-07 02:22:49,964 ma_mapper INFO parse alignment
+2024-06-07 02:28:50,744 ma_mapper INFO parse alignment
+2024-06-07 02:28:53,654 ma_mapper INFO parse alignment
+2024-06-07 02:28:59,292 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-07 02:29:02,188 ma_mapper INFO parse alignment
+2024-06-07 02:29:07,735 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-07 02:29:10,658 ma_mapper INFO parse alignment
+2024-06-07 02:29:14,944 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-07 02:29:17,880 ma_mapper INFO parse alignment
+2024-06-07 02:29:22,120 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-07 02:29:24,957 ma_mapper INFO parse alignment
+2024-06-07 02:29:28,503 ma_mapper INFO done, returning bigwig_out as object
+2024-06-07 02:31:56,959 ma_mapper INFO parse alignment
+2024-06-07 02:32:49,383 ma_mapper INFO parse alignment
+2024-06-07 02:33:28,304 ma_mapper INFO parse alignment
+2024-06-07 02:33:30,975 ma_mapper INFO parse alignment
+2024-06-07 02:35:38,210 ma_mapper INFO parse alignment
+2024-06-07 02:35:40,975 ma_mapper INFO parse alignment
+2024-06-07 02:35:46,474 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-07 02:35:49,324 ma_mapper INFO parse alignment
+2024-06-07 02:35:54,813 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-07 02:35:57,890 ma_mapper INFO parse alignment
+2024-06-07 02:36:02,121 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-07 02:36:04,948 ma_mapper INFO parse alignment
+2024-06-07 02:36:09,171 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-07 02:36:12,220 ma_mapper INFO parse alignment
+2024-06-07 02:36:15,744 ma_mapper INFO done, returning bigwig_out as object
+2024-06-07 02:44:21,094 ma_mapper INFO parse alignment
+2024-06-07 02:44:23,860 ma_mapper INFO parse alignment
+2024-06-07 02:44:29,379 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-07 02:44:33,883 ma_mapper INFO parse alignment
+2024-06-07 02:44:36,666 ma_mapper INFO parse alignment
+2024-06-07 02:44:39,794 ma_mapper INFO parse alignment
+2024-06-07 02:44:42,629 ma_mapper INFO parse alignment
+2024-06-07 02:44:48,150 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-07 02:44:51,292 ma_mapper INFO parse alignment
+2024-06-07 02:44:56,786 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-07 02:44:59,730 ma_mapper INFO parse alignment
+2024-06-07 02:45:03,968 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-07 02:45:07,025 ma_mapper INFO parse alignment
+2024-06-07 02:45:11,259 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-07 02:45:14,142 ma_mapper INFO parse alignment
+2024-06-07 02:45:17,635 ma_mapper INFO done, returning bigwig_out as object
+2024-06-07 02:54:20,051 ma_mapper INFO parse alignment
+2024-06-07 02:54:22,977 ma_mapper INFO parse alignment
+2024-06-07 02:54:28,720 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-07 02:54:31,891 ma_mapper INFO parse alignment
+2024-06-07 02:54:37,407 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-07 02:54:40,600 ma_mapper INFO parse alignment
+2024-06-07 02:54:44,927 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-07 02:54:48,064 ma_mapper INFO parse alignment
+2024-06-07 02:54:52,351 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-07 02:54:55,566 ma_mapper INFO parse alignment
+2024-06-07 02:54:59,130 ma_mapper INFO done, returning bigwig_out as object
+2024-06-07 02:55:51,438 ma_mapper INFO parse alignment
+2024-06-07 02:55:54,178 ma_mapper INFO parse alignment
+2024-06-07 02:55:59,813 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-07 02:56:03,019 ma_mapper INFO parse alignment
+2024-06-07 02:56:08,475 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-07 02:56:11,615 ma_mapper INFO parse alignment
+2024-06-07 02:56:15,837 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-07 02:56:18,957 ma_mapper INFO parse alignment
+2024-06-07 02:56:23,153 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-07 02:56:26,291 ma_mapper INFO parse alignment
+2024-06-07 02:56:29,755 ma_mapper INFO done, returning bigwig_out as object
+2024-06-07 03:52:58,027 ma_mapper INFO parse alignment
+2024-06-07 03:53:03,440 ma_mapper INFO parse alignment
+2024-06-07 03:53:28,718 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-07 03:53:31,500 ma_mapper INFO parse alignment
+2024-06-07 03:53:37,461 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-07 03:53:40,336 ma_mapper INFO parse alignment
+2024-06-07 03:53:56,953 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-07 03:53:59,709 ma_mapper INFO parse alignment
+2024-06-07 03:54:04,275 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-07 03:54:15,879 ma_mapper INFO parse alignment
+2024-06-07 03:54:51,456 ma_mapper INFO done, returning bigwig_out as object
+2024-06-07 03:57:34,459 ma_mapper INFO parse alignment
+2024-06-07 03:57:37,491 ma_mapper INFO parse alignment
+2024-06-07 03:57:43,542 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-07 03:57:46,459 ma_mapper INFO parse alignment
+2024-06-07 03:57:52,381 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-07 03:57:55,234 ma_mapper INFO parse alignment
+2024-06-07 03:57:59,858 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-07 03:58:02,662 ma_mapper INFO parse alignment
+2024-06-07 03:58:07,234 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-07 03:58:10,102 ma_mapper INFO parse alignment
+2024-06-07 03:58:13,917 ma_mapper INFO done, returning bigwig_out as object
+2024-06-07 14:40:51,518 ma_mapper INFO parse alignment
+2024-06-07 14:40:56,033 ma_mapper INFO parse alignment
+2024-06-07 14:41:16,820 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-07 14:41:19,185 ma_mapper INFO parse alignment
+2024-06-07 14:41:23,529 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-07 14:41:26,110 ma_mapper INFO parse alignment
+2024-06-07 14:41:40,001 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-07 14:41:42,428 ma_mapper INFO parse alignment
+2024-06-07 14:41:45,780 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-07 14:41:48,383 ma_mapper INFO parse alignment
+2024-06-07 14:42:22,856 ma_mapper INFO done, returning bigwig_out as object
+2024-06-07 17:45:07,784 ma_mapper INFO parse alignment
+2024-06-07 17:45:09,521 ma_mapper INFO parse alignment
+2024-06-07 17:45:26,133 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-07 17:45:28,721 ma_mapper INFO parse alignment
+2024-06-07 17:45:32,503 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-07 17:45:34,803 ma_mapper INFO parse alignment
+2024-06-07 17:45:48,355 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-07 17:45:50,474 ma_mapper INFO parse alignment
+2024-06-07 17:45:53,178 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-07 17:45:55,327 ma_mapper INFO parse alignment
+2024-06-07 17:46:22,335 ma_mapper INFO done, returning bigwig_out as object
+2024-06-11 14:26:34,727 ma_mapper INFO parse alignment
+2024-06-11 14:26:38,665 ma_mapper INFO parse alignment
+2024-06-11 14:27:11,547 ma_mapper INFO done, returning bigwig_out as object
+2024-06-11 14:27:13,164 ma_mapper INFO parse alignment
+2024-06-11 14:27:17,552 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lift.bed
+2024-06-11 14:27:19,164 ma_mapper INFO done, returning bed_out as object
+2024-06-11 14:27:20,741 ma_mapper INFO parse alignment
+2024-06-11 14:27:22,111 ma_mapper ERROR bed file not found
+2024-06-11 14:27:22,111 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/_housekeeping/data/tfbs_homer/znf525_lift.bed
+2024-06-11 14:29:14,093 ma_mapper INFO parse alignment
+2024-06-11 14:29:15,599 ma_mapper INFO parse alignment
+2024-06-11 14:29:17,586 ma_mapper INFO done, returning bigwig_out as object
+2024-06-11 14:29:19,173 ma_mapper INFO parse alignment
+2024-06-11 14:29:20,528 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lift.bed
+2024-06-11 14:29:22,183 ma_mapper INFO done, returning bed_out as object
+2024-06-11 14:29:23,736 ma_mapper INFO parse alignment
+2024-06-11 14:29:25,094 ma_mapper ERROR bed file not found
+2024-06-11 14:29:25,094 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lift.be
+2024-06-11 14:29:37,844 ma_mapper INFO parse alignment
+2024-06-11 14:29:39,345 ma_mapper INFO parse alignment
+2024-06-11 14:29:41,318 ma_mapper INFO done, returning bigwig_out as object
+2024-06-11 14:29:42,975 ma_mapper INFO parse alignment
+2024-06-11 14:29:44,369 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lift.bed
+2024-06-11 14:29:46,104 ma_mapper INFO done, returning bed_out as object
+2024-06-11 14:29:47,710 ma_mapper INFO parse alignment
+2024-06-11 14:29:49,049 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lift.bed
+2024-06-11 14:29:50,608 ma_mapper INFO done, returning bed_out as object
+2024-06-11 14:58:07,825 ma_mapper INFO parse alignment
+2024-06-11 14:58:23,566 ma_mapper INFO parse alignment
+2024-06-11 14:58:26,085 ma_mapper INFO done, returning bigwig_out as object
+2024-06-11 14:58:35,025 ma_mapper INFO parse alignment
+2024-06-11 14:58:36,761 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-06-11 14:58:39,626 ma_mapper INFO done, returning bed_out as object
+2024-06-11 14:58:41,603 ma_mapper INFO parse alignment
+2024-06-11 14:58:43,344 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-06-11 14:58:46,036 ma_mapper INFO done, returning bed_out as object
+2024-06-11 15:05:17,834 ma_mapper INFO parse alignment
+2024-06-11 15:05:19,658 ma_mapper INFO parse alignment
+2024-06-11 15:05:22,072 ma_mapper INFO done, returning bigwig_out as object
+2024-06-11 15:05:24,058 ma_mapper INFO parse alignment
+2024-06-11 15:05:25,778 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-06-11 15:05:28,647 ma_mapper INFO done, returning bed_out as object
+2024-06-11 15:05:30,580 ma_mapper INFO parse alignment
+2024-06-11 15:05:32,310 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-06-11 15:05:34,658 ma_mapper INFO done, returning bed_out as object
+2024-06-12 10:32:22,141 ma_mapper INFO parse alignment
+2024-06-12 10:32:26,130 ma_mapper INFO parse alignment
+2024-06-12 10:33:05,669 ma_mapper INFO done, returning bigwig_out as object
+2024-06-12 10:33:07,524 ma_mapper INFO parse alignment
+2024-06-12 10:33:12,071 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-06-12 10:33:14,008 ma_mapper INFO done, returning bed_out as object
+2024-06-12 10:33:15,797 ma_mapper INFO parse alignment
+2024-06-12 10:33:17,445 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-06-12 10:33:19,340 ma_mapper INFO done, returning bed_out as object
+2024-06-12 10:37:24,968 ma_mapper INFO parse alignment
+2024-06-12 10:37:26,735 ma_mapper INFO parse alignment
+2024-06-12 10:37:28,990 ma_mapper INFO done, returning bigwig_out as object
+2024-06-12 10:37:35,048 ma_mapper INFO parse alignment
+2024-06-12 10:37:36,906 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-06-12 10:37:38,835 ma_mapper INFO done, returning bed_out as object
+2024-06-12 10:37:40,620 ma_mapper INFO parse alignment
+2024-06-12 10:37:42,113 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-06-12 10:37:43,963 ma_mapper INFO done, returning bed_out as object
+2024-06-12 10:42:45,051 ma_mapper INFO parse alignment
+2024-06-12 10:42:46,767 ma_mapper INFO parse alignment
+2024-06-12 10:42:48,998 ma_mapper INFO done, returning bigwig_out as object
+2024-06-12 10:42:50,749 ma_mapper INFO parse alignment
+2024-06-12 10:42:52,533 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-06-12 10:42:54,771 ma_mapper INFO done, returning bed_out as object
+2024-06-12 10:42:56,428 ma_mapper INFO parse alignment
+2024-06-12 10:42:57,886 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-06-12 10:43:00,113 ma_mapper INFO done, returning bed_out as object
+2024-06-12 10:50:05,067 ma_mapper INFO parse alignment
+2024-06-12 10:50:06,830 ma_mapper INFO parse alignment
+2024-06-12 10:50:09,073 ma_mapper INFO done, returning bigwig_out as object
+2024-06-12 10:50:10,832 ma_mapper INFO parse alignment
+2024-06-12 10:50:12,585 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-06-12 10:50:14,801 ma_mapper INFO done, returning bed_out as object
+2024-06-12 10:50:16,459 ma_mapper INFO parse alignment
+2024-06-12 10:50:17,891 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-06-12 10:50:19,936 ma_mapper INFO done, returning bed_out as object
+2024-06-12 11:26:56,933 ma_mapper INFO parse alignment
+2024-06-12 11:26:58,376 ma_mapper INFO parse alignment
+2024-06-12 11:27:00,251 ma_mapper INFO done, returning bigwig_out as object
+2024-06-12 11:27:01,798 ma_mapper INFO parse alignment
+2024-06-12 11:27:03,319 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-06-12 11:27:04,893 ma_mapper INFO done, returning bed_out as object
+2024-06-12 11:27:06,441 ma_mapper INFO parse alignment
+2024-06-12 11:27:07,693 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-06-12 11:27:09,108 ma_mapper INFO done, returning bed_out as object
+2024-06-12 11:38:50,779 ma_mapper INFO parse alignment
+2024-06-12 11:38:57,849 ma_mapper INFO parse alignment
+2024-06-12 11:39:11,277 ma_mapper INFO parse alignment
+2024-06-12 11:39:12,885 ma_mapper INFO parse alignment
+2024-06-12 12:34:48,907 ma_mapper INFO parse alignment
+2024-06-12 12:34:50,461 ma_mapper INFO parse alignment
+2024-06-12 12:35:08,521 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-12 12:35:10,014 ma_mapper INFO parse alignment
+2024-06-12 12:35:13,076 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-12 12:35:15,194 ma_mapper INFO parse alignment
+2024-06-12 12:35:31,307 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-12 12:35:32,781 ma_mapper INFO parse alignment
+2024-06-12 12:35:35,093 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-12 12:35:36,633 ma_mapper INFO parse alignment
+2024-06-12 12:35:53,027 ma_mapper INFO done, returning bigwig_out as object
+2024-06-12 12:36:18,541 ma_mapper INFO parse alignment
+2024-06-12 12:36:20,011 ma_mapper INFO parse alignment
+2024-06-12 12:36:23,158 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-12 12:36:24,665 ma_mapper INFO parse alignment
+2024-06-12 12:36:33,398 ma_mapper INFO parse alignment
+2024-06-12 12:36:34,825 ma_mapper INFO parse alignment
+2024-06-12 12:36:37,929 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-12 12:36:39,430 ma_mapper INFO parse alignment
+2024-06-12 12:36:42,533 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-12 12:36:44,106 ma_mapper INFO parse alignment
+2024-06-12 12:36:46,450 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2024-06-12 12:36:47,931 ma_mapper INFO parse alignment
+2024-06-12 12:36:50,290 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2024-06-12 12:36:51,833 ma_mapper INFO parse alignment
+2024-06-12 12:36:53,692 ma_mapper INFO done, returning bigwig_out as object
+2024-06-13 03:01:45,349 ma_mapper INFO parse alignment
+2024-06-13 03:01:50,442 ma_mapper INFO parse alignment
+2024-06-13 03:02:25,161 ma_mapper INFO done, returning bigwig_out as object
+2024-06-13 03:02:28,088 ma_mapper INFO parse alignment
+2024-06-13 03:02:33,524 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-06-13 03:02:36,683 ma_mapper INFO done, returning bed_out as object
+2024-06-13 03:02:39,601 ma_mapper INFO parse alignment
+2024-06-13 03:02:41,884 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-06-13 03:02:44,166 ma_mapper INFO done, returning bed_out as object
+2024-06-13 04:37:56,206 ma_mapper INFO parse alignment
+2024-06-13 04:38:00,685 ma_mapper INFO parse alignment
+2024-06-13 04:38:36,524 ma_mapper INFO done, returning bigwig_out as object
+2024-06-13 04:38:39,368 ma_mapper INFO parse alignment
+2024-06-13 04:38:41,741 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-06-13 04:38:44,560 ma_mapper INFO done, returning bed_out as object
+2024-06-13 04:38:47,398 ma_mapper INFO parse alignment
+2024-06-13 04:38:49,711 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-06-13 04:38:52,110 ma_mapper INFO done, returning bed_out as object
+2024-06-13 08:48:02,881 ma_mapper INFO parse alignment
+2024-06-13 08:48:06,243 ma_mapper INFO parse alignment
+2024-06-13 08:48:39,162 ma_mapper INFO done, returning bigwig_out as object
+2024-06-13 08:48:40,906 ma_mapper INFO parse alignment
+2024-06-13 08:48:45,337 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-06-13 08:48:47,084 ma_mapper INFO done, returning bed_out as object
+2024-06-13 08:48:48,634 ma_mapper INFO parse alignment
+2024-06-13 08:48:49,954 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-06-13 08:48:51,600 ma_mapper INFO done, returning bed_out as object
+2024-06-13 12:27:17,889 ma_mapper INFO parse alignment
+2024-06-13 12:27:21,611 ma_mapper INFO parse alignment
+2024-06-13 12:27:57,374 ma_mapper INFO done, returning bigwig_out as object
+2024-06-13 12:27:58,912 ma_mapper INFO parse alignment
+2024-06-13 12:28:00,248 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-06-13 12:28:02,544 ma_mapper INFO done, returning bed_out as object
+2024-06-13 12:28:04,056 ma_mapper INFO parse alignment
+2024-06-13 12:28:05,350 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-06-13 12:28:08,522 ma_mapper INFO done, returning bed_out as object
+2024-06-13 17:38:13,991 ma_mapper INFO parse alignment
+2024-06-13 17:38:18,488 ma_mapper INFO parse alignment
+2024-06-13 17:38:46,698 ma_mapper INFO done, returning bigwig_out as object
+2024-06-13 17:38:48,503 ma_mapper INFO parse alignment
+2024-06-13 17:38:53,265 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-06-13 17:38:55,188 ma_mapper INFO done, returning bed_out as object
+2024-06-13 17:38:56,931 ma_mapper INFO parse alignment
+2024-06-13 17:38:58,417 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-06-13 17:39:00,235 ma_mapper INFO done, returning bed_out as object
+2024-06-13 17:45:17,577 ma_mapper INFO parse alignment
+2024-06-13 17:45:19,204 ma_mapper INFO parse alignment
+2024-06-13 17:45:21,435 ma_mapper INFO done, returning bigwig_out as object
+2024-06-13 17:45:23,222 ma_mapper INFO parse alignment
+2024-06-13 17:45:24,720 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-06-13 17:45:26,638 ma_mapper INFO done, returning bed_out as object
+2024-06-13 17:45:28,380 ma_mapper INFO parse alignment
+2024-06-13 17:45:29,895 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-06-13 17:45:31,764 ma_mapper INFO done, returning bed_out as object
+2024-06-14 02:46:41,230 ma_mapper INFO parse alignment
+2024-07-18 06:52:11,362 ma_mapper INFO parse alignment
+2024-07-18 06:52:11,375 ma_mapper ERROR Alignment file '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker//alignment/MER11.fasta.aligned' not found.
+2024-07-18 06:53:39,141 ma_mapper INFO parse alignment
+2024-07-18 06:55:16,902 ma_mapper INFO parse alignment
+2024-07-18 06:58:16,899 ma_mapper INFO parse alignment
+2024-07-18 07:06:12,428 ma_mapper INFO parse alignment
+2024-07-18 07:20:21,144 ma_mapper INFO parse alignment
+2024-07-18 07:20:24,266 ma_mapper INFO parse alignment
+2024-07-18 07:29:24,177 ma_mapper INFO parse alignment
+2024-07-18 07:29:26,125 ma_mapper INFO parse alignment
+2024-07-18 07:29:27,775 ma_mapper ERROR metadata file not found
+2024-07-18 07:30:58,423 ma_mapper INFO parse alignment
+2024-07-18 07:31:00,449 ma_mapper INFO parse alignment
+2024-07-18 07:31:02,071 ma_mapper ERROR metadata file not found
+2024-07-18 07:32:44,278 ma_mapper INFO parse alignment
+2024-07-18 07:32:46,311 ma_mapper INFO parse alignment
+2024-07-18 07:33:22,851 ma_mapper INFO done, returning bigwig_out as object
+2024-07-18 07:33:23,221 ma_mapper INFO parse alignment
+2024-07-18 07:33:25,754 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-07-18 07:33:27,547 ma_mapper INFO done, returning bed_out as object
+2024-07-18 07:33:27,811 ma_mapper INFO parse alignment
+2024-07-18 07:33:29,471 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-07-18 07:33:31,207 ma_mapper INFO done, returning bed_out as object
+2024-07-18 07:40:17,492 ma_mapper INFO parse alignment
+2024-07-18 07:40:19,698 ma_mapper INFO parse alignment
+2024-07-18 07:40:22,074 ma_mapper INFO done, returning bigwig_out as object
+2024-07-18 07:40:22,394 ma_mapper INFO parse alignment
+2024-07-18 07:40:24,299 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-07-18 07:40:26,203 ma_mapper INFO done, returning bed_out as object
+2024-07-18 07:40:26,475 ma_mapper INFO parse alignment
+2024-07-18 07:40:28,098 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-07-18 07:40:29,945 ma_mapper INFO done, returning bed_out as object
+2024-07-18 07:42:23,645 ma_mapper INFO parse alignment
+2024-07-18 07:42:25,645 ma_mapper INFO parse alignment
+2024-07-18 07:42:27,991 ma_mapper INFO done, returning bigwig_out as object
+2024-07-18 07:42:29,645 ma_mapper INFO parse alignment
+2024-07-18 07:42:31,289 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-07-18 07:42:33,281 ma_mapper INFO done, returning bed_out as object
+2024-07-18 07:42:33,550 ma_mapper INFO parse alignment
+2024-07-18 07:42:35,174 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-07-18 07:42:37,040 ma_mapper INFO done, returning bed_out as object
+2024-07-18 07:42:40,310 ma_mapper INFO parse alignment
+2024-07-18 07:42:42,311 ma_mapper INFO parse alignment
+2024-07-18 07:42:54,801 ma_mapper INFO parse alignment
+2024-07-18 07:42:56,945 ma_mapper INFO parse alignment
+2024-07-18 07:42:59,304 ma_mapper INFO done, returning bigwig_out as object
+2024-07-18 07:42:59,642 ma_mapper INFO parse alignment
+2024-07-18 07:43:01,547 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-07-18 07:43:03,389 ma_mapper INFO done, returning bed_out as object
+2024-07-18 07:43:03,653 ma_mapper INFO parse alignment
+2024-07-18 07:43:05,284 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-07-18 07:43:07,062 ma_mapper INFO done, returning bed_out as object
+2024-07-25 00:25:45,132 ma_mapper INFO parse alignment
+2024-07-25 00:25:50,524 ma_mapper INFO parse alignment
+2024-07-25 00:26:50,026 ma_mapper INFO done, returning bigwig_out as object
+2024-07-25 00:26:50,444 ma_mapper INFO nested_data:None
+2024-07-25 00:26:51,030 ma_mapper INFO parse alignment
+2024-07-25 00:26:59,592 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808.bed
+2024-07-25 00:27:07,657 ma_mapper INFO parse alignment
+2024-07-25 00:27:09,776 ma_mapper ERROR bed file not found
+2024-07-25 00:27:09,777 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lift.bed
+2024-07-25 00:27:35,680 ma_mapper INFO parse alignment
+2024-07-25 00:27:38,867 ma_mapper INFO done, returning bigwig_out as object
+2024-07-25 00:27:39,282 ma_mapper INFO nested_data:None
+2024-07-25 00:27:39,529 ma_mapper INFO parse alignment
+2024-07-25 00:27:41,584 ma_mapper ERROR bed file not found
+2024-07-25 00:27:41,585 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lift.bed
+2024-07-25 00:27:52,225 ma_mapper INFO parse alignment
+2024-07-25 00:27:54,299 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-07-25 00:27:57,439 ma_mapper INFO done, returning bed_out as object
+2024-07-25 00:27:57,855 ma_mapper INFO nested_data:None
+2024-07-25 00:27:58,036 ma_mapper INFO parse alignment
+2024-07-25 00:28:00,096 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-07-25 00:28:02,882 ma_mapper INFO done, returning bed_out as object
+2024-07-25 00:28:03,301 ma_mapper INFO nested_data:None
+2024-07-25 00:44:18,950 ma_mapper INFO parse alignment
+2024-07-25 00:44:21,023 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808.bed
+2024-07-25 00:44:24,045 ma_mapper INFO done, returning bed_out as object
+2024-07-25 00:44:24,462 ma_mapper INFO nested_data:None
+2024-07-25 00:44:24,645 ma_mapper INFO parse alignment
+2024-07-25 00:44:26,751 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-07-25 00:44:30,754 ma_mapper INFO done, returning bed_out as object
+2024-07-25 00:44:31,182 ma_mapper INFO nested_data:None
+2024-07-25 01:13:23,008 ma_mapper INFO parse alignment
+2024-07-25 01:14:41,018 ma_mapper INFO parse alignment
+2024-07-25 01:16:55,465 ma_mapper INFO parse alignment
+2024-07-25 01:17:44,652 ma_mapper INFO parse alignment
+2024-07-25 01:17:47,762 ma_mapper INFO done, returning bigwig_out as object
+2024-07-25 01:17:48,184 ma_mapper INFO nested_data:None
+2024-07-25 01:17:53,203 ma_mapper INFO parse alignment
+2024-07-25 01:17:55,266 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-07-25 01:17:58,615 ma_mapper INFO done, returning bed_out as object
+2024-07-25 01:17:59,039 ma_mapper INFO nested_data:None
+2024-07-25 01:17:59,212 ma_mapper INFO parse alignment
+2024-07-25 01:18:01,283 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-07-25 01:18:04,366 ma_mapper INFO done, returning bed_out as object
+2024-07-25 01:18:04,795 ma_mapper INFO nested_data:None
+2024-07-25 01:48:29,128 ma_mapper INFO parse alignment
+2024-07-25 01:48:31,914 ma_mapper INFO parse alignment
+2024-07-25 01:48:35,200 ma_mapper INFO done, returning bigwig_out as object
+2024-07-25 01:48:35,631 ma_mapper INFO nested_data:None
+2024-07-25 01:48:35,891 ma_mapper INFO parse alignment
+2024-07-25 01:48:38,028 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-07-25 01:48:41,791 ma_mapper INFO done, returning bed_out as object
+2024-07-25 01:48:42,233 ma_mapper INFO nested_data:None
+2024-07-25 01:48:42,428 ma_mapper INFO parse alignment
+2024-07-25 01:48:44,582 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-07-25 01:48:48,448 ma_mapper INFO done, returning bed_out as object
+2024-07-25 01:48:48,882 ma_mapper INFO nested_data:None
+2024-07-25 01:56:28,871 ma_mapper INFO parse alignment
+2024-07-25 02:09:38,659 ma_mapper INFO parse alignment
+2024-07-25 02:09:41,602 ma_mapper INFO parse alignment
+2024-07-25 02:09:44,988 ma_mapper INFO done, returning bigwig_out as object
+2024-07-25 02:09:45,444 ma_mapper INFO nested_data:None
+2024-07-25 02:09:45,699 ma_mapper INFO parse alignment
+2024-07-25 02:11:05,707 ma_mapper INFO parse alignment
+2024-07-25 02:11:08,750 ma_mapper INFO parse alignment
+2024-07-25 02:11:12,027 ma_mapper INFO done, returning bigwig_out as object
+2024-07-25 02:11:12,470 ma_mapper INFO nested_data:None
+2024-07-25 02:11:12,724 ma_mapper INFO parse alignment
+2024-07-25 02:11:18,923 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-07-25 02:11:22,858 ma_mapper INFO done, returning bed_out as object
+2024-07-25 02:11:23,304 ma_mapper INFO nested_data:None
+2024-07-25 02:11:23,498 ma_mapper INFO parse alignment
+2024-07-25 02:11:25,656 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-07-25 02:11:29,592 ma_mapper INFO done, returning bed_out as object
+2024-07-25 02:11:30,028 ma_mapper INFO nested_data:None
+2024-07-25 02:45:33,023 ma_mapper INFO parse alignment
+2024-07-25 02:45:35,801 ma_mapper INFO parse alignment
+2024-07-25 02:45:38,840 ma_mapper INFO done, returning bigwig_out as object
+2024-07-25 02:45:39,259 ma_mapper INFO nested_data:None
+2024-07-25 02:45:39,538 ma_mapper INFO parse alignment
+2024-07-25 02:45:41,597 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-07-25 02:45:44,666 ma_mapper INFO done, returning bed_out as object
+2024-07-25 02:45:45,102 ma_mapper INFO nested_data:None
+2024-07-25 02:45:45,274 ma_mapper INFO parse alignment
+2024-07-25 02:45:47,340 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-07-25 02:45:51,387 ma_mapper INFO done, returning bed_out as object
+2024-07-25 02:45:51,812 ma_mapper INFO nested_data:None
+2024-07-25 03:01:52,636 ma_mapper INFO parse alignment
+2024-07-25 03:01:55,621 ma_mapper INFO parse alignment
+2024-07-25 03:01:58,860 ma_mapper INFO done, returning bigwig_out as object
+2024-07-25 03:01:59,284 ma_mapper INFO nested_data:None
+2024-07-25 03:01:59,548 ma_mapper INFO parse alignment
+2024-07-25 03:02:02,606 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-07-25 03:02:05,359 ma_mapper INFO done, returning bed_out as object
+2024-07-25 03:02:05,778 ma_mapper INFO nested_data:None
+2024-07-25 03:02:05,961 ma_mapper INFO parse alignment
+2024-07-25 03:02:08,036 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-07-25 03:02:11,009 ma_mapper INFO done, returning bed_out as object
+2024-07-25 03:02:11,493 ma_mapper INFO nested_data:None
+2024-07-25 03:28:36,219 ma_mapper INFO parse alignment
+2024-07-25 03:28:39,552 ma_mapper INFO parse alignment
+2024-07-25 03:30:20,746 ma_mapper INFO done, returning vcf_out as object
+2024-07-25 03:30:21,179 ma_mapper INFO nested_data:None
+2024-07-25 03:30:47,244 ma_mapper INFO parse alignment
+2024-07-25 03:30:52,386 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-07-25 03:30:56,374 ma_mapper INFO done, returning bed_out as object
+2024-07-25 03:30:56,825 ma_mapper INFO nested_data:None
+2024-07-25 03:30:57,015 ma_mapper INFO parse alignment
+2024-07-25 03:30:59,207 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-07-25 03:31:02,493 ma_mapper INFO done, returning bed_out as object
+2024-07-25 03:31:02,916 ma_mapper INFO nested_data:None
+2024-07-25 05:05:31,792 ma_mapper INFO parse alignment
+2024-07-25 05:05:34,653 ma_mapper INFO parse alignment
+2024-07-25 05:06:18,818 ma_mapper INFO done, returning bigwig_out as object
+2024-07-25 05:06:19,259 ma_mapper INFO nested_data:None
+2024-07-25 05:06:19,538 ma_mapper INFO parse alignment
+2024-07-25 05:06:21,257 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-07-25 05:06:22,811 ma_mapper INFO done, returning bed_out as object
+2024-07-25 05:06:23,035 ma_mapper INFO nested_data:None
+2024-07-25 05:06:23,151 ma_mapper INFO parse alignment
+2024-07-25 05:06:24,507 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-07-25 05:06:26,084 ma_mapper INFO done, returning bed_out as object
+2024-07-25 05:06:26,309 ma_mapper INFO nested_data:None
+2024-07-25 05:14:13,874 ma_mapper INFO parse alignment
+2024-07-25 05:14:15,762 ma_mapper INFO parse alignment
+2024-07-25 05:14:29,017 ma_mapper INFO done, returning vcf_out as object
+2024-07-25 05:14:29,242 ma_mapper INFO nested_data:None
+2024-07-25 05:14:29,481 ma_mapper INFO parse alignment
+2024-07-25 05:14:30,983 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-07-25 05:14:32,500 ma_mapper INFO done, returning bed_out as object
+2024-07-25 05:14:32,727 ma_mapper INFO nested_data:None
+2024-07-25 05:14:32,842 ma_mapper INFO parse alignment
+2024-07-25 05:14:34,146 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-07-25 05:14:35,644 ma_mapper INFO done, returning bed_out as object
+2024-07-25 05:14:35,875 ma_mapper INFO nested_data:None
+2024-07-25 05:18:41,301 ma_mapper INFO parse alignment
+2024-07-25 05:18:43,004 ma_mapper INFO parse alignment
+2024-07-25 05:18:59,802 ma_mapper INFO parse alignment
+2024-07-25 05:19:01,572 ma_mapper INFO parse alignment
+2024-07-25 05:19:12,406 ma_mapper INFO done, returning vcf_out as object
+2024-07-25 05:19:12,632 ma_mapper INFO nested_data:None
+2024-07-25 05:19:12,837 ma_mapper INFO parse alignment
+2024-07-25 05:19:14,420 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-07-25 05:19:16,042 ma_mapper INFO done, returning bed_out as object
+2024-07-25 05:19:16,264 ma_mapper INFO nested_data:None
+2024-07-25 05:19:16,381 ma_mapper INFO parse alignment
+2024-07-25 05:19:17,711 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-07-25 05:19:19,323 ma_mapper INFO done, returning bed_out as object
+2024-07-25 05:19:19,546 ma_mapper INFO nested_data:None
+2024-07-25 05:24:45,225 ma_mapper INFO parse alignment
+2024-07-25 05:24:47,118 ma_mapper INFO parse alignment
+2024-07-25 05:24:57,834 ma_mapper INFO done, returning vcf_out as object
+2024-07-25 05:24:58,059 ma_mapper INFO nested_data:None
+2024-07-25 05:24:58,267 ma_mapper INFO parse alignment
+2024-07-25 05:24:59,825 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-07-25 05:25:01,412 ma_mapper INFO done, returning bed_out as object
+2024-07-25 05:25:01,635 ma_mapper INFO nested_data:None
+2024-07-25 05:25:01,753 ma_mapper INFO parse alignment
+2024-07-25 05:25:03,090 ma_mapper INFO extract from bam file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-07-25 05:25:04,712 ma_mapper INFO done, returning bed_out as object
+2024-07-25 05:25:04,936 ma_mapper INFO nested_data:None
+2024-08-02 07:09:15,740 ma_mapper INFO parse alignment
+2024-08-02 12:35:55,837 ma_mapper INFO parse alignment
+2024-10-03 08:23:36,657 ma_mapper INFO parse alignment
+2024-10-03 08:26:46,911 ma_mapper INFO parse alignment
+2024-10-03 08:26:48,965 ma_mapper INFO parse alignment
+2024-10-03 08:27:43,554 ma_mapper INFO done, returning bigwig_out as object
+2024-10-03 08:27:44,063 ma_mapper INFO {<class 'numpy.float32'>}
+2024-10-03 08:27:44,065 ma_mapper INFO nested_data:False
+2024-10-03 08:27:44,414 ma_mapper INFO parse alignment
+2024-10-03 08:27:51,129 ma_mapper INFO extract from bed file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf808_lifted.bed
+2024-10-03 08:27:53,672 ma_mapper INFO done, returning bed_out as object
+2024-10-03 08:27:53,915 ma_mapper INFO {<class 'numpy.float64'>}
+2024-10-03 08:27:53,916 ma_mapper INFO nested_data:False
+2024-10-03 08:27:54,762 ma_mapper INFO parse alignment
+2024-10-03 08:27:56,684 ma_mapper INFO extract from bed file: /home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/data/kzfp_peak_bed/znf525_lifted.bed
+2024-10-03 08:27:58,519 ma_mapper INFO done, returning bed_out as object
+2024-10-03 08:27:58,777 ma_mapper INFO {<class 'numpy.float64'>}
+2024-10-03 08:27:58,778 ma_mapper INFO nested_data:False
+2024-10-03 08:30:02,951 ma_mapper INFO parse alignment
+2024-10-03 08:30:16,557 ma_mapper INFO parse alignment
+2024-10-03 08:31:43,206 ma_mapper INFO done, returning bigwig_out as object
+2024-10-03 08:31:44,681 ma_mapper INFO {<class 'numpy.float32'>}
+2024-10-03 08:31:44,683 ma_mapper INFO nested_data:False
+2024-10-03 08:32:42,085 ma_mapper INFO parse alignment
+2024-10-03 08:32:44,324 ma_mapper INFO extract from dataframe
+2024-10-03 08:32:48,559 ma_mapper INFO done, returning bed_out as object
+2024-10-03 08:32:48,819 ma_mapper INFO {<class 'numpy.float64'>}
+2024-10-03 08:32:48,821 ma_mapper INFO nested_data:False
+2024-10-03 08:32:49,116 ma_mapper INFO parse alignment
+2024-10-03 08:32:50,797 ma_mapper INFO extract from dataframe
+2024-10-03 08:32:52,710 ma_mapper INFO done, returning bed_out as object
+2024-10-03 08:32:52,961 ma_mapper INFO {<class 'numpy.float64'>}
+2024-10-03 08:32:52,962 ma_mapper INFO nested_data:False
+2024-10-16 22:42:29,879 ma_mapper INFO parse alignment
+2024-10-16 22:42:29,894 ma_mapper ERROR Alignment file '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker//alignment/MER11.fasta.aligned' not found.
+2024-10-16 22:46:24,064 ma_mapper INFO parse alignment
+2024-10-16 22:46:24,066 ma_mapper ERROR Alignment file '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker//alignment/MER11.fasta.aligned' not found.
+2024-10-16 22:46:31,389 ma_mapper INFO parse alignment

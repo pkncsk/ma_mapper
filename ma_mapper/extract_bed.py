@@ -32,7 +32,7 @@ def metadata_to_bed(metadata: pd.DataFrame|str,
     columns = metadata_bed.columns
     new_names = ['chrom', 'start', 'end']
     metadata_bed.rename(columns={columns[i]: new_names[i] for i in range(3)}, inplace=True)
-    metadata_bed['name'] = metadata_local.id
+    metadata_bed['name'] = metadata_local.meta_id
     metadata_bed['score'] = 10
     metadata_bed['strand'] = metadata_local.strand
     if save_to_file == True:
@@ -85,7 +85,7 @@ def _extract_bed(bed_file, chrom, start_list, end_list, strand):
 def extract_bed(intersect_df: pd.DataFrame,
                 unique_id):
     intersect_df_local = intersect_df
-    intersect_by_id=intersect_df_local[intersect_df_local.name == unique_id]
+    intersect_by_id=intersect_df_local[intersect_df_local['name'] == unique_id]
     unique_start=intersect_by_id.start.unique()
     strand=intersect_by_id.strand.unique()[0]
     drawings = []
@@ -128,11 +128,13 @@ def bed_io(metadata: pd.DataFrame|str,
               output_dir: str|None = None, 
               save_to_file:bool = False, 
               custom_id:bool = False,
+              custom_prefix = 'entry',
+              strand_overlap = True,
               mode:_MODE = 'dirty'):
 
     if isinstance(metadata, str):
         if (os.path.isfile(metadata) == True):
-            metadata_local = pd.read_csv(metadata, sep='\t')
+            metadata_local = pd.read_csv(metadata, sep='\t', header=None)
         else:
             logger.error('metadata file not found')
     else:
@@ -145,38 +147,35 @@ def bed_io(metadata: pd.DataFrame|str,
     if isinstance(bed, str):
         if (os.path.isfile(bed) == True):
             bed_file = pybedtools.BedTool(bed)
+            logger.info('extract from bed file: '+ bed)
         else:
             logger.error('bed file not found')
+    elif isinstance(bed, pd.DataFrame):
+        bed_file=pybedtools.BedTool.from_dataframe(bed.iloc[:,0:6])
+        logger.info('extract from dataframe')
     else:
         bed_file = bed
-    logger.info('extract from bam file: '+ bed)
     if custom_id == False:
-        meta_id = [f'sample_n{index}' for index in metadata_local.index.astype(str)]
+        meta_id = [f'{custom_prefix}_{index}' for index in metadata_local.index.astype(str)]
         metadata_local['meta_id'] = meta_id
     else:
-        metadata_local['meta_id'] = metadata_local.id
+        metadata_local['meta_id'] = metadata_local.iloc[:,3]
         meta_id = metadata_local.meta_id.unique()
     
     
     if mode == 'legacy':
         grouped = metadata_local.groupby('meta_id', sort=False)
-
         chrom_list = grouped.apply(lambda x: x.iloc[:,0].unique()[0], include_groups=False).tolist()
         start_list = grouped.apply(lambda x: x.iloc[:,1].tolist(), include_groups=False).tolist()
         end_list = grouped.apply(lambda x: x.iloc[:,2].tolist(), include_groups=False).tolist()
-        strand_list = grouped.apply(lambda x: x.iloc[:,3].unique()[0], include_groups=False).tolist()
+        strand_list = grouped.apply(lambda x: x.iloc[:,5].unique()[0], include_groups=False).tolist()
         with ProcessPoolExecutor(max_workers=40) as executor:
             results  = executor.map(_extract_bed, repeat(bed_file), chrom_list, start_list,end_list,strand_list)
     elif mode == 'dirty':
-            #make bed-like df
-        metadata_bed = metadata_local.iloc[:,0:3]
-        metadata_bed['name'] = metadata_local.id
-        metadata_bed['score'] = 10
-        metadata_bed['strand'] = metadata_local.strand
-        metadata_bed=pybedtools.BedTool.from_dataframe(metadata_bed)
+        metadata_bed=pybedtools.BedTool.from_dataframe(metadata_local.iloc[:,0:6])
         bed = pybedtools.BedTool(bed)
 
-        intersect_bed=metadata_bed.intersect(bed_file,loj=True, wa = True, wb =True, s=True)
+        intersect_bed=metadata_bed.intersect(bed_file,loj=True, wa = True, wb =True, s=strand_overlap)
         intersect_df=intersect_bed.to_dataframe()
         with ProcessPoolExecutor(max_workers=40) as executor:
             results  = executor.map(extract_bed, repeat(intersect_df), meta_id)

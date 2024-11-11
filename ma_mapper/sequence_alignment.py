@@ -1,5 +1,6 @@
 #%%
 import os
+import pandas as pd
 #from concurrent.futures import ProcessPoolExecutor
 #%%
 ######################run directly from windows
@@ -8,11 +9,11 @@ import os
 #    metadata = metadata_var
 #    global records 
 #    records = records_var
-def extract_subfamily_coord(subfamily,
+def extract_subfamily_coord_from_combined_table(subfamily,
                             save_to_file = True, 
                             output_filepath = None, 
                             species_reference=None):
-    import pandas as pd
+    
     if species_reference is None:
         species_reference = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/combined_age_div/combined_age_and_div.txt'
     age_div_table = pd.read_csv(species_reference, sep='\t')
@@ -30,7 +31,57 @@ def extract_subfamily_coord(subfamily,
         subfam_coord.to_csv(output_filepath, sep='\t', index= False)
     else:
         return subfam_coord
+#%%
 
+def extract_coord_from_repeatmasker_table(
+        subfamily: str|list,
+        repeatmasker_table: str|pd.DataFrame,
+        internal_id_table: str|list|None=None,
+        save_to_file:bool = False,
+        output_filepath: str|None = None,
+        ):
+    
+    if isinstance(subfamily, str):
+        subfamilies = [subfamily]
+    else:
+        subfamilies = subfamily
+    coord_df = []
+    for idx,subfamily in enumerate(subfamilies):
+        if isinstance(repeatmasker_table, str):
+            repeatmasker_table = pd.read_csv(repeatmasker_table, sep='\t', index_col=0, header=0)
+
+        if internal_id_table is not None:
+            if isinstance(internal_id_table, list):
+                internal_id_tbl = internal_id_table[idx]
+            else:
+                internal_id_tbl = internal_id_table
+            if isinstance(internal_id_tbl, str):
+                if os.path.isfile(internal_id_tbl):
+                    internal_id_df = pd.read_csv(internal_id_tbl, sep='\t')
+                else:
+                    raise FileNotFoundError(f"Internal ID table {internal_id_tbl} not found")
+
+            elif isinstance(internal_id_tbl, pd.DataFrame):
+                internal_id_df = internal_id_tbl
+            subfam_w_internal_id=pd.merge(repeatmasker_table, internal_id_df, left_index = True, right_on = 'rmsk_index')
+            subfam_coords = subfam_w_internal_id[['genoName','genoStart','genoEnd','internal_id']].copy()
+            subfam_coords['score'] = 10
+            subfam_coords['strand'] = subfam_w_internal_id.strand
+        else:
+            subfam_table=repeatmasker_table[repeatmasker_table.repName == subfamily].copy().reset_index()
+            subfam_coords = subfam_table[['genoName','genoStart','genoEnd']].copy()
+            subfam_coords['internal_id'] =subfam_table.index.map(lambda x: f'{subfamily}_{x}')
+            subfam_coords['score'] = 10
+            subfam_coords['strand'] = subfam_table.strand
+        coord_df.append(subfam_coords)
+    #     == True:
+    coords = pd.concat(coord_df).reset_index(drop=True)
+    if save_to_file== True:
+        if output_filepath is None:
+            output_filepath = f'{os.path.dirname(os.path.abspath(__file__))}/{subfamily}.txt'
+        coords.to_csv(output_filepath, sep='\t', index= False, header=False)
+    return coords
+#%%
 def extract_sequence(genoname, genostart, genoend,strand, records):
     #seqname = '::'.join([meta_id,genoname,str(genostart),str(genoend),strand])
     chromosome_extract=records[genoname]
@@ -45,15 +96,14 @@ def extract_sequence(genoname, genostart, genoend,strand, records):
 
 
 
-def sequence_io(metadata,source_fasta,output_filepath = None, save_to_file=False, custom_id = False):
-    import pandas as pd
+def sequence_io(metadata,source_fasta,output_filepath = None, save_to_file=False, custom_id = False, custom_prefix = 'entry'):
     from Bio import SeqIO
     from Bio.Seq import Seq
     from Bio.SeqRecord import SeqRecord
 
     if isinstance(metadata, str):
         if (os.path.isfile(metadata) == True):
-            metadata_local = pd.read_csv(metadata, sep='\s+')
+            metadata_local = pd.read_csv(metadata, sep='\t', header=None)
         else:
             print('metadata file not found')
     else:
@@ -66,33 +116,34 @@ def sequence_io(metadata,source_fasta,output_filepath = None, save_to_file=False
             output_filepath = f'{os.path.dirname(os.path.abspath(__file__))}/sequence.fasta'
     else:
         output_filepath = output_filepath
-    
-    records = SeqIO.to_dict(SeqIO.parse(open(source_fasta), 'fasta'))
-    seq_records = []
-    
+        
     if custom_id == False:
-        meta_id = [f'sample_n{index}' for index in metadata_local.index.astype(str)]
+        meta_id = [f'{custom_prefix}_{index}' for index in metadata_local.index.astype(str)]
         metadata_local['meta_id'] = meta_id
     else:
-        metadata_local['meta_id'] = metadata_local.iloc[:,4]
+        metadata_local['meta_id'] = metadata_local.iloc[:,3]
         meta_id = metadata_local.meta_id.unique()
+
+    records = SeqIO.to_dict(SeqIO.parse(open(source_fasta), 'fasta'))
+    seq_records = []
     for uniq_meta_id in meta_id:
         metadata_by_id = metadata_local[metadata_local.meta_id == uniq_meta_id]
         seq_strings = []
         for idx, row in metadata_by_id.iterrows():
             #print(row)       
-            chrom = row.chrom
-            start = row.start
-            end = row.end
-            strand = row.strand
-            print(chrom, start, end, strand, uniq_meta_id)
+            chrom = row.iloc[0]
+            start = row.iloc[1]
+            end = row.iloc[2]
+            strand = row.iloc[5]
+            #print(chrom, start, end, strand, uniq_meta_id)
             seq_string = extract_sequence(chrom, start, end, strand, records)
             seq_strings.append(seq_string)
         if strand == '-':
             seq_strings.reverse()
-        seqname = '::'.join([uniq_meta_id,chrom,str(min(metadata_by_id.iloc[:,1])),str(max(metadata_by_id.iloc[:,2])),strand])
+        seqname = f'{uniq_meta_id}::{chrom}:{min(metadata_by_id.iloc[:,1])}-{max(metadata_by_id.iloc[:,2])}({strand})'
         seq_record = SeqRecord(Seq(''.join(seq_strings)),seqname , '', '')
         seq_records.append(seq_record)
+
 
     if save_to_file == True:
         with open(output_filepath, "w") as output_handle:

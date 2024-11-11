@@ -1,8 +1,10 @@
 ##################################
 
 # testing stuff 
-
-data/
+/script/
+/test/
+/_unused/
+/data/
 # vscode/environment session
 *.code-workspace
 /.venv/*

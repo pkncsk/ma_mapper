@@ -3,8 +3,8 @@ import pandas as pd
 import numpy as np
 import os
 import sys
-sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/stable')
-import config_hg38_repeatlib as config
+sys.path.append('/home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/dev/packaging_dir/ma_mapper/test/te_age')
+import config_hg38 as config
 from concurrent.futures import ProcessPoolExecutor
 #%% mm39 mouse genome setting
 #%%

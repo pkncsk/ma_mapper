@@ -1,11 +1,14 @@
 #%%
 from turtle import back
 import pandas as pd
+
+from ma_mapper import extract_vcf
 from . import sequence_alignment
 import numpy as np
 import sys
 import os
 from . import logger
+import collections
 #from typing import Literal <- python3.8+
 if sys.version_info >= (3, 8, 0):
     from typing import Literal, Tuple, List
@@ -22,23 +25,18 @@ def load_alignment_file(alignment_file):
 
 def extract_metadata_from_alignment(alignment_file, save_to_file = False, output_file =None):
     records = load_alignment_file(alignment_file)
-    dump_list = []
-    chrom_list = []
-    start_list = []
-    end_list = []
-    strand_list = []
+    meta_id_list = []; chrom_list = []; start_list = []; end_list = []; strand_list = []; score_list= []
+    import re
     for record in records:
-        metadata_list=record.name.split(sep='::')
-        for i in range(len(metadata_list)):
-            if metadata_list[i].startswith('chr') == False:
-                dump_list.append(metadata_list[i])
-            else:
-                chrom_list.append(metadata_list[i])
-                start_list.append(int(metadata_list[i+1]))
-                end_list.append(int(metadata_list[i+2]))
-                strand_list.append(metadata_list[i+3])
-                break
-    new_metadata_dict = {'chrom':chrom_list,'start':start_list,'end':end_list,'strand':strand_list,'id':dump_list}
+        identifier=record.name
+        uniq_meta_id, chrom, start, end, strand = re.match(r'([^:]+)::([^:]+):(\d+)-(\d+)\((.)\)', identifier).groups()
+        chrom_list.append(chrom)
+        start_list.append(int(start))
+        end_list.append(int(end))
+        meta_id_list.append(uniq_meta_id)
+        score_list.append(20)
+        strand_list.append(strand)
+    new_metadata_dict = {'chrom':chrom_list,'start':start_list,'end':end_list,'name':meta_id_list,'score':score_list,'strand':strand_list}
     new_metadata = pd.DataFrame(new_metadata_dict)
     if save_to_file == True:
         if output_file is not None:
@@ -165,24 +163,80 @@ def create_filter(parsed_array, col_threshold = 0.50, col_content_threshold = 0.
     else:
         return filters
 #%%
+def create_filter_failed(parsed_array, col_threshold = 0.50, row_threshold = 0.50, save_to_file = False, output_file = None):
+    if isinstance(parsed_array, str) == True:
+        parsed_array = import_parsed_array(parsed_array)
+    col_filter = list(range(parsed_array.shape[1]))
+    row_filter = list(range(parsed_array.shape[0]))
+    while True:
+        # Filter columns
+        new_col_filter = []
+        for idx in col_filter:
+            nonzero_ratio = np.count_nonzero(parsed_array[row_filter, idx]) / len(row_filter)
+            if nonzero_ratio > col_threshold:
+                new_col_filter.append(idx)
+        # Filter rows
+        new_row_filter = []
+        for idx in row_filter:
+            nonzero_ratio = np.count_nonzero(parsed_array[idx, new_col_filter]) / len(new_col_filter)
+            if nonzero_ratio > row_threshold:
+                new_row_filter.append(idx)
+        
+        # Check for convergence
+        if new_col_filter == col_filter and new_row_filter == row_filter:
+            break
+        col_filter, row_filter = new_col_filter, new_row_filter    
+
+    filters = [row_filter,col_filter]
+    if save_to_file == True:
+        import pickle
+        if output_file is None:
+            output_file = 'filter.p'
+        pickle.dump(filters, open(output_file, "wb" ))
+    else:
+        return filters
+#%%
 def map_data(data_file:str,
              sorted_parsed_array: np.ndarray, 
              filters: bool = True,
              custom_filters = None,
              col_threshold: int = 0.50, 
              col_content_threshold:int = 0.10, 
-             row_threshold:int = 0.50,)-> np.ndarray:
+             row_threshold:int = 0.50,
+             nested_data:bool=None)-> np.ndarray:
     if isinstance(data_file, str) == True:
         import compress_pickle
         data_file = compress_pickle.load(data_file)
-    def check_list_type(data, type_check):
-        return all(isinstance(item, type_check) for sublist in data for item in sublist)
-    if check_list_type(sorted_parsed_array, (int, float, type(np.nan))):
-        canvas = np.zeros(sorted_parsed_array.shape, np.float32)
-    else:
-        canvas = np.zeros(sorted_parsed_array.shape, dtype=object)
+    def get_unique_element_types(matrix):
+        unique_types = set()
+        for row in matrix:
+            for element in row:
+                unique_types.add(type(element))
+        return unique_types
     
+    if nested_data is None:
+        unique_types = get_unique_element_types(data_file)
+        logger.info(unique_types)
+        if any(t in unique_types for t in (int,float,np.uint8,np.uint16, np.float32, np.float64)) :
+            nested_data = False
+        #elif any(t in unique_types for t in (str,set(),collections.Counter, list, dict, pd.DataFrame)):
+        #    nested_data = True
+        else:
+            nested_data = True
+    #def check_list_type(data, type_check):
+    #    return all(isinstance(item, type_check) for sublist in data for item in sublist)
+    #if check_list_type(sorted_parsed_array, (int, float, type(np.nan))):
+    #    canvas = np.zeros(sorted_parsed_array.shape, dtype=object)
+    #else:
+    logger.info(f'nested_data:{nested_data}')
+    if nested_data:
+        canvas = np.full(sorted_parsed_array.shape, None)
+    else:
+        canvas = np.zeros(sorted_parsed_array.shape, dtype=float)
+        
     for idx, row in enumerate(sorted_parsed_array):
+        #print(f"data_file[{idx}]: {data_file[idx]}")
+        #print(f"canvas[{idx}]: {canvas[idx, row>0]}")
         canvas[idx, row>0] = data_file[idx]
     mapped_data = canvas
     if filters:
@@ -209,7 +263,7 @@ def base_count(alignment:pd.DataFrame):
     base_count=np.array(output_array).transpose()
     return base_count
 #FIXED: wrong nonzero
-_NORM_METHOD = Literal['average',]
+_NORM_METHOD = Literal['average','perc_coverage','median']
 def normalise(alignment: str|pd.DataFrame,
               mapped_data: pd.DataFrame, 
               method:_NORM_METHOD = 'average', 
@@ -217,25 +271,27 @@ def normalise(alignment: str|pd.DataFrame,
     if method == 'average':
         normalizer = np.count_nonzero(alignment, axis=0)
         data_sum = np.nansum(mapped_data, axis=0)
-        if method == 'average':
-            normalised_data = data_sum/normalizer 
-    
+        normalised_data = data_sum/normalizer 
+    if method == 'perc_coverage':
+        normalizer = np.count_nonzero(alignment, axis=0)
+        data_count = np.count_nonzero(mapped_data, axis=0)
+        normalised_data = data_count/normalizer * 100
+    if method == 'median':
+        normalised_data = np.nanmedian(mapped_data, axis = 0)
     return normalised_data
 
 def flank_sequence_io(metadata: pd.DataFrame,
-                    source_fasta: str|None = None,
+                    source_fasta: str,
                     metadata_out:bool = False, 
                     extension_length:int = 500) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    if source_fasta is None:
-        source_fasta = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/_housekeeping/data/hg38.fa'
 
     front_metadata = metadata.reset_index(drop=True).copy()
-    front_metadata.end = front_metadata.start
-    front_metadata.start = front_metadata.start - extension_length
+    front_metadata.end = front_metadata.start.astype(int)
+    front_metadata.start = front_metadata.start.astype(int) - extension_length
     
     back_metadata = metadata.reset_index(drop=True).copy()
-    back_metadata.start = back_metadata.end 
-    back_metadata.end = back_metadata.end + extension_length
+    back_metadata.start = back_metadata.end.astype(int) 
+    back_metadata.end = back_metadata.end.astype(int) + extension_length
     if metadata_out:
         return front_metadata, back_metadata
     else:
@@ -266,7 +322,7 @@ def parse_and_filter(alignment_file: str,
     metadata_aligned = extract_metadata_from_alignment(alignment_file)
     metadata_aligned['original_order'] = metadata_aligned.index
     if filters:
-        cf_kwargs = {key: value for key, value in kwargs.items() if key in ('col_threshold','col_content_threshold', 'row_threshold')}
+        cf_kwargs = {key: value for key, value in kwargs.items() if key in ('col_threshold', 'row_threshold')}
         filters=create_filter(aligned_parsed, **cf_kwargs)
         row_filter = filters[0]
         col_filter = filters[1]
@@ -289,7 +345,7 @@ def parse_and_filter(alignment_file: str,
         return alignment_output, metadata_aligned_filtered
 
 def match_age_to_id_metadata(metadata: pd.DataFrame|str, 
-                             reference_table:str|None = None) -> pd.DataFrame:
+                             age_table:str|None = None) -> pd.DataFrame:
     if isinstance(metadata, str):
         if os.path.isfile(metadata):
             metadata_df = pd.read_csv(metadata, sep='\t')
@@ -297,13 +353,30 @@ def match_age_to_id_metadata(metadata: pd.DataFrame|str,
             logger.error('metadata file not found')
     elif isinstance(metadata, pd.DataFrame):
         metadata_df = metadata
-    if reference_table is None:
-        reference_table = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/combined_age_div/combined_age_and_div.txt'
-    age_div_table = pd.read_csv(reference_table, sep='\t')
-    age_div_table['id'] = age_div_table.repName+'_'+age_div_table.internal_id.astype(str)
-    te_age=age_div_table[['id','te_age','te_div']].drop_duplicates()
-    metadata_with_te_age=metadata_df.merge(te_age, on = 'id', how ='left')
-    return metadata_with_te_age
+    if isinstance(age_table,list):
+        age_df_list = []
+        for age_tbl in age_table:
+            age_df_list.append(pd.read_csv(age_tbl, sep='\t'))
+        age_df=pd.concat(age_df_list)
+    elif isinstance(age_table, str):
+        if os.path.isfile(age_table):
+            age_df = pd.read_csv(age_table, sep='\t')
+        else:
+            logger.error('metadata file not found')
+            raise FileNotFoundError(f"metadata file not found")
+    elif isinstance(age_table, pd.DataFrame):
+        age_df = age_table
+    #assume BED format:
+    bed_headers = ['chrom','start','end','name','score','strand']
+    if metadata_df.shape[1] == 6:
+        metadata_df.columns = bed_headers
+    elif metadata_df.shape[1] > 6:
+        current_columns = metadata_df.columns.tolist()
+        metadata_df.columns = bed_headers + current_columns[6:]
+    merged_table=metadata_df.merge(age_df, left_on='name', right_on='internal_id', how='left')
+    merged_table=merged_table.drop(columns=['internal_id'])
+
+    return merged_table
 
 _FORMAT = Literal['bam_max','bam_min','bam_forward','bam_reverse','bigwig','bed']
 def map_and_overlay(aligment:str,
@@ -312,57 +385,73 @@ def map_and_overlay(aligment:str,
             data_format:_FORMAT,
             filters:bool = True,
             extension_length: int|None = None,
+            source_fasta:str = None,
+            custom_id:bool=False,
             *args,**kwargs,
             )->Tuple[np.ndarray,pd.DataFrame,np.ndarray,np.ndarray,np.ndarray,np.ndarray]:
-
-    alignment_parsed, metadata_aligned, filters  = parse_and_filter(alignment_file=aligment, preprocess_out=True, **kwargs)
+    fs_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('fs_')}
+    pf_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('pf_')}
+    md_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('md_')}
+    kwargs = {key: value for key, value in kwargs.items() if not key.startswith(('pf_','md_','fs_'))}
+    alignment_parsed, metadata_aligned, filters  = parse_and_filter(alignment_file=aligment, preprocess_out=True, **pf_kwargs)
     
-    if data_format in ['read_max','read_min','read_forward','read_reverse', 'normal_max','normal_min','normal_forward','normal_reverse']:
+    if data_format in ['read_max','read_min','read_forward','read_reverse', 'normal_max','normal_min','normal_forward','normal_reverse','read_sum']:
         from . import extract_bam
-        output=extract_bam.bam_io(metadata= metadata, bam_file=data_file,bam_format=data_format, custom_id=True,**kwargs)
+        output=extract_bam.bam_io(metadata= metadata, bam_file=data_file,bam_format=data_format, custom_id=custom_id,**kwargs)
     elif data_format in ['bigwig']:
         from . import extract_bigwig
-        output=extract_bigwig.bigwig_io(metadata=metadata, bigwig=data_file, custom_id=True,**kwargs)
+        output=extract_bigwig.bigwig_io(metadata=metadata, bigwig=data_file, custom_id=custom_id,**kwargs)
     elif data_format in ['bed']:
         from . import extract_bed
-        output=extract_bed.bed_io(metadata=metadata, bed=data_file, custom_id=True,**kwargs)
+        output=extract_bed.bed_io(metadata=metadata, bed=data_file, custom_id=custom_id,**kwargs)
     elif data_format in ['maf']:
         from . import extract_maf
-        output=extract_maf.maf_io(metadata=metadata, maf=data_file,custom_id=True,**kwargs)
+        output=extract_maf.maf_io(metadata=metadata, maf=data_file,custom_id=custom_id,**kwargs)
+    elif data_format in ['vcf']:
+        output=extract_vcf.vcf_io(metadata=metadata, vcf=data_file, custom_id=custom_id, **kwargs)
     else:
         logger.error('dataformat field unspecified')
-    metadata_df = pd.read_csv(metadata, sep='\t')
-    source_order = metadata_df.iloc[:,4].unique()
+    if isinstance(metadata, str):
+        if (os.path.isfile(metadata) == True):
+            metadata_df = pd.read_csv(metadata, sep='\t', header=None)
+        else:
+            logger.error('metadata file not found')
+    else:
+        metadata_df = metadata   
+    source_order = metadata_df.iloc[:,3].unique()
     output_sorted = []
-    for idx, row in metadata_aligned.iterrows():
-        output_sorted.append(output[np.where(source_order == row.id)[0][0]])
+    for _, row in metadata_aligned.iterrows():
+        #print(row)
+        #print(np.where(source_order == row['name']),row['name'])
+        output_sorted.append(output[np.where(source_order == row['name'])[0][0]])
     
-    md_kwargs = {key: value for key, value in kwargs.items() if key in ('col_threshold','col_content_threshold', 'row_threshold')} 
     overlay = map_data(data_file=output_sorted, sorted_parsed_array = alignment_parsed, custom_filters=filters, **md_kwargs)
-    
     row_filter = filters[0]
-    col_filter = filters[1]
     metadata_filtered=metadata_aligned.iloc[row_filter,:]
 
     if extension_length is not None:
-        ffs_kwargs = {key: value for key, value in kwargs.items() if key in ('source_fasta')} 
-        front_metadata, back_metadata = flank_sequence_io(metadata_filtered, metadata_out=True, extension_length=extension_length, **ffs_kwargs)
-        if data_format in ['bam_max','bam_min','bam_forward','bam_reverse']:
-            
+        
+        front_metadata, back_metadata = flank_sequence_io(metadata_filtered, metadata_out=True, extension_length=extension_length,source_fasta=source_fasta, **fs_kwargs)
+        if data_format in ['read_max','read_min','read_forward','read_reverse', 'normal_max','normal_min','normal_forward','normal_reverse','read_sum']:
             front_output=extract_bam.bam_io(metadata= front_metadata, bam_file=data_file,bam_format=data_format, **kwargs)
             back_output=extract_bam.bam_io(metadata= back_metadata, bam_file=data_file,bam_format=data_format, **kwargs)
         elif data_format in ['bigwig']:
-            front_output=extract_bigwig.bigwig_io(metadata=front_metadata, bigwig=data_file,**kwargs)
-            back_output=extract_bigwig.bigwig_io(metadata=back_metadata, bigwig=data_file,**kwargs)
+            front_output=extract_bigwig.bigwig_io(metadata=front_metadata, bigwig=data_file,custom_id=True,**kwargs)
+            back_output=extract_bigwig.bigwig_io(metadata=back_metadata, bigwig=data_file,custom_id=True,**kwargs)
         elif data_format in ['bed']:
-            front_output=extract_bed.bed_io(metadata=front_metadata, bed=data_file,**kwargs)
-            back_output=extract_bed.bed_io(metadata=back_metadata, bed=data_file,**kwargs)
+            front_output=extract_bed.bed_io(metadata=front_metadata, bed=data_file,custom_id=True,**kwargs)
+            back_output=extract_bed.bed_io(metadata=back_metadata, bed=data_file,custom_id=True,**kwargs)
         elif data_format in ['maf']:
             front_output=extract_maf.maf_io(metadata=front_metadata, maf=data_file,custom_id=True,**kwargs)
-            back_output=extract_maf.maf_io(metadata=back_metadata, bed=data_file,**kwargs)
+            back_output=extract_maf.maf_io(metadata=back_metadata, maf=data_file,custom_id=True,**kwargs)
+        elif data_format in ['vcf']:
+            front_output=extract_vcf.vcf_io(metadata=front_metadata, vcf=data_file,custom_id=True,**kwargs)
+            back_output=extract_vcf.vcf_io(metadata=back_metadata, vcf=data_file,custom_id=True,**kwargs)
         front_overlay = []
         back_overlay = []
-        for i, row in metadata_filtered.iterrows():
+        print(metadata_filtered.shape, len(front_output), len(back_output))
+        for i, row in metadata_filtered.reset_index().iterrows():
+            #print(i)
             if row.strand == '+':
                 front_overlay.append(front_output[i])
                 back_overlay.append(back_output[i])
