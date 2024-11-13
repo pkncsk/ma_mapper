@@ -1,8 +1,8 @@
 ##################################
 
-# testing stuff 
-/script/
-/test/
+# for experimental branch
+#/script/
+#/test/
 /_unused/
 /data/
 # vscode/environment session

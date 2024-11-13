@@ -3,6 +3,7 @@ import sys
 import pandas as pd
 sys.path.append('/home/pc575/rds/rds-mi339-kzfps/users/pakkanan/phd_project_development/dev/packaging_dir/ma_mapper/test/te_age')
 import config_main as config
+sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/dev/packaging_dir/ma_mapper/')
 from ma_mapper import mapper
 from ma_mapper import custom_cmap
 from ma_mapper import sequence_alignment
@@ -54,11 +55,12 @@ plots.plot_experimental(
     data = [maf], 
     alignment=alignment_filtered,
     show_alignment=False, 
-    heatmap_color=['Greens'],
+    heatmap_color=['viridis'],
     heatmap_mode='overlay', 
     vlim = [[0,1.0]],
     show_alignment_colbar=False,
     opacity = 1.0, 
+    hm_interpolation = None,
     aggregated=False,
     colorbar=True,
     colorbar_steps=[0.1], 
