@@ -16,6 +16,7 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from collections import Counter, defaultdict
 import time
+
 def get_spliced_mod(self, starts, ends, strand=1):
     # Dictionary for IUPAC ambiguity codes for 2-base combinations
     iupac_code = {
