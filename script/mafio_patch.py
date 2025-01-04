@@ -189,17 +189,24 @@ class gzMafIndex(MafIO.MafIndex):
         return record
 #%% test mafIO
 target_species = 'hg38'
-chrom = 'chrY'
-maf_file = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/chrY.maf.gz'
-mafindex_file = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/chrY.mafindex'
-strand = '+'
-start = 2781647
-end = 2782000
+chrom = 'chr1'
+maf_file = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/chr1.maf.gz'
+mafindex_file = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/chr1.mafindex'
+strand = '-'
+start = 4381114
+end = 4382190
 maf_id = f'{target_species}.{chrom}'
     
 index_maf = gzMafIndex(mafindex_file, maf_file, maf_id) 
 n_strand = -1 if strand == '-' else 1
+print([start],[end],n_strand)
 results =index_maf.get_spliced([start],[end],n_strand)
+#%%
+start_list = [start]
+end_list = [end]
+start_flanked=[min(start_list)-100] + start_list + [max(end_list)]
+end_flanked = [min(start_list)] + end_list + [max(end_list)+100]
+results =index_maf.get_spliced(start_flanked,end_flanked,n_strand)
 #%% old
 target_species = 'hg38'
 chrom = 'chrX'
@@ -213,6 +220,12 @@ maf_id = f'{target_species}.{chrom}'
 index_maf = MafIO.MafIndex(mafindex_file, maf_file, maf_id) 
 n_strand = -1 if strand == '-' else 1
 results_old =index_maf.get_spliced([start],[end],n_strand)
+#%%
+start_list = [start]
+end_list = [end]
+start_flanked=[min(start_list)-100] + start_list + [max(end_list)]
+end_flanked = [min(start_list)] + end_list + [max(end_list)+100]
+results =index_maf.get_spliced(start_flanked,end_flanked,n_strand)
 #%%
 import subprocess
 
