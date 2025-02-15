@@ -33,28 +33,28 @@ def extract_vcf(vcf_file, chrom, start_list, end_list, strand, query_key):
     window_out = np.concatenate(windows)
     return window_out.astype(float)
 #%%
-def vcf_io(metadata, vcf, query_key = 'AF', output_dir = None, vcf_format = None, save_to_file = False, custom_id = False, custom_prefix='entry'):
-    if isinstance(metadata, str):
-        if (os.path.isfile(metadata) == True):
-            metadata_local = pd.read_csv(metadata, sep='\t', header=None)
+def vcf_io(coordinate_table, vcf, query_key = 'AF', output_dir = None, vcf_format = None, save_to_file = False, custom_id = False, custom_prefix='entry'):
+    if isinstance(coordinate_table, str):
+        if (os.path.isfile(coordinate_table) == True):
+            coordinate_local = pd.read_csv(coordinate_table, sep='\t', header=None)
         else:
-            logger.error('metadata file not found')
+            logger.error('coordinate_table file not found')
     else:
-        metadata_local = metadata
+        coordinate_local = coordinate_table
     if output_dir is None:
-        if isinstance(metadata, str):
-            output_dir = '/'.join(str.split(metadata, sep ='/')[:-1])
+        if isinstance(coordinate_table, str):
+            output_dir = '/'.join(str.split(coordinate_table, sep ='/')[:-1])
         else:
             output_dir = os.path.dirname(os.path.abspath(__file__))
 
     if custom_id == False:
-        meta_id = [f'{custom_prefix}_{index}' for index in metadata_local.index.astype(str)]
-        metadata_local['meta_id'] = meta_id
+        meta_id = [f'{custom_prefix}_{index}' for index in coordinate_local.index.astype(str)]
+        coordinate_local['meta_id'] = meta_id
     else:
-        metadata_local['meta_id'] = metadata_local.iloc[:,3]
-        meta_id = metadata_local.meta_id.unique()
+        coordinate_local['meta_id'] = coordinate_local.iloc[:,3]
+        meta_id = coordinate_local.meta_id.unique()
 
-    grouped = metadata_local.groupby('meta_id', sort=False)
+    grouped = coordinate_local.groupby('meta_id', sort=False)
     chrom_list = grouped.apply(lambda x: x.iloc[:,0].unique()[0], include_groups=False).tolist()
     start_list = grouped.apply(lambda x: x.iloc[:,1].tolist(), include_groups=False).tolist()
     end_list = grouped.apply(lambda x: x.iloc[:,2].tolist(), include_groups=False).tolist()

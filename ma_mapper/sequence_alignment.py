@@ -4,9 +4,9 @@ import pandas as pd
 #from concurrent.futures import ProcessPoolExecutor
 #%%
 ######################run directly from windows
-#def parallel_init(metadata_var, records_var):
-#    global metadata
-#    metadata = metadata_var
+#def parallel_init(coordinate_var, records_var):
+#    global coordinate_table
+#    coordinate_table = coordinate_var
 #    global records 
 #    records = records_var
 def extract_subfamily_coord_from_combined_table(subfamily,
@@ -96,40 +96,40 @@ def extract_sequence(genoname, genostart, genoend,strand, records):
 
 
 
-def sequence_io(metadata,source_fasta,output_filepath = None, save_to_file=False, custom_id = False, custom_prefix = 'entry'):
+def sequence_io(coordinate_table,source_fasta,output_filepath = None, save_to_file=False, custom_id = False, custom_prefix = 'entry'):
     from Bio import SeqIO
     from Bio.Seq import Seq
     from Bio.SeqRecord import SeqRecord
 
-    if isinstance(metadata, str):
-        if (os.path.isfile(metadata) == True):
-            metadata_local = pd.read_csv(metadata, sep='\t', header=None)
+    if isinstance(coordinate_table, str):
+        if (os.path.isfile(coordinate_table) == True):
+            coordinate_local = pd.read_csv(coordinate_table, sep='\t', header=None)
         else:
-            print('metadata file not found')
+            print('coordinate_table file not found')
     else:
-        metadata_local = metadata
+        coordinate_local = coordinate_table
 
     if output_filepath is None:
-        if isinstance(metadata, str):
-            output_filepath =f"{'/'.join(str.split(metadata, sep ='/')[:-1])}.fasta"
+        if isinstance(coordinate_table, str):
+            output_filepath =f"{'/'.join(str.split(coordinate_table, sep ='/')[:-1])}.fasta"
         else:
             output_filepath = f'{os.path.dirname(os.path.abspath(__file__))}/sequence.fasta'
     else:
         output_filepath = output_filepath
         
     if custom_id == False:
-        meta_id = [f'{custom_prefix}_{index}' for index in metadata_local.index.astype(str)]
-        metadata_local['meta_id'] = meta_id
+        meta_id = [f'{custom_prefix}_{index}' for index in coordinate_local.index.astype(str)]
+        coordinate_local['meta_id'] = meta_id
     else:
-        metadata_local['meta_id'] = metadata_local.iloc[:,3]
-        meta_id = metadata_local.meta_id.unique()
+        coordinate_local['meta_id'] = coordinate_local.iloc[:,3]
+        meta_id = coordinate_local.meta_id.unique()
 
     records = SeqIO.to_dict(SeqIO.parse(open(source_fasta), 'fasta'))
     seq_records = []
     for uniq_meta_id in meta_id:
-        metadata_by_id = metadata_local[metadata_local.meta_id == uniq_meta_id]
+        coordinate_by_id = coordinate_local[coordinate_local.meta_id == uniq_meta_id]
         seq_strings = []
-        for idx, row in metadata_by_id.iterrows():
+        for idx, row in coordinate_by_id.iterrows():
             #print(row)       
             chrom = row.iloc[0]
             start = row.iloc[1]
@@ -140,7 +140,7 @@ def sequence_io(metadata,source_fasta,output_filepath = None, save_to_file=False
             seq_strings.append(seq_string)
         if strand == '-':
             seq_strings.reverse()
-        seqname = f'{uniq_meta_id}::{chrom}:{min(metadata_by_id.iloc[:,1])}-{max(metadata_by_id.iloc[:,2])}({strand})'
+        seqname = f'{uniq_meta_id}::{chrom}:{min(coordinate_by_id.iloc[:,1])}-{max(coordinate_by_id.iloc[:,2])}({strand})'
         seq_record = SeqRecord(Seq(''.join(seq_strings)),seqname , '', '')
         seq_records.append(seq_record)
 

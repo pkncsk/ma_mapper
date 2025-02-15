@@ -1,4 +1,6 @@
 #%%
+import concurrent
+from itertools import islice, repeat
 from ma_mapper import extract_maf
 import importlib
 importlib.reload(extract_maf)
@@ -8,9 +10,11 @@ try:
 except ImportError:
     dbapi2 = None
 MAFINDEX_VERSION = 2
-
+import time
 #%%
+import io
 import subprocess
+from subprocess import Popen, PIPE
 gztool_path = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/dev/installation/gztool/gztool'
 #%%
 import os
@@ -82,10 +86,100 @@ class gzMafIndex(MafIO.MafIndex):
 
         except (dbapi2.OperationalError, dbapi2.DatabaseError) as err:
             raise ValueError(f"Problem with SQLite database: {err}") from None
+
+    def _MafIndex__make_new_index(self):
+        """Read MAF file and generate SQLite index (PRIVATE)."""
+        # make the tables
+        self._con.execute("CREATE TABLE meta_data (key TEXT, value TEXT);")
+        self._con.execute(
+            "INSERT INTO meta_data (key, value) VALUES (?, ?);",
+            ("version", MAFINDEX_VERSION),
+        )
+        self._con.execute(
+            "INSERT INTO meta_data (key, value) VALUES ('record_count', -1);"
+        )
+        self._con.execute(
+            "INSERT INTO meta_data (key, value) VALUES (?, ?);",
+            ("target_seqname", self._target_seqname),
+        )
+        # Determine whether to store maf file as relative to the index or absolute
+        if not os.path.isabs(self._maf_file) and not os.path.isabs(self._index_filename):
+            mafpath = os.path.relpath(self._maf_file, self._relative_path).replace(
+                os.path.sep, "/"
+            )
+        elif (
+            os.path.dirname(os.path.abspath(self._maf_file)) + os.path.sep
+        ).startswith(self._relative_path + os.path.sep):
+            mafpath = os.path.relpath(self._maf_file, self._relative_path).replace(
+                os.path.sep, "/"
+            )
+        else:
+            mafpath = os.path.abspath(self._maf_file)
+        self._con.execute(
+            "INSERT INTO meta_data (key, value) VALUES (?, ?);",
+            ("filename", mafpath),
+        )
         
-    def seek_and_read(self, offset):
-        """Seek to a specific offset in the compressed file and read the block."""
-        # Query the next offset from SQLite
+        # Add length_to_next column for precomputed lengths (initialized as NULL)
+        self._con.execute(
+            "CREATE TABLE offset_data (bin INTEGER, start INTEGER, end INTEGER, offset INTEGER, length_to_next INTEGER DEFAULT NULL);"
+        )
+
+        insert_count = 0
+
+        # iterate over the entire file and insert in batches
+        mafindex_func = self._MafIndex__maf_indexer()
+
+        while True:
+            batch = list(islice(mafindex_func, 100))
+            if not batch:
+                break
+
+            # Insert batch data without length_to_next for now (defaults to NULL)
+            self._con.executemany(
+                "INSERT INTO offset_data (bin, start, end, offset) VALUES (?,?,?,?);",
+                batch,
+            )
+            self._con.commit()
+            insert_count += len(batch)
+
+        # Update length_to_next column for precomputed lengths
+        self._con.execute(
+            """
+            WITH cte AS (
+                SELECT offset, 
+                    LEAD(offset) OVER (ORDER BY offset ASC) - offset AS length_to_next
+                FROM offset_data
+            )
+            UPDATE offset_data
+            SET length_to_next = cte.length_to_next
+            FROM cte
+            WHERE offset_data.offset = cte.offset;
+            """
+        )
+
+        # then make indexes on the relevant fields
+        self._con.execute("CREATE INDEX IF NOT EXISTS bin_index ON offset_data(bin);")
+        self._con.execute(
+            "CREATE INDEX IF NOT EXISTS start_index ON offset_data(start);"
+        )
+        self._con.execute("CREATE INDEX IF NOT EXISTS end_index ON offset_data(end);")
+
+        self._con.execute(
+            f"UPDATE meta_data SET value = '{insert_count}' WHERE key = 'record_count'"
+        )
+
+        self._con.commit()
+
+        return insert_count
+    @staticmethod
+    def seek_and_read(offset, length_to_next, maf_file):
+        
+        #start_seek = time.time()    
+        """
+        Seek to a specific offset in the compressed file and read the block.
+        Query the next offset from SQLite
+        start_sql = time.time()    
         cursor = self._con.cursor()
         cursor.execute(
             "SELECT offset FROM offset_data WHERE offset > ? ORDER BY offset ASC LIMIT 1;",
@@ -93,41 +187,103 @@ class gzMafIndex(MafIO.MafIndex):
         )
         next_offset_row = cursor.fetchone()
 
-        # Determine the length of the block
+        Determine the length of the block
         if next_offset_row:
             next_offset = next_offset_row[0]
-            #print(next_offset)
+            print(f'next offset: {next_offset}')
             length = next_offset - offset
         else:
-            # If no next offset, read until EOF
+        # If no next offset, read until EOF
             length = None  # Indicates to read to the end or a large chunk
-
+        print("sql time:", time.time() - start_sql)
+        """
+        #start_gz = time.time()    
         data = b""
-        if length is not None:
+        if length_to_next is not None:
             cmd = [
                 gztool_path,
                 "-b", str(offset),  # Offset to seek
-                "-r", str(length),  # Byte length to read
-                self._maf_file,
+                "-r", str(length_to_next),  # Byte length to read
+                maf_file,
             ]
         else:
             cmd = [
                 gztool_path,
                 "-b", str(offset),  # Offset to seek
-                self._maf_file,
+                maf_file,
             ]
+        #print(f'gztool time {time.time()-start_gz}')
+        
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+        #start_read = time.time()
         data += result.stdout
-
+        #print(f'read time {time.time()-start_read}')
+        start_io = time.time()
         from io import StringIO
         handle = StringIO(data.decode())
+        #print(f'stringio time {time.time()-start_io}')
         try:
+            #start_parse = time.time() 
             record = next(MafIO.MafIterator(handle))
+            #print("parse time:", time.time() - start_parse)
+            #print("seek time:", time.time() - start_seek)
             return record
         except ValueError:
             raise RuntimeError("Failed to parse block.")
+        """
         
+        with Popen(cmd, stdout=PIPE, stderr=PIPE, text = True) as proc:
+            try:
+                #start_parse = time.time() 
+                record = next(MafIO.MafIterator(proc.stdout))
+                #print("parse time:", time.time() - start_parse)
+                #print("seek time:", time.time() - start_seek)
+                return record
+            except ValueError:
+                raise RuntimeError("Failed to parse block.")
+        
+        
+        with Popen(cmd, stdout=PIPE, stderr=PIPE) as proc:
+        # Capture gztool's output into a BytesIO stream
+            
+            #start_read = time.time()
+            raw_data = proc.stdout.read()
+            #print(f'read time {time.time()-start_read}')
+            
+            #start_io = time.time()
+            handle = io.StringIO(raw_data.decode())
+            #print(f'stringio time {time.time()-start_io}')
+            
+            try:
+                start_parse = time.time() 
+                record = next(MafIO.MafIterator(handle))
+                #print("parse time:", time.time() - start_parse)
+                #print("seek time:", time.time() - start_seek)
+                return record
+            except ValueError:
+                raise RuntimeError("Failed to parse block.")
+        """
+    @staticmethod
+    def fetch_align(row,maf_file, target_seqname):
+        rec_start, rec_end, offset, length_to_next=row
+        fetched = gzMafIndex.seek_and_read(int(offset), int(length_to_next), maf_file)
+
+        for record in fetched:
+            if record.id == target_seqname:
+                start = record.annotations["start"]
+                end = start + record.annotations["size"] - 1
+
+                if not (start == rec_start and end == rec_end):
+                    raise ValueError(
+                        "Expected %s-%s @ offset %s, found %s-%s"
+                        % (rec_start, rec_end, offset, start, end)
+                    )
+        return fetched
+
     def search(self, starts, ends):
+        
+        
+        
         if len(starts) != len(ends):
             raise ValueError("Every position in starts must have a match in ends")
         for exonstart, exonend in zip(starts, ends):
@@ -149,49 +305,71 @@ class gzMafIndex(MafIO.MafIndex):
                     "Exon coordinates must be integers "
                     "(start=%d, end=%d)" % (exonstart, exonend)
                 ) from None
-
+            #start_sql = time.time()
             result = con.execute(
-                "SELECT DISTINCT start, end, offset FROM offset_data "
-                "WHERE bin IN (%s) "
-                "AND (end BETWEEN %s AND %s OR %s BETWEEN start AND end) "
-                "ORDER BY start, end, offset ASC;"
-                % (possible_bins, exonstart, exonend - 1, exonend - 1)
+                """
+                SELECT DISTINCT start, 
+                   end, 
+                   offset, 
+                   length_to_next
+                FROM offset_data
+                WHERE bin IN (%s)
+                AND (end BETWEEN %s AND %s OR %s BETWEEN start AND end)
+                ORDER BY start, end, offset ASC;
+                """ % (possible_bins, exonstart, exonend - 1, exonend - 1)
             )
-
+            
             rows = result.fetchall()
-            for rec_start, rec_end, offset in rows:
-                #print(f'{rec_start}\t{rec_end}\t{offset}')
+            #print(f'sql time:{time.time()-start_sql}')
+            print(f'unfiltered block {len(rows)}')
+            #filter_start = time.time()
+            filtered_count = 0
+            filtered_rows = []
+            total_length = 0
+            for rec_start, rec_end, offset, length_to_next in rows:
+                """
+                print(f'recs info: {rec_start}\t{rec_end}')
+                print(f'offsets: {offset},{length_to_next}')
+                """
                 if (rec_start, rec_end) in yielded_rec_coords:
+                    filtered_count = filtered_count+1
                     continue
                 else:
                     yielded_rec_coords.add((rec_start, rec_end))
-                fetched = self._get_record(int(offset))
-
-                for record in fetched:
-                    if record.id == self._target_seqname:
-                        start = record.annotations["start"]
-                        end = start + record.annotations["size"] - 1
-
-                        if not (start == rec_start and end == rec_end):
-                            raise ValueError(
-                                "Expected %s-%s @ offset %s, found %s-%s"
-                                % (rec_start, rec_end, offset, start, end)
-                            )
-
+                    filtered_rows.append((rec_start, rec_end, offset, length_to_next))
+            
+            #print(f'filter time {time.time()-filter_start}')
+            #start_fetch = time.time()
+            """
+            for row in filtered_rows:
+                fetched = fetch_align(row, self._maf_file, self._target_seqname)
                 yield fetched
+            """
+            with concurrent.futures.ProcessPoolExecutor(max_workers = 60) as executor:
+                results=executor.map(gzMafIndex.fetch_align, filtered_rows, repeat(self._maf_file), repeat(self._target_seqname))
+            
+            for result in results:
+                #print(f"Alignment with {len(result)} rows and {result.get_alignment_length()} columns")
+                total_length = total_length+result.get_alignment_length()
+                yield result
 
-    def _get_record(self, offset):
-        if os.path.splitext(self._maf_file)[1] == ".gz":
-            record = self.seek_and_read(offset)
-        else:
-            self._maf_fp.seek(offset)
-            record = next(self._mafiter)
-        return record
+            #print(f'fetch time {time.time()-start_fetch}')
+            print(f'filtered {filtered_count}')
+            print(f'total length {total_length}')
+
+
 #%% test mafIO
-target_species = 'hg38'
+start_total = time.time()  
+
 chrom = 'chr1'
+target_species = 'hg38'
 maf_file = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/chr1.maf.gz'
 mafindex_file = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/chr1.mafindex'
+"""
+target_species = 'Homo_sapiens'
+maf_file = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/zoonomia_241_species/241-mammalian-2020v2b.maf.chr1.gz'
+mafindex_file = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/zoonomia_241_species/241-mammalian-2020v2b.maf.chr1.mafindex'
+"""
 strand = '-'
 start = 4381114
 end = 4382190
@@ -201,20 +379,27 @@ index_maf = gzMafIndex(mafindex_file, maf_file, maf_id)
 n_strand = -1 if strand == '-' else 1
 print([start],[end],n_strand)
 results =index_maf.get_spliced([start],[end],n_strand)
-#%%
+print("total time:", time.time() - start_total)
+ #%%
+start_total = time.time()  
 start_list = [start]
 end_list = [end]
-start_flanked=[min(start_list)-100] + start_list + [max(end_list)]
-end_flanked = [min(start_list)] + end_list + [max(end_list)+100]
+start_flanked=[min(start_list)-5000] + start_list + [max(end_list)]
+end_flanked = [min(start_list)] + end_list + [max(end_list)+5000]
 results =index_maf.get_spliced(start_flanked,end_flanked,n_strand)
+print("total time:", time.time() - start_total)
 #%% old
 target_species = 'hg38'
-chrom = 'chrX'
-maf_file = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/chrX.maf'
-mafindex_file = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/chrX.mafindex'
-strand = '+'
-start = 2781647
-end = 2782000
+#target_species = 'Homo_sapiens'
+chrom = 'chr2'
+maf_file = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/chr2.maf'
+mafindex_file = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/chr2.mafindex'
+#maf_file = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/zoonomia_241_species/241-mammalian-2020v2b.maf.chr1'
+#mafindex_file = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/zoonomia_241_species/241-mammalian-2020v2b.maf.chr1.mafindex'
+
+strand = '-'
+start = 4381114
+end = 4382190
 maf_id = f'{target_species}.{chrom}'
     
 index_maf = MafIO.MafIndex(mafindex_file, maf_file, maf_id) 
@@ -223,8 +408,8 @@ results_old =index_maf.get_spliced([start],[end],n_strand)
 #%%
 start_list = [start]
 end_list = [end]
-start_flanked=[min(start_list)-100] + start_list + [max(end_list)]
-end_flanked = [min(start_list)] + end_list + [max(end_list)+100]
+start_flanked=[min(start_list)-5000] + start_list + [max(end_list)]
+end_flanked = [min(start_list)] + end_list + [max(end_list)+5000]
 results =index_maf.get_spliced(start_flanked,end_flanked,n_strand)
 #%%
 import subprocess

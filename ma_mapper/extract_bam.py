@@ -181,7 +181,7 @@ def extract_bam(bam_file:str, chrom:str, start_list:List, end_list:List, strand:
 #%%
 _IO = Literal['legacy','optimized']
 _MODE = Literal['legacy','optimized']
-def bam_io(metadata: str|pd.DataFrame, 
+def bam_io(coordinate_table: str|pd.DataFrame, 
               bam_file:str,
               bam_format:_FORMAT, 
               output_dir:str = None, 
@@ -193,16 +193,16 @@ def bam_io(metadata: str|pd.DataFrame,
               **kwargs)->List:
     
 
-    if isinstance(metadata, str):
-        if (os.path.isfile(metadata) == True):
-            metadata_local = pd.read_csv(metadata, sep='\t', header=None)
+    if isinstance(coordinate_table, str):
+        if (os.path.isfile(coordinate_table) == True):
+            metadata_local = pd.read_csv(coordinate_table, sep='\t', header=None)
         else:
-            logger.error('metadata file not found')
+            logger.error('coordinate_table file not found')
     else:
-        metadata_local = metadata
+        metadata_local = coordinate_table
     if output_dir is None:
-        if isinstance(metadata, str):
-            output_dir = '/'.join(str.split(metadata, sep ='/')[:-1])
+        if isinstance(coordinate_table, str):
+            output_dir = '/'.join(str.split(coordinate_table, sep ='/')[:-1])
         else:
             output_dir = os.path.dirname(os.path.abspath(__file__))
     if custom_id == False:

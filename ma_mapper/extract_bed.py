@@ -12,34 +12,34 @@ if sys.version_info >= (3, 8, 0):
 else:
     from typing_extensions import Literal, Tuple, List
 #%%
-def metadata_to_bed(metadata: pd.DataFrame|str,
+def coordinate_table_to_bed(coordinate_table: pd.DataFrame|str,
                     output_dir: str|None = None, 
                     save_to_file:bool = False,
                     export_bedtool:bool = False):
-    if isinstance(metadata, str):
-        if (os.path.isfile(metadata) == True):
-            metadata_local = pd.read_csv(metadata, sep='\t')
+    if isinstance(coordinate_table, str):
+        if (os.path.isfile(coordinate_table) == True):
+            coordinate_local = pd.read_csv(coordinate_table, sep='\t')
         else:
-            logger.error('metadata file not found')
+            logger.error('coordinate_table file not found')
     else:
-        metadata_local = metadata
+        coordinate_local = coordinate_table
     if output_dir is None:
-        if isinstance(metadata, str):
-            output_dir = '/'.join(str.split(metadata_local, sep ='/')[:-1])
+        if isinstance(coordinate_table, str):
+            output_dir = '/'.join(str.split(coordinate_local, sep ='/')[:-1])
         else:
             output_dir = os.path.dirname(os.path.abspath(__file__))  
-    metadata_bed = metadata_local.iloc[:,0:3]
-    columns = metadata_bed.columns
+    coordinate_bed = coordinate_local.iloc[:,0:3]
+    columns = coordinate_bed.columns
     new_names = ['chrom', 'start', 'end']
-    metadata_bed.rename(columns={columns[i]: new_names[i] for i in range(3)}, inplace=True)
-    metadata_bed['name'] = metadata_local.meta_id
-    metadata_bed['score'] = 10
-    metadata_bed['strand'] = metadata_local.strand
+    coordinate_bed.rename(columns={columns[i]: new_names[i] for i in range(3)}, inplace=True)
+    coordinate_bed['name'] = coordinate_local.meta_id
+    coordinate_bed['score'] = 10
+    coordinate_bed['strand'] = coordinate_local.strand
     if save_to_file == True:
-        metadata_bed.to_csv(output_dir, sep='\t', index= False)
+        coordinate_bed.to_csv(output_dir, sep='\t', index= False)
     if export_bedtool:
-        metadata_bed=pybedtools.BedTool.from_dataframe(metadata_bed)
-    return metadata_bed
+        coordinate_bed=pybedtools.BedTool.from_dataframe(coordinate_bed)
+    return coordinate_bed
 
 #%%
 
@@ -58,8 +58,8 @@ def _extract_bed(bed_file, chrom, start_list, end_list, strand):
         end = end_list[i]
         prep_dict = {'chrom':[chrom], 'start':[start], 'end':[end],'name':['temp'],'score':[10], strand:[strand]}
         temp_df = pd.DataFrame(prep_dict)
-        metadata_bed=pybedtools.BedTool.from_dataframe(temp_df)
-        temp_intersect=metadata_bed.intersect(bed_file_local,wa=True, wb =True, s=True)
+        coordinate_bed=pybedtools.BedTool.from_dataframe(temp_df)
+        temp_intersect=coordinate_bed.intersect(bed_file_local,wa=True, wb =True, s=True)
         fragment_length = end - start
         canvas=np.zeros(fragment_length)
         for intersect in temp_intersect:
@@ -123,7 +123,7 @@ def extract_bed(intersect_df: pd.DataFrame,
     return bed_out
 #%%
 _MODE = Literal['legacy','dirty']
-def bed_io(metadata: pd.DataFrame|str, 
+def bed_io(coordinate_table: pd.DataFrame|str, 
               bed: pd.DataFrame|pybedtools.BedTool|str, 
               output_dir: str|None = None, 
               save_to_file:bool = False, 
@@ -132,16 +132,16 @@ def bed_io(metadata: pd.DataFrame|str,
               strand_overlap = True,
               mode:_MODE = 'dirty'):
 
-    if isinstance(metadata, str):
-        if (os.path.isfile(metadata) == True):
-            metadata_local = pd.read_csv(metadata, sep='\t', header=None)
+    if isinstance(coordinate_table, str):
+        if (os.path.isfile(coordinate_table) == True):
+            coordinate_local = pd.read_csv(coordinate_table, sep='\t', header=None)
         else:
-            logger.error('metadata file not found')
+            logger.error('coordinate_table file not found')
     else:
-        metadata_local = metadata
+        coordinate_local = coordinate_table
     if output_dir is None:
-        if isinstance(metadata, str):
-            output_dir = '/'.join(str.split(metadata, sep ='/')[:-1])
+        if isinstance(coordinate_table, str):
+            output_dir = '/'.join(str.split(coordinate_table, sep ='/')[:-1])
         else:
             output_dir = os.path.dirname(os.path.abspath(__file__))  
     if isinstance(bed, str):
@@ -156,15 +156,15 @@ def bed_io(metadata: pd.DataFrame|str,
     else:
         bed_file = bed
     if custom_id == False:
-        meta_id = [f'{custom_prefix}_{index}' for index in metadata_local.index.astype(str)]
-        metadata_local['meta_id'] = meta_id
+        meta_id = [f'{custom_prefix}_{index}' for index in coordinate_local.index.astype(str)]
+        coordinate_local['meta_id'] = meta_id
     else:
-        metadata_local['meta_id'] = metadata_local.iloc[:,3]
-        meta_id = metadata_local.meta_id.unique()
+        coordinate_local['meta_id'] = coordinate_local.iloc[:,3]
+        meta_id = coordinate_local.meta_id.unique()
     
     
     if mode == 'legacy':
-        grouped = metadata_local.groupby('meta_id', sort=False)
+        grouped = coordinate_local.groupby('meta_id', sort=False)
         chrom_list = grouped.apply(lambda x: x.iloc[:,0].unique()[0], include_groups=False).tolist()
         start_list = grouped.apply(lambda x: x.iloc[:,1].tolist(), include_groups=False).tolist()
         end_list = grouped.apply(lambda x: x.iloc[:,2].tolist(), include_groups=False).tolist()
@@ -172,10 +172,10 @@ def bed_io(metadata: pd.DataFrame|str,
         with ProcessPoolExecutor(max_workers=40) as executor:
             results  = executor.map(_extract_bed, repeat(bed_file), chrom_list, start_list,end_list,strand_list)
     elif mode == 'dirty':
-        metadata_bed=pybedtools.BedTool.from_dataframe(metadata_local.iloc[:,0:6])
+        coordinate_bed=pybedtools.BedTool.from_dataframe(coordinate_local.iloc[:,0:6])
         bed = pybedtools.BedTool(bed)
 
-        intersect_bed=metadata_bed.intersect(bed_file,loj=True, wa = True, wb =True, s=strand_overlap)
+        intersect_bed=coordinate_bed.intersect(bed_file,loj=True, wa = True, wb =True, s=strand_overlap)
         intersect_df=intersect_bed.to_dataframe()
         with ProcessPoolExecutor(max_workers=40) as executor:
             results  = executor.map(extract_bed, repeat(intersect_df), meta_id)

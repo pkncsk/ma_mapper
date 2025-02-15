@@ -320,7 +320,7 @@ def extract_maf(internal_id:str,
     #logger.info(f'done {internal_id} {start_time-time.time()}')
     return output_array
 #%%
-def maf_io(metadata: pd.DataFrame|str, 
+def maf_io(coordinate_table: pd.DataFrame|str, 
            maf:str,
            output_dir:str|None = None, 
            separated_maf:bool = False, 
@@ -332,28 +332,28 @@ def maf_io(metadata: pd.DataFrame|str,
            species_list:list=None,
            e_value_table: str|pd.DataFrame|None=None, 
            internal_id_table: str|pd.DataFrame|None=None, **kwargs):
-    if isinstance(metadata, str):
-        if os.path.isfile(metadata):
-            metadata_local = pd.read_csv(metadata, sep='\t', header=None)
+    if isinstance(coordinate_table, str):
+        if os.path.isfile(coordinate_table):
+            coordinate_local = pd.read_csv(coordinate_table, sep='\t', header=None)
         else:
-            logger.error('metadata file not found')
+            logger.error('coordinate_table file not found')
     else:
-        metadata_local = metadata
+        coordinate_local = coordinate_table
     if output_dir is None:
-        if isinstance(metadata, str):
-            output_dir = '/'.join(str.split(metadata, sep ='/')[:-1])
+        if isinstance(coordinate_table, str):
+            output_dir = '/'.join(str.split(coordinate_table, sep ='/')[:-1])
         else: 
             output_dir = os.path.dirname(os.path.abspath(__file__))
 
     logger.info(f'extract from maf target: {maf}')
     if custom_id == False:
-        meta_id = [f'{custom_prefix}_{index}' for index in metadata_local.index.astype(str)]
-        metadata_local['meta_id'] = meta_id
+        meta_id = [f'{custom_prefix}_{index}' for index in coordinate_local.index.astype(str)]
+        coordinate_local['meta_id'] = meta_id
     else:
-        metadata_local['meta_id'] = metadata_local.iloc[:,3]
-        meta_id = metadata_local.meta_id.unique()
+        coordinate_local['meta_id'] = coordinate_local.iloc[:,3]
+        meta_id = coordinate_local.meta_id.unique()
     print(meta_id[0])
-    grouped = metadata_local.groupby('meta_id', sort=False)
+    grouped = coordinate_local.groupby('meta_id', sort=False)
     chrom_list = grouped.apply(lambda x: x.iloc[:,0].unique()[0], include_groups=False).tolist()
     start_list = grouped.apply(lambda x: x.iloc[:,1].tolist(), include_groups=False).tolist()
     end_list = grouped.apply(lambda x: x.iloc[:,2].tolist(), include_groups=False).tolist()
