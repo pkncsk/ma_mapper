@@ -431,14 +431,14 @@ def map_and_overlay(aligment:str,
         for _, row in alignment_coordinate.iterrows():
             sorted_order.append(np.where(source_order == row['name'])[0][0])
         alignment_matrix_sorted = alignment_matrix[sorted_order]
-        alignment_coordinate_sorted = alignment_coordinate[sorted_order]
+        alignment_coordinate_sorted = alignment_coordinate.iloc[sorted_order]
         row_filter_sorted = row_filter[sorted_order]
     if filter:
         if isinstance(filter, list):
             mapping_filters = filter
         else:
             mapping_filters = [row_filter_sorted, col_filter]
-        alignment_coordinate_filtered=alignment_coordinate_sorted.iloc[row_filter_sorted,:]
+        alignment_coordinate_filtered=alignment_coordinate_sorted.iloc[row_filter_sorted]
     else:
         mapping_filters = None
         alignment_coordinate_filtered=alignment_coordinate_sorted

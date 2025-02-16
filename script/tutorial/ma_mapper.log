@@ -19,3 +19,11 @@
 2025-02-15 16:03:54,582 ma_mapper INFO nested_data:False
 2025-02-15 16:03:55,185 ma_mapper INFO parse alignment
 2025-02-15 16:04:22,674 ma_mapper INFO parse alignment
+2025-02-16 00:18:40,558 ma_mapper INFO parse alignment
+2025-02-16 00:18:49,194 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-02-16 00:19:27,032 ma_mapper INFO done, returning bed_out as object
+2025-02-16 00:22:50,757 ma_mapper INFO parse alignment
+2025-02-16 00:24:47,111 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-02-16 00:32:32,897 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-02-16 00:35:05,217 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-02-16 00:35:54,365 ma_mapper INFO done, returning bed_out as object
