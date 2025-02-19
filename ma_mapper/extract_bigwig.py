@@ -53,10 +53,10 @@ def bigwig_io(coordinate_table,
         coordinate_local['meta_id'] = coordinate_local.iloc[:,3]
         meta_id = coordinate_local.meta_id.unique()    
     grouped = coordinate_local.groupby('meta_id', sort=False)
-    chrom_list = grouped.apply(lambda x: x.iloc[:,0].unique()[0], include_groups=False).tolist()
-    start_list = grouped.apply(lambda x: x.iloc[:,1].tolist(), include_groups=False).tolist()
-    end_list = grouped.apply(lambda x: x.iloc[:,2].tolist(), include_groups=False).tolist()
-    strand_list = grouped.apply(lambda x: x.iloc[:,5].unique()[0], include_groups=False).tolist()
+    chrom_list = grouped.apply(lambda x: x.iloc[:,0].unique()[0]).tolist()
+    start_list = grouped.apply(lambda x: x.iloc[:,1].tolist()).tolist()
+    end_list = grouped.apply(lambda x: x.iloc[:,2].tolist()).tolist()
+    strand_list = grouped.apply(lambda x: x.iloc[:,5].unique()[0]).tolist()
     with pyBigWig.open(bigwig) as bigwig_file:
         bigwig_out = []
         for i  in range(len(chrom_list)):

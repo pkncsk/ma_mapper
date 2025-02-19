@@ -27,3 +27,36 @@
 2025-02-16 00:32:32,897 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
 2025-02-16 00:35:05,217 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
 2025-02-16 00:35:54,365 ma_mapper INFO done, returning bed_out as object
+2025-02-16 01:01:05,762 ma_mapper INFO parse alignment
+2025-02-16 01:01:13,971 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-02-16 01:01:55,928 ma_mapper INFO done, returning bed_out as object
+2025-02-16 01:01:56,160 ma_mapper INFO {<class 'numpy.float64'>}
+2025-02-16 01:01:56,161 ma_mapper INFO nested_data:False
+2025-02-17 00:38:29,342 ma_mapper INFO parse alignment
+2025-02-17 00:38:41,998 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-02-17 00:39:04,428 ma_mapper INFO done, returning bed_out as object
+2025-02-17 00:39:04,590 ma_mapper INFO {<class 'numpy.float64'>}
+2025-02-17 00:39:04,590 ma_mapper INFO nested_data:False
+2025-02-17 00:39:09,248 ma_mapper INFO parse alignment
+2025-02-17 00:39:13,439 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-02-17 00:39:36,574 ma_mapper INFO done, returning bed_out as object
+2025-02-17 00:39:36,734 ma_mapper INFO {<class 'numpy.float64'>}
+2025-02-17 00:39:36,734 ma_mapper INFO nested_data:False
+2025-02-18 07:56:41,370 ma_mapper INFO parse alignment
+2025-02-18 07:56:57,293 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-02-18 07:57:21,620 ma_mapper INFO done, returning bed_out as object
+2025-02-18 07:57:21,786 ma_mapper INFO {<class 'numpy.float64'>}
+2025-02-18 07:57:21,787 ma_mapper INFO nested_data:False
+2025-02-18 07:57:22,398 ma_mapper INFO parse alignment
+2025-02-19 02:51:12,731 ma_mapper INFO parse alignment
+2025-02-19 02:51:23,022 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-02-19 02:51:49,384 ma_mapper INFO done, returning bed_out as object
+2025-02-19 02:51:49,577 ma_mapper INFO {<class 'numpy.float64'>}
+2025-02-19 02:51:49,578 ma_mapper INFO nested_data:False
+2025-02-19 02:51:49,984 ma_mapper INFO parse alignment
+2025-02-19 02:55:23,547 ma_mapper INFO parse alignment
+2025-02-19 02:55:28,208 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-02-19 02:55:55,183 ma_mapper INFO done, returning bed_out as object
+2025-02-19 02:55:55,364 ma_mapper INFO {<class 'numpy.float64'>}
+2025-02-19 02:55:55,365 ma_mapper INFO nested_data:False
+2025-02-19 02:55:57,876 ma_mapper INFO parse alignment
