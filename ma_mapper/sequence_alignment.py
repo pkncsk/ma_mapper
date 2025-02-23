@@ -96,7 +96,12 @@ def extract_sequence(genoname, genostart, genoend,strand, records):
 
 
 
-def sequence_io(coordinate_table,source_fasta,output_filepath = None, save_to_file=False, custom_id = False, custom_prefix = 'entry'):
+def sequence_io(coordinate_table,
+                source_fasta,
+                output_filepath = None, 
+                save_to_file=False, 
+                custom_id = None, 
+                ):
     from Bio import SeqIO
     from Bio.Seq import Seq
     from Bio.SeqRecord import SeqRecord
@@ -116,9 +121,9 @@ def sequence_io(coordinate_table,source_fasta,output_filepath = None, save_to_fi
             output_filepath = f'{os.path.dirname(os.path.abspath(__file__))}/sequence.fasta'
     else:
         output_filepath = output_filepath
-        
-    if custom_id == False:
-        meta_id = [f'{custom_prefix}_{index}' for index in coordinate_local.index.astype(str)]
+    
+    if custom_id:
+        meta_id = [f'{custom_id}_{index}' for index in coordinate_local.index.astype(str)]
         coordinate_local['meta_id'] = meta_id
     else:
         coordinate_local['meta_id'] = coordinate_local.iloc[:,3]
