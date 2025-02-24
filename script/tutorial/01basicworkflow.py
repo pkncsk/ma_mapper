@@ -1,6 +1,7 @@
 #%% LOAD PACKAGE
 from ma_mapper import mapper
 from ma_mapper import plots
+from ma_mapper import custom_cmap
 #%% INITIAL PARAMETER
 alignment_filepath = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/output/ma_mapper/hg38_main/alignment/THE1C.fasta.aligned'
 genomewide_data_filepath = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed'
@@ -23,4 +24,12 @@ alignment_coordinate_filtered=alignment_coordinate.iloc[row_filter]
 output_matrix_filtered = mapper.map_data(data_file=output_matrix, sorted_parsed_alignment= alignment_matrix, filter=filters)
 #visualization
 plots.plot_experimental(data = [output_matrix_filtered], heatmap_color=['Greens'], vlim = [[0,0.1]], opacity = 1)
-#%%
+#%% matrix extension
+#it is possible to extend data extraction beyond the input coordinates by using extension_length argument. However the extended parts will be extracted as is, no alignment
+phyloP_data_filepath = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/UCSC_phyloP_track/hg38.phyloP447way.bw'
+phyloP_matrix=mapper.map_and_overlay(alignment_filepath, phyloP_data_filepath,data_format='bigwig', custom_id=True=)
+plots.plot_experimental(data=[phyloP_matrix], heatmap_color=[custom_cmap.vlag_r_mpl], vlim =[[-0.5,0.5]])
+phyloP_matrix_extended=mapper.map_and_overlay(alignment_filepath, phyloP_data_filepath,data_format='bigwig', custom_id=True, extension_length=100)
+#compared to the data mapped on aligned, the data on unaligned are more non-uniform
+plots.plot_experimental(data=[phyloP_matrix_extended], heatmap_color=[custom_cmap.vlag_r_mpl], vlim =[[-0.5,0.5]])
+# %%

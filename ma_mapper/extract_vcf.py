@@ -55,10 +55,10 @@ def vcf_io(coordinate_table, vcf, query_key = 'AF', output_dir = None, vcf_forma
         meta_id = coordinate_local.meta_id.unique()
 
     grouped = coordinate_local.groupby('meta_id', sort=False)
-    chrom_list = grouped.apply(lambda x: x.iloc[:,0].unique()[0], include_groups=False).tolist()
-    start_list = grouped.apply(lambda x: x.iloc[:,1].tolist(), include_groups=False).tolist()
-    end_list = grouped.apply(lambda x: x.iloc[:,2].tolist(), include_groups=False).tolist()
-    strand_list = grouped.apply(lambda x: x.iloc[:,5].unique()[0], include_groups=False).tolist()
+    chrom_list = grouped.apply(lambda x: x.iloc[:,0].unique()[0]).tolist()
+    start_list = grouped.apply(lambda x: x.iloc[:,1].tolist()).tolist()
+    end_list = grouped.apply(lambda x: x.iloc[:,2].tolist()).tolist()
+    strand_list = grouped.apply(lambda x: x.iloc[:,5].unique()[0]).tolist()
     vcf_call_list = []
     for chrom in chrom_list:
         if vcf_format == 'gnomad':

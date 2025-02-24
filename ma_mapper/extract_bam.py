@@ -216,10 +216,10 @@ def bam_io(coordinate_table: str|pd.DataFrame,
         eb_kwargs = {key: value for key, value in kwargs.items() if key in ('offset','probe_length', 'smoothing_length')}
         if io == 'optimized': 
             grouped = metadata_local.groupby('meta_id', sort=False)
-            chrom_list = grouped.apply(lambda x: x.iloc[:,0].unique()[0], include_groups=False).tolist()
-            start_list = grouped.apply(lambda x: x.iloc[:,1].tolist(), include_groups=False).tolist()
-            end_list = grouped.apply(lambda x: x.iloc[:,2].tolist(), include_groups=False).tolist()
-            strand_list = grouped.apply(lambda x: x.iloc[:,5].unique()[0], include_groups=False).tolist()
+            chrom_list = grouped.apply(lambda x: x.iloc[:,0].unique()[0]).tolist()
+            start_list = grouped.apply(lambda x: x.iloc[:,1].tolist()).tolist()
+            end_list = grouped.apply(lambda x: x.iloc[:,2].tolist()).tolist()
+            strand_list = grouped.apply(lambda x: x.iloc[:,5].unique()[0]).tolist()
             bam = []
             for i  in range(len(chrom_list)):
                 if mode == 'legacy':
