@@ -66,7 +66,6 @@ plots.plot(
     heatmap_color=["Blues"], 
     vlim =[[0,5]],
     opacity=0.99, #transparency value of heatmap layer
-    transparency_mode = 'gradient', 
     show_alignment=True,
     alignment=alignment_matrix, 
     alignment_col='nulc_white', 
@@ -100,7 +99,7 @@ plots.plot(
 #%% aggregated plot
 # this part was intended to show aggregated data from the main plot by normalizing the matrix by column and plot a resulting array as a bar chart
 ##plot preparation (not shown)
-mean_phyloP=mapper.normalise(alignment=alignment_matrix, mapped_data=phyloP_matrix, method = 'average')
+mean_phyloP=mapper.normalise(alignment_matrix=alignment_matrix, data_matrix=phyloP_matrix, method = 'average')
 #%%
 #here is the most basic aggregated plot
 plots.plot(
@@ -146,7 +145,7 @@ plots.plot(
 ##plot preparation (not shown)
 #genomewide data can be used to sort data matrix
 #calculate AP-1 coverage
-ap1_coverage_array=mapper.normalise(alignment=alignment_matrix, mapped_data=ap1_matrix, method='perc_coverage')
+ap1_coverage_array=mapper.normalise(alignment_matrix=alignment_matrix, data_matrix=ap1_matrix, method='perc_coverage')
 #since the coordinate table was filtered in parse and filter function, reset index to match positions in output matrices
 coordinate_table = coordinate_table.reset_index()
 #find peaks of coverage
@@ -165,7 +164,6 @@ plots.plot(
     heatmap_color=[custom_cmap.vlag_r_mpl], 
     vlim =[[-0.5,0.5]], 
     opacity=0.99, 
-    transparency_mode = 'gradient', 
     annotation = True,  #enable annotation
     anno_col=[['blue','white']], #annotation colorset
     annotation_data= [ap1_motif_annotation], #annotation array
@@ -176,7 +174,6 @@ plots.plot(
     heatmap_color=[custom_cmap.vlag_r_mpl], 
     vlim =[[-0.5,0.5]], 
     opacity=0.99, 
-    transparency_mode = 'gradient', 
     annotation = True,  #enable annotation
     anno_col=[['blue','white']], #annotation colorset
     annotation_data= [ap1_motif_annotation], #annotation array

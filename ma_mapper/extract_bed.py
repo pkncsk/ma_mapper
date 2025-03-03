@@ -22,11 +22,7 @@ def coordinate_table_to_bed(coordinate_table: pd.DataFrame|str,
             logger.error('coordinate_table file not found')
     else:
         coordinate_local = coordinate_table
-    if output_dir is None:
-        if isinstance(coordinate_table, str):
-            output_dir = '/'.join(str.split(coordinate_local, sep ='/')[:-1])
-        else:
-            output_dir = os.path.dirname(os.path.abspath(__file__))  
+
     coordinate_bed = coordinate_local.iloc[:,0:3]
     columns = coordinate_bed.columns
     new_names = ['chrom', 'start', 'end']
@@ -43,7 +39,7 @@ def coordinate_table_to_bed(coordinate_table: pd.DataFrame|str,
             else:
                 output_dir = os.path.dirname(os.path.abspath(__file__)) 
             output_filepath = f'{output_dir}/coordinate.bed'
-        coordinate_bed.to_csv(output_dir, sep='\t', index= False)
+        coordinate_bed.to_csv(output_filepath, sep='\t', index= False)
     if export_as_bedtool == True:
         coordinate_bed=pybedtools.BedTool.from_dataframe(coordinate_bed)
     return coordinate_bed

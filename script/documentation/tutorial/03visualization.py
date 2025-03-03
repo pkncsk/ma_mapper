@@ -10,16 +10,16 @@ NFkB_motif_data_filepath = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/res
 phyloP_data_filepath = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/UCSC_phyloP_track/hg38.phyloP447way.bw'
 #%%
 #extract genomewide data into data matrix using coordinates and alignment structure from the alignment file 
-ap1_matrix=mapper.map_and_overlay(alignment_filepath, AP1_motif_data_filepath,data_format='bed', custom_id=True)
-nfkb_matrix=mapper.map_and_overlay(alignment_filepath, NFkB_motif_data_filepath,data_format='bed', custom_id=True)
+ap1_matrix=mapper.map_and_overlay(alignment_filepath, AP1_motif_data_filepath,data_format='bed')
+nfkb_matrix=mapper.map_and_overlay(alignment_filepath, NFkB_motif_data_filepath,data_format='bed')
 #%% DATA OVERLAY
 # Since different kinds of data are overlaid on the same TE alignment, it is possible to overlay their plot to gain visual insight about the data 
-plots.plot_experimental(data=[nfkb_matrix,ap1_matrix], heatmap_color=["Blues","Greens"], vlim =[[0,10],[0,10]], opacity=0.99, transparency_mode = 'gradient')
+plots.plot(data=[nfkb_matrix,ap1_matrix], heatmap_color=["Blues","Greens"], vlim =[[0,10],[0,10]], opacity=0.99)
 #%%  PLOT SORTING
 #genomewide data can be used to sort data matrix
 #calculate AP-1 coverage
 alignment_matrix, coordinate_table=mapper.parse_and_filter(alignment_filepath)
-ap1_coverage_array=mapper.normalise(alignment=alignment_matrix, mapped_data=ap1_matrix, method='perc_coverage')
+ap1_coverage_array=mapper.normalise(alignment_matrix=alignment_matrix, data_matrix=ap1_matrix, method='perc_coverage')
 #since the coordinate table was filtered in parse and filter function, reset index to match positions in output matrices
 coordinate_table = coordinate_table.reset_index()
 #find peaks of coverage
@@ -32,24 +32,26 @@ index_sorted=np.concatenate((index_of_rows_with_ap1, index_of_rows_without_ap1))
 #the sorted index can be used to rearrange matrix of mapped genomewide data
 ap1_matrix_sorted = ap1_matrix[index_sorted]
 nfkb_matrix_sorted = nfkb_matrix[index_sorted]
-plots.plot_experimental(data=[nfkb_matrix_sorted,ap1_matrix_sorted], heatmap_color=["Blues","Greens"], vlim =[[0,10],[0,10]], opacity=0.99, transparency_mode = 'gradient')
+#%%
+plots.plot(data=[nfkb_matrix_sorted,ap1_matrix_sorted], heatmap_color=["Blues","Greens"], vlim =[[0,10],[0,10]], opacity=0.99)
 #%% PLOT ANNOTATION
 #some data such as phyloP can use visual aid from TF motif annotation
-phyloP_matrix = mapper.map_and_overlay(alignment_filepath, phyloP_data_filepath, data_format='bigwig', custom_id=True)
+phyloP_matrix = mapper.map_and_overlay(alignment_filepath, phyloP_data_filepath, data_format='bigwig')
 #data matrix extracted from genome-wide data of TE can also be annotated using coordinate table as a metadata table.
 coordinate_table['AP1_motif'] = 1
 coordinate_table.loc[coordinate_table.index.isin(index_of_rows_with_ap1), 'AP1_motif'] = 0
+#%%
 #extract annotation from metadata
 ap1_motif_annotation=coordinate_table['AP1_motif']
-plots.plot_experimental(data=[phyloP_matrix], heatmap_color=[custom_cmap.vlag_r_mpl], vlim =[[-0.5,0.5]], opacity=0.99, transparency_mode = 'gradient', annotation = True, anno_col=[['blue','white']], annotation_data= [ap1_motif_annotation], anno_cbar_label=[['TE with AP1 motif', 'TE without AP1 motif']])
+plots.plot(data=[phyloP_matrix], heatmap_color=[custom_cmap.vlag_r_mpl], vlim =[[-0.5,0.5]], opacity=0.99, annotation = True, anno_col=[['blue','white']], annotation_data= [ap1_motif_annotation], anno_cbar_label=[['TE with AP1 motif', 'TE without AP1 motif']])
 #%% ANNOTATION SORTING
 phyloP_matrix_sorted = phyloP_matrix[index_sorted]
-plots.plot_experimental(data=[phyloP_matrix], heatmap_color=[custom_cmap.vlag_r_mpl], vlim =[[-0.5,0.5]], opacity=0.99, transparency_mode = 'gradient')
-plots.plot_experimental(data=[phyloP_matrix_sorted], heatmap_color=[custom_cmap.vlag_r_mpl], vlim =[[-0.5,0.5]], opacity=0.99, transparency_mode = 'gradient')
+plots.plot(data=[phyloP_matrix], heatmap_color=[custom_cmap.vlag_r_mpl], vlim =[[-0.5,0.5]], opacity=0.99)
+plots.plot(data=[phyloP_matrix_sorted], heatmap_color=[custom_cmap.vlag_r_mpl], vlim =[[-0.5,0.5]], opacity=0.99)
 #sort rows in metadata using row order from coverage sort earlier
 coordinate_table_sorted=coordinate_table.iloc[index_sorted]
 #now the metadata table has the same order as the sorted alignment, extract annotation
 ap1_motif_annotation_sorted=coordinate_table_sorted['AP1_motif']
-plots.plot_experimental(data=[phyloP_matrix_sorted], heatmap_color=[custom_cmap.vlag_r_mpl], vlim =[[-0.5,0.5]], opacity=0.99, transparency_mode = 'gradient', annotation = True, anno_col=[['blue','white']], annotation_data= [ap1_motif_annotation_sorted], anno_cbar_label=[['TE with AP1 motif', 'TE without AP1 motif']])
+plots.plot(data=[phyloP_matrix_sorted], heatmap_color=[custom_cmap.vlag_r_mpl], vlim =[[-0.5,0.5]], opacity=0.99, annotation = True, anno_col=[['blue','white']], annotation_data= [ap1_motif_annotation_sorted], anno_cbar_label=[['TE with AP1 motif', 'TE without AP1 motif']])
 
 # %%

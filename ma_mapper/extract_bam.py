@@ -108,11 +108,6 @@ def bam_io(coordinate_table: str|pd.DataFrame,
             logger.error('coordinate_table file not found')
     else:
         metadata_local = coordinate_table
-    if output_dir is None:
-        if isinstance(coordinate_table, str):
-            output_dir = '/'.join(str.split(coordinate_table, sep ='/')[:-1])
-        else:
-            output_dir = os.path.dirname(os.path.abspath(__file__))
     if generate_new_id == True:
         meta_id = [f'entry_{index}' for index in metadata_local.index.astype(str)]
         metadata_local['meta_id'] = meta_id

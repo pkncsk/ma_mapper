@@ -14,8 +14,7 @@ coord_table=sequence_alignment.extract_coord_from_repeatmasker_table(
 te_seqeunces=sequence_alignment.sequence_io(
     coordinate_table=coord_table,
     source_fasta='/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/human_genome_fasta/hg38_fasta/hg38.fa',
-    save_to_file=True,
-    output_filepath='/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/repeatmasker_table/THE1C.fa',)
+    save_to_file='/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/repeatmasker_table/THE1C.fa')
 # %% align TE sequences using MAFFT warpper
 # mafft arguments like nthread,  nthreadtb, nthreadtit can be used, additional parameter can be used by additional command using mafft_arg= )
 sequence_alignment.mafft_align(

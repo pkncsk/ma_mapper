@@ -256,17 +256,17 @@ def plot_annotation(anno: list|np.ndarray|pd.Series|pd.DataFrame,
         anno_plot = anno.values
         anno_uniq=anno.sort_values().unique()
     if isinstance(cmap, ListedColormap|LinearSegmentedColormap):
-        print('check1')
+        #print('check1')
         anno_cmap = cmap
     elif isinstance(cmap, list):
-        print('check2')
+        #print('check2')
         anno_cmap = ListedColormap(cmap)
         boundaries = np.arange(len(cmap) + 1) - 0.
         num_colors = len(anno_uniq)
         norm = BoundaryNorm(boundaries, num_colors)
         
     else:
-        print('check3')
+        #print('check3')
         cmap = cmap or 'Blues'
         anno_cmap_= plt.get_cmap(cmap)
         num_colors = len(anno_uniq)
@@ -423,9 +423,9 @@ def plot(data: list|np.ndarray|None = None,
                     agg_xlabel_fs =None,
                     agg_major_tick: int = 50,
                     agg_yscale: list|None = None,
-                    agg_titles: list|None = None,
-                    agg_titles_fs: int = 6,
-                    agg_titles_pos: list = [1.1,0.5],
+                    agg_ylabel_right: list|None = None,
+                    agg_ylabel_right_fs: int = 6,
+                    agg_ylabel_right_pos: list = [1.1,0.5],
                     agg_plottext: list|None = None,
                     agg_plottext_fs: int = 6,
                     agg_plottext_pos: list = [0.99,0.90],
@@ -588,10 +588,10 @@ def plot(data: list|np.ndarray|None = None,
             if agg_xhighlight is not None:
                 for _idx, xhighlight_coord in enumerate(agg_xhighlight):
                     aggregated_grids[idx].axhspan(xhighlight_coord[0], xhighlight_coord[1], color=agg_xhighlight_col[(_idx % len(agg_xhighlight))], alpha=agg_xhighlight_alpha[(_idx % len(agg_xhighlight))])
-            if agg_titles is not None and agg_titles[idx] is not None:
-                aggregated_grids[idx].text(agg_titles_pos[0], agg_titles_pos[1], agg_titles[idx], 
+            if agg_ylabel_right is not None and agg_ylabel_right[idx] is not None:
+                aggregated_grids[idx].text(agg_ylabel_right_pos[0], agg_ylabel_right_pos[1], agg_ylabel_right[idx], 
                 transform=aggregated_grids[idx].transAxes, 
-                fontsize=agg_titles_fs, 
+                fontsize=agg_ylabel_right_fs, 
                 verticalalignment='bottom', 
                 horizontalalignment='right')
             if agg_plottext is not None and agg_plottext[idx] is not None:

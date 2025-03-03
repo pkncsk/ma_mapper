@@ -11,26 +11,26 @@ alignment_matrix, alignment_coordinate, filters  = mapper.parse_and_filter(align
 # extract_bed is a wrapper for pybedtools
 from ma_mapper import extract_bed
 #then use alignment coordinate to extract genomewide data
-output_matrix=extract_bed.bed_io(coordinate_table=alignment_coordinate, bed=BED_filepath, custom_id=True)
+output_matrix=extract_bed.bed_io(coordinate_table=alignment_coordinate, bed=BED_filepath)
 
 #the default setting for BED file extraction is to match DNA strand, in the case where strand matching is not needed, it can be disabled
-output_matrix=extract_bed.bed_io(coordinate_table=alignment_coordinate, bed=BED_filepath, custom_id=True, strand_overlap=False)
+output_matrix=extract_bed.bed_io(coordinate_table=alignment_coordinate, bed=BED_filepath, strand_overlap=False)
 #%% BIGWIG file 
 # was also introduced earlier in basic workflow, as of now there is no options for this function
 # extract_bigwig is a wrapper for pybigwig
 from ma_mapper import extract_bigwig
 BIGWIG_filepath = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/UCSC_phyloP_track/hg38.phyloP447way.bw'
-extract_bigwig.bigwig_io(coordinate_table=alignment_coordinate, bigwig=BIGWIG_filepath, custom_id=True)
+extract_bigwig.bigwig_io(coordinate_table=alignment_coordinate, bigwig=BIGWIG_filepath)
 #%% BAM/SAM file
 # extract_bam is a wrapper for pysam
 from ma_mapper import extract_bam
 BAM_filepath = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/sequenceing_data_fastqsambam/znf267.sorted.bam'
 # this module has different outputs which can be extracted, we can separate reverse, forward reads or have them all as summation, and have all those as smooted reads
-read_forward_matrix=extract_bam.bam_io(coordinate_table=alignment_coordinate,bam_file=BAM_filepath, bam_format='read_forward', custom_id=True)
-read_reverse_matrix=extract_bam.bam_io(coordinate_table=alignment_coordinate,bam_file=BAM_filepath, bam_format='read_reverse', custom_id=True)
-read_total_matrix=extract_bam.bam_io(coordinate_table=alignment_coordinate,bam_file=BAM_filepath, bam_format='read_sum', custom_id=True)
+read_forward_matrix=extract_bam.bam_io(coordinate_table=alignment_coordinate,bam_file=BAM_filepath, bam_format='read_forward')
+read_reverse_matrix=extract_bam.bam_io(coordinate_table=alignment_coordinate,bam_file=BAM_filepath, bam_format='read_reverse')
+read_total_matrix=extract_bam.bam_io(coordinate_table=alignment_coordinate,bam_file=BAM_filepath, bam_format='read_sum')
 # it is also possible to control probe and smoothing length for smooted reads
-normal_forward_matrix=extract_bam.bam_io(coordinate_table=alignment_coordinate,bam_file=BAM_filepath, bam_format='normal_forward', custom_id=True, probe_length=100, smoothing_length=100)
+normal_forward_matrix=extract_bam.bam_io(coordinate_table=alignment_coordinate,bam_file=BAM_filepath, bam_format='normal_forward', probe_length=100, smoothing_length=100)
 #%% MAF file
 # extract_maf is a wrapper for MafIO from biopython package
 # it also modified get_spliced function to handle duplicate entries in zoonomia maf file, as for now it will collaspe duplicates according to IUPAC rules, add parallelization support to speed up the process
@@ -48,4 +48,5 @@ maf_matrix_filtered = extract_maf.maf_io(coordinate_table=alignment_coordinate, 
 # as of now it supports gnomAD vcf file. As gnomAD VCF store subset of data with key such as AF (allele freqeucy), we can specify query key for a subset we want
 from ma_mapper import extract_vcf
 VCF_dir = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/allele_frequency_vcf/gnomad'
-vcf_matrix = extract_vcf.vcf_io(coordinate_table=alignment_coordinate, vcf=VCF_dir, query_key='AF', vcf_format='gnomad', custom_id=True)
+vcf_matrix = extract_vcf.vcf_io(coordinate_table=alignment_coordinate, vcf=VCF_dir, query_key='AF', vcf_format='gnomad')
+#%%
