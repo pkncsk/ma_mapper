@@ -181,8 +181,8 @@ def get_spliced_mod(self, starts, ends, strand=1):
 MafIO.MafIndex.get_spliced = get_spliced_mod
 #%%
 _AGEARG = Literal[None,'calibrate']
-_COUNTARG = Literal['human_ref','coverage','common', 'common_raw','common_nogap', 'total_raw','a','t','c','g','base_count','base_freq','base_freq_nogap','raw']
-def extract_maf(internal_id:str,
+_COUNTARG = Literal['ref_freq','coverage','common_freq', 'common_raw','common_freq_nogap','a','t','c','g','base_count','base_freq','base_freq_nogap','raw']
+def extract_maf(name:str,
                 maf_file:str, 
                 chrom:str, 
                 start:int, 
@@ -190,9 +190,9 @@ def extract_maf(internal_id:str,
                 strand:str,
                 target_species:str = 'Homo_sapiens', 
                 count_arg:_COUNTARG = 'common',
+                species_list:list=None,
                 e_value_df:pd.DataFrame = None, 
                 internal_id_df:pd.DataFrame = None,
-                species_list:list=None,
                 ):
     iupac_codes = {
         'A': {'A'},
@@ -224,10 +224,6 @@ def extract_maf(internal_id:str,
         
         return base_counts
 
-
-    #start_time = timeal.time()
-    #print(intern_id)
-    #print(target_species,chrom, start, end, strand)
     maf_id = f'{target_species}.{chrom}'
     
     index_maf = MafIO.MafIndex(f'{maf_file}.mafindex', maf_file, maf_id) 
@@ -240,17 +236,14 @@ def extract_maf(internal_id:str,
         collector = results[results['seqid'].str.contains(pattern)]
     else:
         if internal_id_df is not None:
-            #subfamily = str.split(internal_id, sep ='_')[:-1]
-            #internal_id_idx = str.split(internal_id, sep ='_')[-1]
-            #_internal_id = internal_id_df[internal_id_df.index==int(internal_id_idx)]['internal_id'].values[0]
             _internal_id = internal_id_df[internal_id_df['meta_id'] == internal_id]['internal_id'].values[0]
         else:
-            _internal_id = internal_id
+            _internal_id = name
         e_value_df['seqid'] = e_value_df.species + '.' + e_value_df.chr_code
         e_value_internal_id=e_value_df[e_value_df['internal_id'] == _internal_id]
         
         if e_value_internal_id.shape[0] <= 1:
-            collector = results[results.seqid.str.contains('Homo_sapiens')]
+            collector = results[results.seqid.str.contains(target_species)]
         else:
             collector = results[results.seqid.isin(e_value_internal_id.seqid.values)]
             
@@ -266,13 +259,11 @@ def extract_maf(internal_id:str,
     #return collector
     #logger.info('pass1')
     try:
-        #logger.info(np.char.upper(results[results.seqid.str.contains('Homo_sapiens')]['seq'].to_list()))
-        ref_alleles = np.char.upper(results[results.seqid.str.contains('Homo_sapiens')]['seq'].to_list())[0]
-        #logger.info(ref_alleles)
+
+        ref_alleles = np.char.upper(results[results.seqid.str.contains(target_species)]['seq'].to_list())[0]
     except IndexError:
-        print(f'IndexError:{internal_id}\t{maf_file}\t{maf_id}\t{chrom}\t{start}\t{end}\t{strand}')
-        #print(collector)
-        
+        print(f'IndexError:{name}\t{maf_file}\t{maf_id}\t{chrom}\t{start}\t{end}\t{strand}')
+       
     
     
     array_transposed=np.array(collector['seq'].to_list()).transpose()
@@ -280,30 +271,29 @@ def extract_maf(internal_id:str,
     for idx, pos_array in enumerate(array_transposed):
         frequencies =count_bases_with_ambiguity(np.char.upper(pos_array))
         ref_allele=ref_alleles[idx]
-        #frequencies.pop('-', None) #->count deletion/insertion
         total = sum(frequencies.values())
-        if count_arg == 'human_ref':
+        if count_arg == 'ref_freq':
             alt_count = total - frequencies[ref_allele]
             alt_freq=alt_count/total
             if total == 1:
                 alt_freq = np.nan
             output_array.append(alt_freq)
-        elif count_arg in ['coverage', 'total_raw']:
+        elif count_arg == 'coverage':
             output_array.append(total)
-        elif count_arg in ['common', 'common_raw']:
+        elif count_arg in ['common_freq', 'common_raw']:
             common_allele = max(frequencies, key=frequencies.get)
             common_count = frequencies.get(common_allele)
-            if count_arg == 'common':
+            if count_arg == 'common_freq':
                 common_freq = common_count/total
                 output_array.append(common_freq)
             else:
                 output_array.append(common_count)
-        elif count_arg == 'common_nogap':
+        elif count_arg == 'common_freq_nogap':
             frequencies.pop('-', None)
             try:
                 common_allele = max(frequencies, key=frequencies.get)
             except ValueError:
-                print(f'ValueError:{internal_id}\t{maf_file}\t{maf_id}\t{chrom}\t{start}\t{end}\t{strand}')
+                print(f'ValueError:{name}\t{maf_file}\t{maf_id}\t{chrom}\t{start}\t{end}\t{strand}')
             common_count = frequencies.get(common_allele)
             common_freq = common_count/total
             output_array.append(common_freq)
@@ -316,19 +306,16 @@ def extract_maf(internal_id:str,
             count_freq = {base: count / total for base, count in frequencies.items()}
             output_array.append(count_freq)
     if isinstance(output_array, str):
-        print('debug',internal_id,output_array)
-    #logger.info(f'done {internal_id} {start_time-time.time()}')
+        print('debug',name,output_array)
     return output_array
 #%%
 def maf_io(coordinate_table: pd.DataFrame|str, 
            maf:str,
-           output_dir:str|None = None, 
            separated_maf:bool = False, 
            target_species:str = 'Homo_sapiens', 
            count_arg:_COUNTARG = 'common', 
            save_to_file:bool = False, 
-           custom_id:bool = False, 
-           custom_prefix='entry', 
+           generate_new_id:bool = False, 
            species_list:list=None,
            e_value_table: str|pd.DataFrame|None=None, 
            internal_id_table: str|pd.DataFrame|None=None, **kwargs):
@@ -339,15 +326,11 @@ def maf_io(coordinate_table: pd.DataFrame|str,
             logger.error('coordinate_table file not found')
     else:
         coordinate_local = coordinate_table
-    if output_dir is None:
-        if isinstance(coordinate_table, str):
-            output_dir = '/'.join(str.split(coordinate_table, sep ='/')[:-1])
-        else: 
-            output_dir = os.path.dirname(os.path.abspath(__file__))
+    
 
     logger.info(f'extract from maf target: {maf}')
-    if custom_id == False:
-        meta_id = [f'{custom_prefix}_{index}' for index in coordinate_local.index.astype(str)]
+    if generate_new_id == True:
+        meta_id = [f'entry_{index}' for index in coordinate_local.index.astype(str)]
         coordinate_local['meta_id'] = meta_id
     else:
         coordinate_local['meta_id'] = coordinate_local.iloc[:,3]
@@ -365,40 +348,34 @@ def maf_io(coordinate_table: pd.DataFrame|str,
         else:
             maf_file = maf
         maf_call_list.append(maf_file)
-    if species_list is not None:
-        logger.info('bruteforce with species list')
-        with ProcessPoolExecutor(max_workers=40) as executor:
-            results  = executor.map(extract_maf,meta_id, maf_call_list, chrom_list, start_list, end_list, strand_list, repeat(target_species) ,repeat(count_arg), repeat(None), repeat(None), repeat(species_list))
-    elif e_value_table is None:
-        logger.info('normal maf extraction without calibration')
-        with ProcessPoolExecutor(max_workers=40) as executor:
-            results  = executor.map(extract_maf,meta_id, maf_call_list, chrom_list, start_list, end_list, strand_list, repeat(target_species) ,repeat(count_arg))
-    elif internal_id_table is None:
-        logger.info('calibrate age using e-value')
-        if isinstance(e_value_table, str):
-            e_value_df = pd.read_csv(e_value_table, sep='\t')
-        elif isinstance(e_value_table, pd.DataFrame):
-            e_value_df = e_value_table
-        with ProcessPoolExecutor(max_workers=40) as executor:
-            results  = executor.map(extract_maf,meta_id, maf_call_list, chrom_list, start_list, end_list, strand_list, repeat(target_species) ,repeat(count_arg), repeat(e_value_df))
-    else:
-        logger.info('calibrate age using e-value and internal_id conversion')
-        if isinstance(e_value_table, str):
-            e_value_df = pd.read_csv(e_value_table, sep='\t')
-        elif isinstance(e_value_table, pd.DataFrame):
-            e_value_df = e_value_table
-        if isinstance(internal_id_table, str):
-            internal_id_df = pd.read_csv(internal_id_table, sep='\t')
-        elif isinstance(internal_id_table, pd.DataFrame):
-            internal_id_df = internal_id_table
-        with ProcessPoolExecutor(max_workers=40) as executor:
-            results  = executor.map(extract_maf,meta_id, maf_call_list, chrom_list, start_list, end_list, strand_list, repeat(target_species) ,repeat(count_arg), repeat(e_value_df), repeat(internal_id_df))
+    
+    if isinstance(e_value_table, str):
+        e_value_df = pd.read_csv(e_value_table, sep='\t')
+    elif isinstance(e_value_table, pd.DataFrame):
+        e_value_df = e_value_table
+
+    if isinstance(internal_id_table, str):
+        internal_id_df = pd.read_csv(internal_id_table, sep='\t')
+    elif isinstance(internal_id_table, pd.DataFrame):
+        internal_id_df = internal_id_table
+
+    with ProcessPoolExecutor(max_workers=40) as executor:
+        results = executor.map(extract_maf, meta_id, maf_call_list, chrom_list, start_list, end_list, strand_list, 
+                               repeat(target_species), repeat(count_arg), repeat(e_value_df), repeat(internal_id_df), repeat(species_list))
+
     maf_out = []
     for result in results:
         maf_out.append(result)
     if save_to_file == True:
+        if isinstance(save_to_file, str):
+            output_filepath = save_to_file
+        else:
+            if isinstance(coordinate_table, str):
+                output_dir = '/'.join(str.split(coordinate_table, sep ='/')[:-1])
+            else: 
+                output_dir = os.path.dirname(os.path.abspath(__file__))
+            output_filepath = f'{output_dir}/maf_output.p'
         import compress_pickle
-        output_filepath = f'{output_dir}/maf_out.lzma'
         compress_pickle.dump(maf_out, output_filepath, compression="lzma")
         logger.info('done, saving maf_out at: ', output_filepath)
     else:

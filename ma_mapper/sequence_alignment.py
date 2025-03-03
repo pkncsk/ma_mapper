@@ -1,44 +1,15 @@
 #%%
 import os
+from numpy import save
 import pandas as pd
 #from concurrent.futures import ProcessPoolExecutor
-#%%
-######################run directly from windows
-#def parallel_init(coordinate_var, records_var):
-#    global coordinate_table
-#    coordinate_table = coordinate_var
-#    global records 
-#    records = records_var
-def extract_subfamily_coord_from_combined_table(subfamily,
-                            save_to_file = True, 
-                            output_filepath = None, 
-                            species_reference=None):
-    
-    if species_reference is None:
-        species_reference = '/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/data/_mapper_output/hg38_repeatmasker_4_0_5_repeatlib20140131/combined_age_div/combined_age_and_div.txt'
-    age_div_table = pd.read_csv(species_reference, sep='\t')
-    try:
-        subfam_table=age_div_table[age_div_table.repName.isin(subfamily)]
-    except TypeError:
-        print('expecting a list of subfamily')
-    subfam_table = subfam_table[subfam_table.genoName.isin(['chr1','chr2','chr3','chr4','chr5','chr6','chr7','chr8','chr9','chr10','chr11','chr12','chr13','chr14','chr15','chr16','chr17','chr18','chr19','chr20','chr21','chr22','chrX','chrY'])]
-    subfam_coord = subfam_table[['genoName','genoStart','genoEnd','strand']].copy()
-    subfam_coord.columns = ['chrom','start','end','strand']
-    subfam_coord['id'] = subfam_table.repName + '_' + subfam_table.internal_id.astype(str)
-    if save_to_file == True:
-        if output_filepath is None:
-            output_filepath = f'{os.path.dirname(os.path.abspath(__file__))}/{subfamily}.txt'
-        subfam_coord.to_csv(output_filepath, sep='\t', index= False)
-    else:
-        return subfam_coord
-#%%
 
+#%%
 def extract_coord_from_repeatmasker_table(
         subfamily: str|list,
         repeatmasker_table: str|pd.DataFrame,
         internal_id_table: str|list|None=None,
         save_to_file:bool = False,
-        output_filepath: str|None = None,
         ):
     
     if isinstance(subfamily, str):
@@ -74,33 +45,29 @@ def extract_coord_from_repeatmasker_table(
             subfam_coords['score'] = 10
             subfam_coords['strand'] = subfam_table.strand
         coord_df.append(subfam_coords)
-    #     == True:
+
     coords = pd.concat(coord_df).reset_index(drop=True)
-    if save_to_file== True:
-        if output_filepath is None:
+    if save_to_file:
+        if isinstance(save_to_file, str):
+            output_filepath = save_to_file  
+        else:
             output_filepath = f'{os.path.dirname(os.path.abspath(__file__))}/{subfamily}.txt'
         coords.to_csv(output_filepath, sep='\t', index= False, header=False)
     return coords
 #%%
-def extract_sequence(genoname, genostart, genoend,strand, records):
+def extract_sequence(chrom, start, end,strand, records):
     #seqname = '::'.join([meta_id,genoname,str(genostart),str(genoend),strand])
-    chromosome_extract=records[genoname]
+    chromosome_extract=records[chrom]
     if strand == '+':
-        seq_string = str(chromosome_extract[genostart:genoend].seq)
+        seq_string = str(chromosome_extract[start:end].seq)
     else:
-        seq_string = str(chromosome_extract[genostart:genoend].seq.reverse_complement())
+        seq_string = str(chromosome_extract[start:end].seq.reverse_complement())
     return seq_string
-    #seq_record = SeqRecord(Seq(''.join(seq_string)),seqname , '', '')
-    #return seq_record
-
-
-
 
 def sequence_io(coordinate_table,
-                source_fasta,
-                output_filepath = None, 
+                source_fasta, 
                 save_to_file=False, 
-                custom_id = None, 
+                generate_new_id = False, 
                 ):
     from Bio import SeqIO
     from Bio.Seq import Seq
@@ -113,17 +80,9 @@ def sequence_io(coordinate_table,
             print('coordinate_table file not found')
     else:
         coordinate_local = coordinate_table
-
-    if output_filepath is None:
-        if isinstance(coordinate_table, str):
-            output_filepath =f"{'/'.join(str.split(coordinate_table, sep ='/')[:-1])}.fasta"
-        else:
-            output_filepath = f'{os.path.dirname(os.path.abspath(__file__))}/sequence.fasta'
-    else:
-        output_filepath = output_filepath
     
-    if custom_id:
-        meta_id = [f'{custom_id}_{index}' for index in coordinate_local.index.astype(str)]
+    if generate_new_id:
+        meta_id = [f'entry_{index}' for index in coordinate_local.index.astype(str)]
         coordinate_local['meta_id'] = meta_id
     else:
         coordinate_local['meta_id'] = coordinate_local.iloc[:,3]
@@ -134,6 +93,7 @@ def sequence_io(coordinate_table,
     for uniq_meta_id in meta_id:
         coordinate_by_id = coordinate_local[coordinate_local.meta_id == uniq_meta_id]
         seq_strings = []
+        start_list, end_list = [], []
         for idx, row in coordinate_by_id.iterrows():
             #print(row)       
             chrom = row.iloc[0]
@@ -143,20 +103,30 @@ def sequence_io(coordinate_table,
             #print(chrom, start, end, strand, uniq_meta_id)
             seq_string = extract_sequence(chrom, start, end, strand, records)
             seq_strings.append(seq_string)
+            start_list.append(str(start))
+            end_list.append(str(end))
         if strand == '-':
             seq_strings.reverse()
-        seqname = f'{uniq_meta_id}::{chrom}:{min(coordinate_by_id.iloc[:,1])}-{max(coordinate_by_id.iloc[:,2])}({strand})'
-        seq_record = SeqRecord(Seq(''.join(seq_strings)),seqname , '', '')
+        coord_string = ",".join(f"{s}-{e}" for s, e in zip(start_list, end_list))
+        seqname = f"{uniq_meta_id}::{chrom}:{coord_string}({strand})"
+        seq_record = SeqRecord(Seq(''.join(seq_strings)),id = seqname , name ='', description='')
         seq_records.append(seq_record)
 
 
     if save_to_file == True:
+        if isinstance(save_to_file, str):
+            output_filepath = save_to_file
+        else:
+            if isinstance(coordinate_table, str):
+                output_filepath =f"{'/'.join(str.split(coordinate_table, sep ='/')[:-1])}.fasta"
+            else:
+                output_filepath = f'{os.path.dirname(os.path.abspath(__file__))}/sequence.fasta'
         with open(output_filepath, "w") as output_handle:
             SeqIO.write(seq_records, output_handle, "fasta")
     else:
         return seq_records
 
-def parsed_array_to_sequence(parsed_array,prefix, output_filepath):
+def parse_alignment_to_fasta(parsed_alignment,name=None, save_to_file=False):
     import numpy as np
     from Bio.Seq import Seq
     from Bio.SeqRecord import SeqRecord
@@ -165,16 +135,24 @@ def parsed_array_to_sequence(parsed_array,prefix, output_filepath):
     # Define the mapping
     base_mapping = {0: 'N', 1: 'A', 2: 'C', 3: 'T',4:'G'}
 
+    if name is None:
+        name = 'entry'
     # Convert each row to DNA sequence
     dna_sequences = []
-    for idx, row in enumerate(parsed_array):
-        seq_name = f'{prefix}_{idx}'
+    for idx, row in enumerate(parsed_alignment):
+        seq_name = f'{name}_{idx}'
         dna_sequence = ''.join(base_mapping[int(val)] for val in row)
         dna_sequences.append(SeqRecord(Seq(dna_sequence),seq_name , '', ''))
 
     # Write the sequences to a FASTA file
-    with open(output_filepath, "w") as output_handle:
-        SeqIO.write(dna_sequences, output_handle, "fasta")
+    if save_to_file:
+        if isinstance(save_to_file, str):
+            output_filepath = save_to_file  
+        else:
+            output_filepath = f'{os.path.dirname(os.path.abspath(__file__))}/parsed_to_seq.fasta'
+        with open(output_filepath, "w") as output_handle:
+            SeqIO.write(dna_sequences, output_handle, "fasta")
+    return dna_sequences
 
 def mafft_align(input_filepath, nthread = None, nthreadtb = None, nthreadit =None, output_filepath = None, mafft_arg = 
                   #--quiet --memsave 

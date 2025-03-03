@@ -19,5 +19,4 @@ plots.plot_experimental(aggregated_data=[mean_output], aggregated=True,heatmap=F
 #%% plots can be stacked 
 plots.plot_experimental(aggregated_data=[mean_output, median_output, coverage_output], aggregated=True,heatmap=False,agg_colset=['grey','grey','red'], agg_ylabel=['average','median','coverage'],agg_ylabel_fs=8, agg_xlabel='position (bp)', agg_xlabel_fs=8)
 #%% CUSTOM ANALYSIS
-# since the plot function accepts 1d array as long as the length matches, a user can make their own analysis and plot the result using plot
-# for example
+# since the plot function accepts 1d array as long as the length matches, a user can make their own analysis and plot the result using plots module

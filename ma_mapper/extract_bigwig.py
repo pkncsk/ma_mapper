@@ -30,10 +30,8 @@ def extract_bigwig(bigwig_file, chrom, start_list, end_list, strand):
 #%%
 def bigwig_io(coordinate_table, 
               bigwig, 
-              output_filepath = None, 
               save_to_file = False, 
-              custom_id = False,
-              custom_prefix='entry'):
+              generate_new_id = False):
     if isinstance(coordinate_table, str):
         if (os.path.isfile(coordinate_table) == True):
             coordinate_local = pd.read_csv(coordinate_table, sep='\t', header=None)
@@ -46,8 +44,8 @@ def bigwig_io(coordinate_table,
             output_filepath = '/'.join(str.split(coordinate_table, sep ='/')[:-1])
         else:
             output_filepath = os.path.dirname(os.path.abspath(__file__))
-    if custom_id == False:
-        meta_id = [f'{custom_prefix}_{index}' for index in coordinate_local.index.astype(str)]
+    if generate_new_id == True:
+        meta_id = [f'entry_{index}' for index in coordinate_local.index.astype(str)]
         coordinate_local['meta_id'] = meta_id
     else:
         coordinate_local['meta_id'] = coordinate_local.iloc[:,3]
@@ -63,6 +61,14 @@ def bigwig_io(coordinate_table,
             bigwig_out.append(extract_bigwig(bigwig_file, chrom_list[i], start_list[i], end_list[i], strand_list[i]))
 
     if save_to_file == True:
+        if isinstance(save_to_file, str):
+            output_filepath = save_to_file
+        else:
+            if isinstance(coordinate_table, str):
+                output_dir = '/'.join(str.split(coordinate_table, sep ='/')[:-1])
+            else:
+                output_dir = os.path.dirname(os.path.abspath(__file__))
+        output_filepath = f'{output_dir}/bigwig_out.p'
         import compress_pickle
         compress_pickle.dump(bigwig_out, output_filepath, compression="lzma")
         logger.info('done, saving bigwig_out at: ',output_filepath)

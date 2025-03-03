@@ -23,24 +23,31 @@ def load_alignment_file(alignment_file):
         records = alignment_file
     return records
 
-def extract_coordinate_from_alignment(alignment_file, save_to_file = False, output_file =None):
+def extract_coordinate_from_alignment(alignment_file, save_to_file = None):
     records = load_alignment_file(alignment_file)
     meta_id_list = []; chrom_list = []; start_list = []; end_list = []; strand_list = []; score_list= []
     import re
     for record in records:
         identifier=record.name
-        uniq_meta_id, chrom, start, end, strand = re.match(r'([^:]+)::([^:]+):(\d+)-(\d+)\((.)\)', identifier).groups()
-        chrom_list.append(chrom)
-        start_list.append(int(start))
-        end_list.append(int(end))
-        meta_id_list.append(uniq_meta_id)
-        score_list.append(20)
-        strand_list.append(strand)
+        match = re.match(r'([^:]+)::([^:]+):([\d,-]+)\((.)\)', identifier)
+        if not match:
+            raise ValueError(f"Invalid format: {identifier}")
+        uniq_meta_id, chrom, coord_string, strand = match.groups()
+        coord_pairs = coord_string.split(',')
+        for pair in coord_pairs:
+            start, end = map(int, pair.split('-'))
+            chrom_list.append(chrom)
+            start_list.append(start)
+            end_list.append(end)
+            meta_id_list.append(uniq_meta_id)
+            score_list.append(20)
+            strand_list.append(strand)
+
     new_coordinate_dict = {'chrom':chrom_list,'start':start_list,'end':end_list,'name':meta_id_list,'score':score_list,'strand':strand_list}
     coordinate_table = pd.DataFrame(new_coordinate_dict)
-    if save_to_file == True:
-        if output_file is not None:
-            output_filepath = output_file
+    if save_to_file:
+        if isinstance(save_to_file, str) == True:
+            output_filepath = save_to_file
         else:
             import os
             output_filepath =f'{os.path.dirname(os.path.abspath(__file__))}/alignment_coordinate.txt'
@@ -50,14 +57,7 @@ def extract_coordinate_from_alignment(alignment_file, save_to_file = False, outp
         return coordinate_table
 
 def parse_alignment(alignment_file:str, 
-                    save_to_file: bool =False, 
-                    output_file: str| None=None):
-    if output_file is None:
-        if isinstance(alignment_file, str):
-            output_file = f'{alignment_file}.parsed'
-        else:
-            output_file = f'{os.path.dirname(os.path.abspath(__file__))}/alignment.parsed'
-    output_dir = '/'.join(str.split(output_file, sep ='/')[:-1])
+                    save_to_file: bool =False):
     logger.info('parse alignment')
     if isinstance(alignment_file, str):
         if (os.path.isfile(alignment_file) == True):
@@ -92,46 +92,32 @@ def parse_alignment(alignment_file:str,
         parsed_alignment[i, :] = np.array(str(value.seq).upper(), 'c').view(np.uint8)
     
     hash_table = {45:0, 65:1, 67:2, 84:3, 71:4, 78:5}
-    result_array = np.ndarray(parsed_alignment.shape)
+    alignment_matrix = np.ndarray(parsed_alignment.shape)
     for k in hash_table:
-        result_array[parsed_alignment == k] = hash_table[k]
-    if save_to_file == True:
+        alignment_matrix[parsed_alignment == k] = hash_table[k]
+    if save_to_file:
+        if isinstance(save_to_file, str) == True:
+            output_file = save_to_file
+        else:
+            if isinstance(alignment_file, str):
+                output_file = f'{alignment_file}.parsed'
+            else:
+                output_file = f'{os.path.dirname(os.path.abspath(__file__))}/alignment.parsed'
+
         import h5py
         with h5py.File(output_file, 'w') as hf:
-            hf.create_dataset("parsed_alignment",  data=result_array, compression="lzf")
+            hf.create_dataset("parsed_alignment",  data=alignment_matrix, compression="lzf")
         logger.info('done, saving parsed alignment at: ',output_file)
     else: 
-        return result_array
+        return alignment_matrix
 #%%
 def import_parsed_alignment(parsed_alignment_file):
     import h5py
     with h5py.File(f'{parsed_alignment_file}', 'r') as hf:
-        parsed_array = hf['result_array'][:]  
-    return parsed_array
-#%%#FIXME: find a better way to sort your alignment (and why does it need to be sorted?)
-def sort_parsed_alignment(parsed_alignment, aligned_seqeunce):
-    if isinstance(parsed_array, str) == True:
-        parsed_array = import_parsed_alignment(parsed_array)
-    if isinstance(aligned_seqeunce, str) == True:
-        from Bio import SeqIO
-        records = (r for r in SeqIO.parse(aligned_seqeunce, "fasta"))
-    else:
-        records = aligned_seqeunce
-    align_order = []
-    seq_id_list = []
-    seq_row_nmber_list=[]
-    for i, value in enumerate(records):
-        #print(i)
-        seq_id, seq_row_nmber=value.name.split(sep='(')[0].split(sep='.')
-        seq_id_list.append(int(seq_id))
-        seq_row_nmber_list.append(int(seq_row_nmber))
-        align_order.append(i)
-
-    seq_id_list_sorted, seq_row_nmber_list_sorted, parsed_array_sorted,align_order_sort = zip(*sorted(zip(seq_id_list, seq_row_nmber_list, parsed_array,align_order)))
-    parsed_array_sorted = np.array(parsed_array_sorted)
-    return parsed_array_sorted
+        parsed_alignment = hf['result_array'][:]  
+    return parsed_alignment
 #%%
-def create_filter(parsed_alignment, col_threshold = 0.50, col_content_threshold = 0.10, row_threshold = 0.50, save_to_file = False, output_file = None):
+def create_filter(parsed_alignment, col_threshold = 0.50, col_content_threshold = 0.10, row_threshold = 0.50, save_to_file = False):
     if isinstance(parsed_alignment, str) == True:
         parsed_alignment = import_parsed_alignment(parsed_alignment)
     col_counts = np.zeros(parsed_alignment.shape[1])
@@ -155,10 +141,12 @@ def create_filter(parsed_alignment, col_threshold = 0.50, col_content_threshold 
         col_counts_max[nonzeros[0]:nonzeros[-1]] += 1
     col_filter = (col_counts > col_counts_max * col_threshold) & (col_counts >= parsed_alignment.shape[0] * col_content_threshold)
     filters = [row_filter,col_filter]
-    if save_to_file == True:
+    if save_to_file:
         import pickle
-        if output_file is None:
-            output_file = 'filter.p'
+        if isinstance(save_to_file, str) == True:
+            output_file = save_to_file 
+        else:
+            output_file = f'{os.path.dirname(os.path.abspath(__file__))}/alignment.filter'
         pickle.dump(filters, open(output_file, "wb" ))
     else:
         return filters
@@ -196,16 +184,12 @@ def create_filter_failed(parsed_alignment, col_threshold = 0.50, row_threshold =
     else:
         return filters
 #%%
-def map_data(data_file:str,
-             sorted_parsed_alignment: np.ndarray, 
-             filter: bool|None|list = True,
-             col_threshold: int = 0.50, 
-             col_content_threshold:int = 0.10, 
-             row_threshold:int = 0.50,
-             nested_data:bool=None)-> np.ndarray:
-    if isinstance(data_file, str) == True:
+def map_data(extracted_data:str,
+             alignment_matrix: np.ndarray, 
+             filter: bool|None|list = True, **kwargs)-> np.ndarray:
+    if isinstance(extracted_data, str) == True:
         import compress_pickle
-        data_file = compress_pickle.load(data_file)
+        extracted_data = compress_pickle.load(extracted_data)
     def get_unique_element_types(matrix):
         unique_types = set()
         for row in matrix:
@@ -213,71 +197,56 @@ def map_data(data_file:str,
                 unique_types.add(type(element))
         return unique_types
     
-    if nested_data is None:
-        unique_types = get_unique_element_types(data_file)
-        logger.info(unique_types)
-        if any(t in unique_types for t in (int,float,np.uint8,np.uint16, np.float32, np.float64)) :
-            nested_data = False
-        #elif any(t in unique_types for t in (str,set(),collections.Counter, list, dict, pd.DataFrame)):
-        #    nested_data = True
-        else:
-            nested_data = True
-    #def check_list_type(data, type_check):
-    #    return all(isinstance(item, type_check) for sublist in data for item in sublist)
-    #if check_list_type(sorted_parsed_array, (int, float, type(np.nan))):
-    #    canvas = np.zeros(sorted_parsed_array.shape, dtype=object)
-    #else:
+
+    unique_types = get_unique_element_types(extracted_data)
+    logger.info(unique_types)
+    if any(t in unique_types for t in (int,float,np.uint8,np.uint16, np.float32, np.float64)) :
+        nested_data = False
+    else:
+        nested_data = True
     logger.info(f'nested_data:{nested_data}')
     if nested_data:
-        canvas = np.full(sorted_parsed_alignment.shape, None)
+        canvas = np.full(alignment_matrix.shape, None)
     else:
-        canvas = np.zeros(sorted_parsed_alignment.shape, dtype=float)
+        canvas = np.zeros(alignment_matrix.shape, dtype=float)
         
-    for idx, row in enumerate(sorted_parsed_alignment):
+    for idx, row in enumerate(alignment_matrix):
         #print(f"data_file[{idx}]: {data_file[idx]}")
         #print(f"canvas[{idx}]: {canvas[idx, row>0]}")
-        canvas[idx, row>0] = data_file[idx]
+        canvas[idx, row>0] = extracted_data[idx]
     mapped_data = canvas
     if filter: 
         if isinstance(filter, list):
             filters = filter
         else:  
-            filters=create_filter(sorted_parsed_alignment, col_threshold = col_threshold, col_content_threshold = col_content_threshold, row_threshold = row_threshold)   
+            filters=create_filter(alignment_matrix, **kwargs)   
         row_filter = filters[0]
         col_filter = filters[1]
         mapped_data=mapped_data[np.ix_(row_filter,col_filter)]
 
     return mapped_data
 #%%
-def base_count(alignment:pd.DataFrame):
-    alignment_transposed = alignment.transpose()
-    output_array = []
-    for idx, ref_count in enumerate(alignment_transposed):
-        (unique, counts) = np.unique(ref_count, return_counts=True)
-        frequencies = dict(zip(unique, counts))
-        base_count = []
-        for base in [0,1,2,3,4]:
-            nucl_count = frequencies.get(base,0)
-            base_count.append(nucl_count)
-        output_array.append(base_count)
-    base_count=np.array(output_array).transpose()
+def base_count(alignment_matrix:pd.DataFrame):
+
+    base_count = np.apply_along_axis(lambda col: np.bincount(col, minlength=5), axis=0, arr=alignment_matrix)
     return base_count
+
 #FIXED: wrong nonzero
 _NORM_METHOD = Literal['average','perc_coverage','median']
-def normalise(alignment: str|pd.DataFrame,
-              mapped_data: pd.DataFrame, 
+def normalise(alignment_matrix: str|pd.DataFrame,
+              data_matrix: pd.DataFrame, 
               method:_NORM_METHOD = 'average', 
               ):
     if method == 'average':
-        normalizer = np.count_nonzero(alignment, axis=0)
-        data_sum = np.nansum(mapped_data, axis=0)
+        normalizer = np.count_nonzero(alignment_matrix, axis=0)
+        data_sum = np.nansum(data_matrix, axis=0)
         normalised_data = data_sum/normalizer 
     if method == 'perc_coverage':
-        normalizer = np.count_nonzero(alignment, axis=0)
-        data_count = np.count_nonzero(mapped_data, axis=0)
+        normalizer = np.count_nonzero(alignment_matrix, axis=0)
+        data_count = np.count_nonzero(data_matrix, axis=0)
         normalised_data = data_count/normalizer * 100
     if method == 'median':
-        normalised_data = np.nanmedian(mapped_data, axis = 0)
+        normalised_data = np.nanmedian(data_matrix, axis = 0)
     return normalised_data
 
 def flank_sequence_io(coordinate_table: pd.DataFrame,
@@ -295,8 +264,8 @@ def flank_sequence_io(coordinate_table: pd.DataFrame,
     if coordinate_table_out:
         return front_coordinate_table, back_coordinate_table
     else:
-        front_seq = sequence_alignment.sequence_io(front_coordinate_table, source_fasta, custom_id=False)
-        back_seq = sequence_alignment.sequence_io(front_coordinate_table, source_fasta, custom_id=False)
+        front_seq = sequence_alignment.sequence_io(front_coordinate_table, source_fasta)
+        back_seq = sequence_alignment.sequence_io(front_coordinate_table, source_fasta)
         
         front_list = []
         back_list = []
@@ -329,6 +298,7 @@ def parse_and_filter(alignment_file: str,
         parsed_alignment_filtered=parsed_alignment[np.ix_(row_filter,col_filter)]
         coordinate_table_filtered=coordinate_table.iloc[row_filter,:]
     else:
+        filters = [np.arange(parsed_alignment.shape[0]), np.arange(parsed_alignment.shape[1])]
         parsed_alignment_filtered = parsed_alignment
         coordinate_table_filtered = coordinate_table
     #print(metadata_aligned_filtered.dtypes)
@@ -386,7 +356,6 @@ def map_and_overlay(aligment:str,
             coordinate_file:str|None = None,
             extension_length: int|None = None,
             source_fasta:str = None,
-            custom_id:bool=False,
             **kwargs,
             ):
     fs_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('fs_')}
@@ -406,18 +375,18 @@ def map_and_overlay(aligment:str,
         coordinate_table = coordinate_file   
     if data_format in ['read_max','read_min','read_forward','read_reverse', 'normal_max','normal_min','normal_forward','normal_reverse','read_sum']:
         from . import extract_bam
-        output_matrix=extract_bam.bam_io(coordinate_table= coordinate_table, bam_file=data_file,bam_format=data_format, custom_id=custom_id,**kwargs)
+        extracted_data=extract_bam.bam_io(coordinate_table= coordinate_table, bam_file=data_file,bam_format=data_format,**kwargs)
     elif data_format in ['bigwig']:
         from . import extract_bigwig
-        output_matrix=extract_bigwig.bigwig_io(coordinate_table=coordinate_table, bigwig=data_file, custom_id=custom_id,**kwargs)
+        extracted_data=extract_bigwig.bigwig_io(coordinate_table=coordinate_table, bigwig=data_file,**kwargs)
     elif data_format in ['bed']:
         from . import extract_bed
-        output_matrix=extract_bed.bed_io(coordinate_table=coordinate_table, bed=data_file, custom_id=custom_id,**kwargs)
+        extracted_data=extract_bed.bed_io(coordinate_table=coordinate_table, bed=data_file,**kwargs)
     elif data_format in ['maf']:
         from . import extract_maf
-        output_matrix=extract_maf.maf_io(coordinate_table=coordinate_table, maf=data_file,custom_id=custom_id,**kwargs)
+        extracted_data=extract_maf.maf_io(coordinate_table=coordinate_table, maf=data_file,**kwargs)
     elif data_format in ['vcf']:
-        output_matrix=extract_vcf.vcf_io(coordinate_table=coordinate_table, vcf=data_file, custom_id=custom_id, **kwargs)
+        extracted_data=extract_vcf.vcf_io(coordinate_table=coordinate_table, vcf=data_file, **kwargs)
     else:
         logger.error('dataformat field unspecified')
     row_filter, col_filter = filters
@@ -442,30 +411,30 @@ def map_and_overlay(aligment:str,
     else:
         mapping_filters = None
         alignment_coordinate_filtered=alignment_coordinate_sorted
-    output_matrix_filtered = map_data(data_file=output_matrix, sorted_parsed_alignment= alignment_matrix_sorted, filter=mapping_filters, **md_kwargs)
+    output_matrix_filtered = map_data(data_file=extracted_data, sorted_parsed_alignment= alignment_matrix_sorted, filter=mapping_filters, **md_kwargs)
     
     
     if extension_length is not None:
         
         front_coordinate_table, back_coordinate_table = flank_sequence_io(alignment_coordinate_filtered, coordinate_table_out=True, extension_length=extension_length,source_fasta=source_fasta, **fs_kwargs)
         if data_format in ['read_max','read_min','read_forward','read_reverse', 'normal_max','normal_min','normal_forward','normal_reverse','read_sum']:
-            front_output_matrix=extract_bam.bam_io(coordinate_table= front_coordinate_table, bam_file=data_file,bam_format=data_format, **kwargs)
-            back_output_matrix=extract_bam.bam_io(coordinate_table= back_coordinate_table, bam_file=data_file,bam_format=data_format, **kwargs)
+            front_extracted_data=extract_bam.bam_io(coordinate_table= front_coordinate_table, bam_file=data_file,bam_format=data_format, **kwargs)
+            back_extracted_data=extract_bam.bam_io(coordinate_table= back_coordinate_table, bam_file=data_file,bam_format=data_format, **kwargs)
         elif data_format in ['bigwig']:
-            front_output_matrix=extract_bigwig.bigwig_io(coordinate_table=front_coordinate_table, bigwig=data_file,custom_id=True,**kwargs)
-            back_output_matrix=extract_bigwig.bigwig_io(coordinate_table=back_coordinate_table, bigwig=data_file,custom_id=True,**kwargs)
+            front_extracted_data=extract_bigwig.bigwig_io(coordinate_table=front_coordinate_table, bigwig=data_file,**kwargs)
+            back_extracted_data=extract_bigwig.bigwig_io(coordinate_table=back_coordinate_table, bigwig=data_file,**kwargs)
         elif data_format in ['bed']:
-            front_output_matrix=extract_bed.bed_io(coordinate_table=front_coordinate_table, bed=data_file,custom_id=True,**kwargs)
-            back_output_matrix=extract_bed.bed_io(coordinate_table=back_coordinate_table, bed=data_file,custom_id=True,**kwargs)
+            front_extracted_data=extract_bed.bed_io(coordinate_table=front_coordinate_table, bed=data_file,**kwargs)
+            back_extracted_data=extract_bed.bed_io(coordinate_table=back_coordinate_table, bed=data_file,**kwargs)
         elif data_format in ['maf']:
-            front_output_matrix=extract_maf.maf_io(coordinate_table=front_coordinate_table, maf=data_file,custom_id=True,**kwargs)
-            back_output_matrix=extract_maf.maf_io(coordinate_table=back_coordinate_table, maf=data_file,custom_id=True,**kwargs)
+            front_extracted_data=extract_maf.maf_io(coordinate_table=front_coordinate_table, maf=data_file,**kwargs)
+            back_extracted_data=extract_maf.maf_io(coordinate_table=back_coordinate_table, maf=data_file,**kwargs)
         elif data_format in ['vcf']:
-            front_output_matrix=extract_vcf.vcf_io(coordinate_table=front_coordinate_table, vcf=data_file,custom_id=True,**kwargs)
-            back_output_matrix=extract_vcf.vcf_io(coordinate_table=back_coordinate_table, vcf=data_file,custom_id=True,**kwargs)
+            front_extracted_data=extract_vcf.vcf_io(coordinate_table=front_coordinate_table, vcf=data_file,**kwargs)
+            back_extracted_data=extract_vcf.vcf_io(coordinate_table=back_coordinate_table, vcf=data_file,**kwargs)
   
-        print(alignment_coordinate_sorted.shape, len(front_output_matrix), len(back_output_matrix))
-        output_matrix_filtered = np.hstack((front_output_matrix,output_matrix_filtered,back_output_matrix))
+        print(alignment_coordinate_sorted.shape, len(front_extracted_data), len(back_extracted_data))
+        output_matrix_filtered = np.hstack((front_extracted_data,output_matrix_filtered,back_extracted_data))
 
 
     return output_matrix_filtered

@@ -70,7 +70,8 @@ def plot_heatmap(data: list|np.ndarray|None = None,
             if transparency_mode == 'gradient':
                 plot_cmap[:,-1] = np.linspace(0, opacity, ncolors)
             else:
-                plot_cmap[:,-1] = np.linspace(opacity, opacity, ncolors)
+                plot_cmap[:,-1] = opacity
+                plot_cmap[0,-1] = 0
             plot_cmap_a = ListedColormap(colors=plot_cmap)
         else:
             plot_cmap_a = cmap
@@ -379,314 +380,10 @@ def plot_logos(alignment:np.ndarray|None,
     if show_plot == True:
         plt.rcParams['figure.dpi'] = image_res
         plt.show()
-    
-#%%
-_PLOT_LAYOUT = Literal['overlay','spread']
-def all_overlay_plot(data: list|np.ndarray|None = None,
-                     alignment: np.ndarray|None = None,
-                    save_to_file: bool = False,
-                    heatmap:bool = True,
-                    aggregated:bool = False,
-                    annotation:bool = False,
-                    annotation_data: list|None= None,
-                    anno_col: list|None = ['Blues'],
-                    colorbar:bool = False,
-                    logos:bool = False,
-                    base_count:bool = False,
-                    output_filepath: str | None = None, 
-                    image_res: int = 600, 
-                    alignment_col: str = 'nulc_white',
-                    heatmap_color: ListedColormap|str|None = None,
-                    agg_colset: str|None = None,
-                    colorbar_steps: list|None = None,
-                    vlim: list|None = None,
-                    figsize:list=[10,10],
-                    show_plot:bool = True,
-                    **kwargs):
-    plt.rcParams['savefig.dpi'] = image_res
-    plt.rcParams['figure.dpi'] = image_res
-    fig = plt.figure(figsize=figsize)
-    grid = fig.add_gridspec(nrows = 100, ncols = 100, hspace=0)
-    global_kwargs = {key: value for key, value in kwargs.items() if not key.startswith(('ag_', 'hm_', 'cb_','bc_','lg_'))}
-    ag_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('ag_')}
-    hm_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('hm_')}
-    cb_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('cb_')}
-    bc_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('bc_')}
-    lg_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('lg_')}
-    if heatmap:
-        heatmap_grid = fig.add_subplot(grid[0:50,20:70])
-        if alignment is not None:
-            plot_heatmap(alignment, cmap = alignment_col,matplot_axes = heatmap_grid,vmin=0, vmax=5,**hm_kwargs, **global_kwargs)
-        if data is not None:
-            for idx, overlay in enumerate(data):
-                plot_heatmap(overlay, cmap = heatmap_color[idx],matplot_axes = heatmap_grid,vmin=vlim[idx][0], vmax=vlim[idx][1],**hm_kwargs,**global_kwargs)
-        heatmap_grid.tick_params(axis='both', which='major', labelsize=8)
-        heatmap_grid.xaxis.set_major_locator(MaxNLocator(integer=True))
-        heatmap_grid.set_yticks([])
-    if aggregated:
-        aggregated_grid = fig.add_subplot(grid[55:65,20:70])
-        for idx, overlay in enumerate(data):
-            plot_bar(overlay,color = agg_colset[idx] ,alignment=alignment,mode='average', matplot_axes=aggregated_grid,**ag_kwargs,**global_kwargs)
-        aggregated_grid.tick_params(axis='both', which='major', labelsize=8)
-    if base_count:
-        base_count_grid = fig.add_subplot(grid[75:85,20:70])
-        plot_basecount(alignment=alignment, matplot_axes=base_count_grid, **bc_kwargs,**global_kwargs)
-        base_count_grid.tick_params(axis='both', which='major', labelsize=8)
-    if logos:
-        logos_grid = fig.add_subplot(grid[65:75,20:70])
-        plot_logos(alignment=alignment, matplot_axes=logos_grid, **lg_kwargs,**global_kwargs)
-        logos_grid.tick_params(axis='both', which='major', labelsize=8)
-    if colorbar:
-        cbar_grids = []
-        for idx in range(len(data)):
-            cbar_grids.append(fig.add_subplot(grid[0:50, 70+7*idx:72+7*idx]))
-        for idx, overlay in enumerate(data):
-            plot_colorbar(cmap=heatmap_color[idx], data=overlay, vmin=vlim[idx][0], vmax=vlim[idx][1], matplot_axes=cbar_grids[idx], step = colorbar_steps[idx],**cb_kwargs)
-            cbar_grids[idx].tick_params(axis='both', which='major', labelsize=8,)
-    if annotation:
-        anno_grids = []
-        for idx in range(len(annotation_data)):         
-            anno_grids.append(fig.add_subplot(grid[0:50,18-2*idx:20-2*idx]))
-        for idx, annotation in enumerate(annotation_data):
-            anno_grids[idx].tick_params(axis='both', which='major', labelsize=8)
-            anno_grids[idx].set_xticks([])
-            if idx < len(annotation_data)-1:
-                anno_grids[idx].set_yticks([])
-            plot_annotation(annotation,matplot_axes=anno_grids[idx], cmap=anno_col[idx])
-    
-    if save_to_file == True:
-        plt.rcParams['savefig.dpi'] = image_res
-        if output_filepath is None:
-            output_filepath = f'{os.path.dirname(os.path.abspath(__file__))}/annot_bar.png'
-        plt.savefig(output_filepath)
-    if show_plot == True:
-        plt.rcParams['figure.dpi'] = image_res
-        plt.show()
-    
-#%%
-def heatmap_overlay_agg_spread_plot(data: list|np.ndarray|None = None,
-                     alignment: np.ndarray|None = None,
-                    save_to_file: bool = False,
-                    heatmap:bool = True,
-                    aggregated:bool = False,
-                    aggregated_data: list|None=None,
-                    annotation:bool = False,
-                    annotation_data: list|None= None,
-                    anno_col: list|None = ['Blues'],
-                    colorbar:bool = False,
-                    logos:bool = False,
-                    base_count:bool = False,
-                    output_filepath: str | None = None, 
-                    image_res: int = 600, 
-                    alignment_col: str = 'nulc_white',
-                    heatmap_color: ListedColormap|str|None = None,
-                    agg_colset: str|None = None,
-                    colorbar_steps: list|None = None,
-                    agg_titles: list|None = None,
-                    vlim: list|None = None,
-                    figsize:list=[10,10],
-                    show_plot:bool = True,
-                    **kwargs):
-    plt.rcParams['savefig.dpi'] = image_res
-    plt.rcParams['figure.dpi'] = image_res
-    fig = plt.figure(figsize=figsize)
-    grid = fig.add_gridspec(nrows = 100, ncols = 100, hspace=0)
-    global_kwargs = {key: value for key, value in kwargs.items() if not key.startswith(('ag_', 'hm_', 'cb_','bc_','lg_'))}
-    ag_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('ag_')}
-    hm_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('hm_')}
-    cb_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('cb_')}
-    bc_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('bc_')}
-    lg_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('lg_')}
-    if heatmap:
-        heatmap_grid = fig.add_subplot(grid[0:50,20:70])
-        if alignment is not None:
-            plot_heatmap(alignment, cmap = alignment_col,matplot_axes = heatmap_grid,vmin=0, vmax=5,**hm_kwargs, **global_kwargs)
-        if data is not None:
-            for idx, overlay in enumerate(data):
-                plot_heatmap(overlay, cmap = heatmap_color[idx],matplot_axes = heatmap_grid,vmin=vlim[idx][0], vmax=vlim[idx][1],**hm_kwargs,**global_kwargs)
-        heatmap_grid.tick_params(axis='both', which='major', labelsize=8)
-        heatmap_grid.xaxis.set_major_locator(MaxNLocator(integer=True))
-        heatmap_grid.set_yticks([])
-    if aggregated:
-        aggregated_grids = []
-        for idx in range(len(aggregated_data)):
-            aggregated_grids.append(fig.add_subplot(grid[50+10*idx:60+10*idx, 20:70]))
-        for idx, agg_data in enumerate(aggregated_data):
-            plot_bar(data = agg_data,color = agg_colset[idx] ,alignment=alignment, matplot_axes=aggregated_grids[idx], mode='1D',**ag_kwargs,**global_kwargs)
-            aggregated_grids[idx].tick_params(axis='both', which='major', labelsize=8)
-        if agg_titles is not None:
-            for idx, agg_title in enumerate(agg_titles):
-                aggregated_grids[idx].set_title(agg_title, fontsize='small', x=1.05, y=0.4)
-    if base_count:
-        base_count_grid = fig.add_subplot(grid[50+10*len(data):60+10*len(data),20:70])
-        plot_basecount(alignment=alignment, matplot_axes=base_count_grid, **bc_kwargs,**global_kwargs)
-        base_count_grid.tick_params(axis='both', which='major', labelsize=8)
-    if logos:
-        logos_grid = fig.add_subplot(grid[50+10*(len(data)+1):60+10*(len(data)+1),20:70])
-        plot_logos(alignment=alignment, matplot_axes=logos_grid, **lg_kwargs,**global_kwargs)
-        logos_grid.tick_params(axis='both', which='major', labelsize=8)
-    if colorbar:
-        cbar_grids = []
-        for idx in range(len(data)):
-            cbar_grids.append(fig.add_subplot(grid[0:50, 70+7*idx:72+7*idx]))
-        for idx, overlay in enumerate(data):
-            plot_colorbar(cmap=heatmap_color[idx], data=overlay, vmin=vlim[idx][0], vmax=vlim[idx][1], matplot_axes=cbar_grids[idx], step = colorbar_steps[idx],**cb_kwargs)
-            cbar_grids[idx].tick_params(axis='both', which='major', labelsize=8,)
-    if annotation:
-        anno_grids = []
-        for idx in range(len(annotation_data)):         
-            anno_grids.append(fig.add_subplot(grid[0:50,18-2*idx:20-2*idx]))
-        for idx, annotation in enumerate(annotation_data):
-            anno_grids[idx].tick_params(axis='both', which='major', labelsize=8)
-            anno_grids[idx].set_xticks([])
-            if idx < len(annotation_data)-1:
-                anno_grids[idx].set_yticks([])
-            plot_annotation(annotation,matplot_axes=anno_grids[idx], cmap=anno_col[idx])
-    
-    if save_to_file == True:
-        plt.rcParams['savefig.dpi'] = image_res
-        if output_filepath is None:
-            output_filepath = f'{os.path.dirname(os.path.abspath(__file__))}/annot_bar.png'
-        plt.savefig(output_filepath)  
-    if show_plot == True:
-        plt.rcParams['figure.dpi'] = image_res
-        plt.show()
-    
-
-# %%
-_SPREAD_MODE = Literal['horizontal','vertical']
-def heatmap_spread_plot(data: list|np.ndarray|None = None,
-                        show_alignment:bool = False,
-                        alignment: np.ndarray|None = None,
-                        save_to_file: bool = False,
-                        heatmap:bool = True,
-                        aggregated:bool = False,
-                        annotation:bool = False,
-                        annotation_data: list|None= None,
-                        anno_col: list|None = ['Blues'],
-                        colorbar:bool = False,
-                        logos:bool = False,
-                        base_count:bool = False,
-                        output_filepath: str | None = None, 
-                        image_res: int = 600, 
-                        alignment_col: str = 'nulc_white',
-                        heatmap_color: ListedColormap|str|None = None,
-                        agg_colset: str|None = None,
-                        colorbar_steps: list|None = None,
-                        vlim: list|None = None,
-                        figsize:list=[50,50],
-                        show_plot:bool = True,
-                        spread_mode:_SPREAD_MODE = 'horizontal',
-                        **kwargs):
-    plt.rcParams['savefig.dpi'] = image_res
-    plt.rcParams['figure.dpi'] = image_res
-    fig = plt.figure(figsize=figsize)
-    grid = fig.add_gridspec(nrows = 500, ncols = 500, hspace=0)
-    global_kwargs = {key: value for key, value in kwargs.items() if not key.startswith(('ag_', 'hm_', 'cb_','bc_','lg_'))}
-    ag_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('ag_')}
-    hm_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('hm_')}
-    cb_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('cb_')}
-    bc_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('bc_')}
-    lg_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('lg_')}
-    total_data_count = len(data)
-    if alignment is not None and show_alignment:
-        total_data_count += 1
-    heatmap_grids = []
-    for idx in range(total_data_count):
-        if spread_mode == 'horizontal':
-            heatmap_grids.append(fig.add_subplot(grid[0:50,20+60*idx:70+60*idx]))
-        elif spread_mode == 'vertical':
-            heatmap_grids.append(fig.add_subplot(grid[0+65*idx:50+65*idx,20:70]))
-    if alignment is not None and show_alignment:
-            plot_heatmap(alignment, cmap = alignment_col,matplot_axes = heatmap_grids[0],vmin=0, vmax=5,**hm_kwargs, **global_kwargs)
-            heatmap_grids[0].tick_params(axis='both', which='major', labelsize=8)
-            heatmap_grids[0].xaxis.set_major_locator(MaxNLocator(integer=True))
-            heatmap_grids[0].set_yticks([])
-    if data is not None:
-        for idx, overlay in enumerate(data):
-            if alignment is not None and show_alignment:
-                grid_idx = idx+1
-            else:
-                grid_idx = idx
-            plot_heatmap(overlay, cmap = heatmap_color[idx],matplot_axes = heatmap_grids[grid_idx],vmin=vlim[idx][0], vmax=vlim[idx][1],**hm_kwargs,**global_kwargs)
-            heatmap_grids[grid_idx].tick_params(axis='both', which='major', labelsize=8)
-            heatmap_grids[grid_idx].xaxis.set_major_locator(MaxNLocator(integer=True))
-            heatmap_grids[grid_idx].set_yticks([])
-    if aggregated:
-        aggregated_grids = []
-        for idx, overlay in enumerate(data):
-            if alignment is not None and show_alignment:
-                grid_idx = idx+1
-            else:
-                grid_idx = idx
-            if spread_mode == 'horizontal':
-                aggregated_grid = fig.add_subplot(grid[50:60,20+60*grid_idx:70+60*grid_idx])
-            elif spread_mode == 'vertical':
-                aggregated_grid = fig.add_subplot(grid[50+65*grid_idx:60+65*grid_idx,20:70])
-            plot_bar(overlay,color = agg_colset[idx] ,alignment=alignment,mode='average', matplot_axes=aggregated_grid,**ag_kwargs,**global_kwargs)
-            aggregated_grid.tick_params(axis='both', which='major', labelsize=8)
-    if base_count:
-        base_count_grid = fig.add_subplot(grid[50:60,20:70])
-        plot_basecount(alignment=alignment, matplot_axes=base_count_grid, **bc_kwargs,**global_kwargs)
-        base_count_grid.tick_params(axis='both', which='major', labelsize=8)
-    if logos:
-        logos_grid = fig.add_subplot(grid[50:60,20:70])
-        plot_logos(alignment=alignment, matplot_axes=logos_grid, **lg_kwargs,**global_kwargs)
-        logos_grid.tick_params(axis='both', which='major', labelsize=8)
-    if colorbar:
-        cbar_grids = []
-        for idx in range(len(data)):
-            if alignment is not None:
-                grid_idx = idx+1
-            else:
-                grid_idx = idx
-            if spread_mode == 'horizontal':
-                cbar_grids.append(fig.add_subplot(grid[0:50,70+60*grid_idx:72+60*grid_idx]))
-            elif spread_mode == 'vertical':
-                cbar_grids.append(fig.add_subplot(grid[0+65*grid_idx:50+65*grid_idx,70:72]))
-        for idx, overlay in enumerate(data):
-            plot_colorbar(cmap=heatmap_color[idx], data=overlay, vmin=vlim[idx][0], vmax=vlim[idx][1], matplot_axes=cbar_grids[idx], step = colorbar_steps[idx],**cb_kwargs)
-            cbar_grids[idx].tick_params(axis='both', which='major', labelsize=8,)
-    if annotation:       
-        for idx in range(total_data_count):
-            if spread_mode == 'horizontal':
-                anno_grids = []
-                for idx_ in range(len(annotation_data)):         
-                    anno_grids.append(fig.add_subplot(grid[0:50,18-2*idx_+60*idx:20-2*idx_+60*idx]))
-                for idx_, annotation in enumerate(annotation_data):
-                    anno_grids[idx_].tick_params(axis='both', which='major', labelsize=8)
-                    anno_grids[idx_].set_xticks([])
-                    if idx_ < len(annotation_data)-1:
-                        anno_grids[idx_].set_yticks([])
-                    plot_annotation(annotation,matplot_axes=anno_grids[idx_], cmap=anno_col[idx_])
-            elif spread_mode == 'vertical':
-                anno_grids = []
-                for idx_ in range(len(annotation_data)):         
-                    anno_grids.append(fig.add_subplot(grid[0+65*idx:50+65*idx,18-2*idx_:20-2*idx_]))
-                for idx_, annotation in enumerate(annotation_data):
-                    anno_grids[idx_].tick_params(axis='both', which='major', labelsize=8)
-                    anno_grids[idx_].set_xticks([])
-                    if idx_ < len(annotation_data)-1:
-                        anno_grids[idx_].set_yticks([])
-                    plot_annotation(annotation,matplot_axes=anno_grids[idx_], cmap=anno_col[idx_])
-                anno_grid = fig.add_subplot(grid[0+65*idx:50+65*idx,18:20])
-                anno_grid.set_xticks([])
-                anno_grid.tick_params(axis='both', which='major', labelsize=8)
-         
-    
-    if save_to_file == True:
-        plt.rcParams['savefig.dpi'] = image_res
-        if output_filepath is None:
-            output_filepath = f'{os.path.dirname(os.path.abspath(__file__))}/annot_bar.png'
-        plt.savefig(output_filepath)
-    if show_plot == True:
-        plt.rcParams['figure.dpi'] = image_res
-        plt.show()
-        
 
 #%%
 _HEATMAP_MODE = Literal['overlay','spread_horizontal','spread_vertical']
-def plot_experimental(data: list|np.ndarray|None = None,
+def plot(data: list|np.ndarray|None = None,
                       show_alignment:bool = False,
                       alignment: np.ndarray|None = None,
                       alignment_col: str = 'nulc_white',
@@ -758,8 +455,7 @@ def plot_experimental(data: list|np.ndarray|None = None,
                     image_res: int = 600, 
                     figsize:list=[50,50],
                     show_plot:bool = True,
-                    save_to_file: bool = False,
-                    output_filepath: str | None = None, 
+                    save_to_file: bool = False, 
                     **kwargs):
     plt.rcParams['savefig.dpi'] = image_res
     plt.rcParams['figure.dpi'] = image_res
@@ -1020,11 +716,13 @@ def plot_experimental(data: list|np.ndarray|None = None,
                 if anno_cbar_label is not None and anno_cbar_label[idx] is not None:
                     anno_cbar.ax.set_yticklabels(anno_cbar_label[idx])
                     #anno_cbar.ax.yaxis.set_major_formatter(FuncFormatter(format_func))
-    if save_to_file == True:
+    if save_to_file:
         plt.rcParams['savefig.dpi'] = image_res
         plt.rcParams['savefig.bbox'] = 'tight'
         plt.rcParams['savefig.pad_inches'] = 0
-        if output_filepath is None:
+        if isinstance(save_to_file, str):
+            output_filepath = save_to_file
+        else:
             output_filepath = f'{os.path.dirname(os.path.abspath(__file__))}/annot_bar.png'
         print('save1')
         plt.savefig(output_filepath)

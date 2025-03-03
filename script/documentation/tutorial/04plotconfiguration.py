@@ -5,7 +5,7 @@ from ma_mapper import custom_cmap
 #%% PLOT CONFIGURATION
 #the plots module is a matplotlib wrapper that offer a certain degree of quick configuration for mapped alignment visualization
 
-#plot_experimental() is the wrapper of functions in this module. At basic level, this function should be enough for data plotting and customization
+#plot() is the wrapper of functions in this module. At basic level, this function should be enough for data plotting and customization
 #%% plot preparation (not shown)
 alignment_filepath = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/output/ma_mapper/hg38_main/alignment/THE1C.fasta.aligned'
 AP1_motif_data_filepath = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed'
@@ -19,33 +19,33 @@ phyloP_matrix = mapper.map_and_overlay(alignment_filepath, phyloP_data_filepath,
 #%%heatmap customization
 #as the output from mapper module is matrix, one of the best way to visualize it is heatmap, so this module would play around heatmap plot
 #here is the most basic form of heatmap
-plots.plot_experimental(
+plots.plot(
     data=[phyloP_matrix], #data matrix
     heatmap_color=[custom_cmap.vlag_r_mpl], #colormap for the heatmap
     vlim =[[-0.5,0.5]]) #data value caps
 #%%
 #it is possible to change colormap
-plots.plot_experimental(
+plots.plot(
     data=[phyloP_matrix], 
     heatmap_color=["viridis"], 
     vlim =[[-0.5,0.5]],
     )
 #%% there might be some data that need to be shown with alignment gap for visual/context clarity, there are specific functions to handle alignment plot
 alignment_matrix, coordinate_table=mapper.parse_and_filter(alignment_filepath)
-plots.plot_experimental(
+plots.plot(
     show_alignment=True,
     alignment=alignment_matrix, 
     alignment_col='dna', # color coding for dna
     )
 #%%
 # in some context, we only need to see the gaps
-plots.plot_experimental(
+plots.plot(
     show_alignment=True,
     alignment=alignment_matrix, 
     alignment_col='nulc_white', 
     )
 #%% we can also add colorbars for both heatmap and alignment
-plots.plot_experimental(
+plots.plot(
     data=[phyloP_matrix], 
     heatmap_color=["viridis"], 
     vlim =[[-0.5,0.5]],
@@ -53,7 +53,7 @@ plots.plot_experimental(
     colorbar_steps = [0.1], #control colorbar scale
     )
 #%%
-plots.plot_experimental(
+plots.plot(
     show_alignment=True,
     alignment=alignment_matrix, 
     alignment_col='dna',
@@ -61,7 +61,7 @@ plots.plot_experimental(
     show_alignment_colbar=True 
     )
 #%% similar to data overlay, we can overlay data over alignment
-plots.plot_experimental(
+plots.plot(
     data=[ap1_matrix], 
     heatmap_color=["Blues"], 
     vlim =[[0,5]],
@@ -73,7 +73,7 @@ plots.plot_experimental(
     )
 #%%
 #title, x-, y- axis label can be added 
-plots.plot_experimental(
+plots.plot(
     data=[phyloP_matrix], 
     heatmap_color=[custom_cmap.vlag_r_mpl], 
     vlim =[[-0.5,0.5]],
@@ -86,7 +86,7 @@ plots.plot_experimental(
     ) 
 # %%
 # also a certain area of the plot an be highlighted
-plots.plot_experimental(
+plots.plot(
     data=[phyloP_matrix], 
     heatmap_color=[custom_cmap.vlag_r_mpl], 
     vlim =[[-0.5,0.5]],
@@ -103,20 +103,20 @@ plots.plot_experimental(
 mean_phyloP=mapper.normalise(alignment=alignment_matrix, mapped_data=phyloP_matrix, method = 'average')
 #%%
 #here is the most basic aggregated plot
-plots.plot_experimental(
+plots.plot(
     heatmap=False,
     aggregated_data=[mean_phyloP], 
     aggregated=True,
     agg_colset=['grey'])
 # %% same as the heatmap, it is possible to change plot color
-plots.plot_experimental(
+plots.plot(
     heatmap=False,
     aggregated_data=[mean_phyloP], 
     aggregated=True,
     agg_colset=['red'])
 #%%
 #title, x-, y- axis label can be added 
-plots.plot_experimental(
+plots.plot(
     heatmap=False,
     aggregated_data=[mean_phyloP], 
     aggregated=True,
@@ -130,7 +130,7 @@ plots.plot_experimental(
 
 # %%
 # also a certain area of the plot an be highlighted
-plots.plot_experimental(
+plots.plot(
     heatmap=False,
     aggregated_data=[mean_phyloP], 
     aggregated=True,
@@ -160,7 +160,7 @@ coordinate_table.loc[coordinate_table.index.isin(index_of_rows_with_ap1), 'AP1_m
 #extract annotation from metadata
 ap1_motif_annotation=coordinate_table['AP1_motif']
 # %% basic annotation configuration
-plots.plot_experimental(
+plots.plot(
     data=[phyloP_matrix], 
     heatmap_color=[custom_cmap.vlag_r_mpl], 
     vlim =[[-0.5,0.5]], 
@@ -171,7 +171,7 @@ plots.plot_experimental(
     annotation_data= [ap1_motif_annotation], #annotation array
     anno_cbar_label=[['TE with AP1 motif', 'TE without AP1 motif']]) #annotation label
 # %% we can adjust label and title
-plots.plot_experimental(
+plots.plot(
     data=[phyloP_matrix], 
     heatmap_color=[custom_cmap.vlag_r_mpl], 
     vlim =[[-0.5,0.5]], 
