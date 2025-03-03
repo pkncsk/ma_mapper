@@ -348,12 +348,12 @@ def maf_io(coordinate_table: pd.DataFrame|str,
         else:
             maf_file = maf
         maf_call_list.append(maf_file)
-    
+    e_value_df = None
     if isinstance(e_value_table, str):
         e_value_df = pd.read_csv(e_value_table, sep='\t')
     else:
         e_value_df = e_value_table
-
+    internal_id_df = None
     if isinstance(internal_id_table, str):
         internal_id_df = pd.read_csv(internal_id_table, sep='\t')
     else:
