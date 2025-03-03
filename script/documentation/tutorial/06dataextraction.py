@@ -38,11 +38,11 @@ from ma_mapper import extract_maf
 MAF_dir = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447'
 # since maf is a collection of multiple seqeucne alignment, extracting the data into numerical matrix means extract just human alignment or simply base counting, we can specify what to count, coverage, common base, frequencies, and more
 #this module was intended to use in junction with output files from teatime package, however it can be used as standalone
-maf_matrix = extract_maf.maf_io(coordinate_table=alignment_coordinate, maf = MAF_dir, separated_maf=True, count_arg='common',custom_id=True)
+maf_matrix = extract_maf.maf_io(coordinate_table=alignment_coordinate, maf = MAF_dir, separated_maf=True, count_arg='common')
 #if there are teatime output files, they can be used to filter alignment to be counted
 e_value_table_filepath = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/output/teatime/e_value/THE1C.txt'
 internal_id_table_filepath = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/output/teatime/internal_id/THE1C.txt'
-maf_matrix_filtered = extract_maf.maf_io(coordinate_table=alignment_coordinate, maf = MAF_dir, separated_maf=True, count_arg='common',custom_id=True, e_value_table=e_value_table_filepath, internal_id_table=internal_id_table_filepath)
+maf_matrix_filtered = extract_maf.maf_io(coordinate_table=alignment_coordinate, maf = MAF_dir, separated_maf=True, count_arg='common', e_value_table=e_value_table_filepath, internal_id_table=internal_id_table_filepath)
 #%% VCF file
 # extract_vcf is a wrapper for cyvcf2
 # as of now it supports gnomAD vcf file. As gnomAD VCF store subset of data with key such as AF (allele freqeucy), we can specify query key for a subset we want

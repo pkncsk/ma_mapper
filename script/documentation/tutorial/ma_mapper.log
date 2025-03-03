@@ -82,3 +82,26 @@
 2025-03-03 22:32:05,034 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
 2025-03-03 22:32:32,128 ma_mapper INFO done, returning bed_out as object
 2025-03-03 22:35:13,864 ma_mapper INFO done, returning bigwig_out as object
+2025-03-03 22:47:18,780 ma_mapper INFO parse alignment
+2025-03-03 22:47:24,811 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-03-03 22:47:47,965 ma_mapper INFO done, returning bed_out as object
+2025-03-03 22:47:47,975 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-03-03 22:48:17,138 ma_mapper INFO done, returning bed_out as object
+2025-03-03 22:49:27,993 ma_mapper INFO done, returning bigwig_out as object
+2025-03-03 22:53:12,357 ma_mapper INFO parse alignment
+2025-03-03 22:54:13,826 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-03-03 22:54:37,301 ma_mapper INFO done, returning bed_out as object
+2025-03-03 22:54:37,305 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-03-03 22:55:03,722 ma_mapper INFO done, returning bed_out as object
+2025-03-03 22:55:06,401 ma_mapper INFO done, returning bigwig_out as object
+2025-03-03 22:56:17,555 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2025-03-03 22:56:21,581 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2025-03-03 22:56:25,636 ma_mapper INFO done, returning mapped bam as a list. format: read_sum
+2025-03-03 22:56:29,650 ma_mapper INFO done, returning mapped bam as a list. format: normal_forward
+2025-03-03 22:56:29,885 ma_mapper INFO extract from maf target: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447
+2025-03-03 23:11:30,118 ma_mapper INFO extract from maf target: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447
+2025-03-03 23:12:47,864 ma_mapper INFO parse alignment
+2025-03-03 23:12:53,198 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-03-03 23:13:22,364 ma_mapper INFO done, returning bed_out as object
+2025-03-03 23:13:22,374 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-03-03 23:13:52,341 ma_mapper INFO done, returning bed_out as object
