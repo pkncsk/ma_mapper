@@ -1,0 +1,4 @@
+2025-03-03 20:37:30,966 ma_mapper INFO parse alignment
+2025-03-03 20:41:56,716 ma_mapper INFO parse alignment
+2025-03-03 20:42:01,089 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-03-03 20:42:23,381 ma_mapper INFO done, returning bed_out as object

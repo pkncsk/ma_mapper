@@ -411,7 +411,7 @@ def map_and_overlay(aligment:str,
     else:
         mapping_filters = None
         alignment_coordinate_filtered=alignment_coordinate_sorted
-    output_matrix_filtered = map_data(data_file=extracted_data, sorted_parsed_alignment= alignment_matrix_sorted, filter=mapping_filters, **md_kwargs)
+    output_matrix_filtered = map_data(extracted_data=extracted_data, alignment_matrix=alignment_matrix_sorted, filter=mapping_filters, **md_kwargs)
     
     
     if extension_length is not None:
