@@ -39,11 +39,6 @@ def bigwig_io(coordinate_table,
             logger.error('coordinate_table file not found')
     else:
         coordinate_local = coordinate_table
-    if output_filepath is None:
-        if isinstance(coordinate_table, str):
-            output_filepath = '/'.join(str.split(coordinate_table, sep ='/')[:-1])
-        else:
-            output_filepath = os.path.dirname(os.path.abspath(__file__))
     if generate_new_id == True:
         meta_id = [f'entry_{index}' for index in coordinate_local.index.astype(str)]
         coordinate_local['meta_id'] = meta_id
