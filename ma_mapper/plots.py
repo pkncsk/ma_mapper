@@ -2,6 +2,8 @@
 import sys
 import os
 from tabnanny import verbose
+
+from dev.installation.biopython.Bio.Emboss.PrimerSearch import OutputRecord
 sys.path.append('/home/pc575/rds/rds-kzfps-XrHDlpCeVDg/users/pakkanan/phd_project_development/dev/packaging_dir/ma_mapper/')
 from ma_mapper import mapper
 import pandas as pd
@@ -29,25 +31,24 @@ else:
 #%%
 def plot_heatmap(data: list|np.ndarray|None = None,
                  save_to_file: bool = False,
-                 output_filepath: str | None = None, 
                  image_res: int = 600, 
                  cmap: ListedColormap|str|None = None,
                  plot_title: str|None = None,
+                 title_fs=None,
                  xlim: list|None = None,
                  ylim: list|None = None,
-                 figsize:list=[2,2],
-                 opacity: float = 1.0,
-                 transparency_mode:str|None=None,
-                 show_plot:bool = False, 
-                 matplot_axes = None,
-                 zero_col_centering:bool=False,
+                 xlabel = None,
+                 ylabel = None,
                  xticklabels = None,
                  xticklabels_fs = None,
                  xticklabels_rt = None,
+                 figsize:list=[2,2],
+                 opacity: float = 1.0,
+                 transparency_mode:str='constant',
+                 show_plot:bool = False, 
+                 matplot_axes = None,
+                 zero_col_centering:bool=False,
                  interpolation = 'none',
-                 title_fs=None,
-                 xlabel = None,
-                 ylabel = None,
                  **kwargs):
     if data is None or not isinstance(data, (list, np.ndarray)):
         raise ValueError("Invalid data")
@@ -69,7 +70,7 @@ def plot_heatmap(data: list|np.ndarray|None = None,
             plot_cmap = plt.get_cmap(cmap)(range(ncolors))
             if transparency_mode == 'gradient':
                 plot_cmap[:,-1] = np.linspace(0, opacity, ncolors)
-            else:
+            elif transparency_mode == 'constant':
                 plot_cmap[:,-1] = opacity
                 plot_cmap[0,-1] = 0
             plot_cmap_a = ListedColormap(colors=plot_cmap)
@@ -101,7 +102,9 @@ def plot_heatmap(data: list|np.ndarray|None = None,
     
     if save_to_file == True:
         plt.rcParams['savefig.dpi'] = image_res
-        if output_filepath is None:
+        if isinstance(save_to_file, str):
+            output_filepath = save_to_file
+        else:
             output_filepath = f'{os.path.dirname(os.path.abspath(__file__))}/overlay.png'
         plt.savefig(output_filepath) 
     if show_plot == True:
@@ -109,11 +112,8 @@ def plot_heatmap(data: list|np.ndarray|None = None,
         plt.show()
     
 # %%
-_DATAMODE = Literal['1D','average']
 def plot_bar(data: list|np.ndarray|None = None,
-             alignment: np.ndarray|None = None,
              save_to_file: bool = False,
-             output_filepath: str | None = None, 
              image_res: int = 600, 
              color: str|None = None,
              bar_title: str|None = None,
@@ -121,18 +121,11 @@ def plot_bar(data: list|np.ndarray|None = None,
              ylim: list|None = None,
              figsize:list=[2,2],
              show_plot:bool = False, 
-             mode:_DATAMODE = 'average',
              matplot_axes = None,
              **kwargs):
     if data is None or not isinstance(data, (list, np.ndarray)):
         raise ValueError("Invalid data")
-    if mode == '1D':
-        dataplot = data
-    elif mode == 'average':
-        if alignment is None:
-            raise ValueError("need alignment when mode is 'average'")
-        nm_kwargs = {key: value for key, value in kwargs.items() if key in ('method')}
-        dataplot=mapper.normalise(alignment=alignment,mapped_data=data,**nm_kwargs)
+    dataplot = data
     if color is None:
         color = 'grey'
     opacity=kwargs.pop('opacity',1.0)
@@ -147,10 +140,12 @@ def plot_bar(data: list|np.ndarray|None = None,
     if ylim is not None:
         ax.set_ylim(ylim[0],ylim[1])
     
-    if save_to_file == True:
+    if save_to_file:
+        if isinstance(save_to_file, str):
+            output_filepath = save_to_file
+        else:
+             output_filepath = f'{os.path.dirname(os.path.abspath(__file__))}/barplot.png'
         plt.rcParams['savefig.dpi'] = image_res
-        if output_filepath is None:
-            output_filepath = f'{os.path.dirname(os.path.abspath(__file__))}/barplot.png'
         plt.savefig(output_filepath)  
     if show_plot == True:
         plt.rcParams['figure.dpi'] = image_res
@@ -163,7 +158,6 @@ def plot_colorbar(cmap: str|ListedColormap|LinearSegmentedColormap,
                   vmax:int|float|None = None,
                   data:list|np.ndarray|None = None,
                   save_to_file: bool = False,
-                  output_filepath: str | None = None, 
                   image_res: int = 600, 
                   cbar_label: str|None = None,
                   cbar_title: str|None = None,
@@ -241,13 +235,11 @@ def plot_colorbar(cmap: str|ListedColormap|LinearSegmentedColormap,
 def plot_annotation(anno: list|np.ndarray|pd.Series|pd.DataFrame,
                     cmap: str|ListedColormap|LinearSegmentedColormap|None=None,
                     ylim: list|None = None,
-                    figsize:list=[2,2],
-                    show_plot:bool = False, 
                     save_to_file: bool = False,
-                    output_filepath: str | None = None, 
                     image_res: int = 600, 
+                    figsize:list=[2,2],
+                    show_plot:bool = False,
                     matplot_axes = None,
-                    export_mats: bool = False,
                     **kwargs):
     if isinstance(anno, list|np.ndarray):
         anno_plot = np.array(anno)
@@ -281,17 +273,16 @@ def plot_annotation(anno: list|np.ndarray|pd.Series|pd.DataFrame,
     ax.margins(x=0, y=0)
     if ylim is not None:
         ax.set_ylim(ylim[0],ylim[1])
-    if save_to_file == True:
-        plt.rcParams['savefig.dpi'] = image_res
-        if output_filepath is None:
+    if save_to_file:
+        if isinstance(save_to_file, str):
+            output_filepath = save_to_file
+        else:
             output_filepath = f'{os.path.dirname(os.path.abspath(__file__))}/annot_bar.png'
+        plt.rcParams['savefig.dpi'] = image_res            
         plt.savefig(output_filepath)
     if show_plot == True:
         plt.rcParams['figure.dpi'] = image_res
         plt.show()
-    
-    if export_mats:
-        return anno_cmap, norm, num_colors, boundaries  
 #%%
 def format_func(value, tick_number):
     if value < 0.1:
@@ -301,16 +292,14 @@ def format_func(value, tick_number):
 formatter = ticker.FuncFormatter(format_func)
 #%%
 def plot_basecount(alignment:np.ndarray|None,
-                   figsize:list=[2,2],
-                   matplot_axes=None,
-                   bar_title: str|None = None,
-                   xlim: list|None = None,
-                   ylim: list|None = None,
-                   show_plot:bool = False,
                    save_to_file: bool = False,
                    image_res: int = 600,
-                   opacity:int|None=None,
-                   output_filepath: str | None = None,
+                   basecount_title: str|None = None,
+                   xlim: list|None = None,
+                   ylim: list|None = None,
+                   figsize:list=[2,2],
+                   show_plot:bool = False,
+                   matplot_axes=None,
                    **kwargs):
     col_dict_dna={'-': 'white','A':'green','C': 'blue','T': 'red','G': 'yellow',}
     base_count=mapper.base_count(alignment=alignment)
@@ -320,8 +309,8 @@ def plot_basecount(alignment:np.ndarray|None,
         ax.bar(np.arange(base_count.shape[1]), values, label=label, bottom=bottom, color=col_dict_dna[label], **kwargs)
         bottom += values
         ax.margins(x=0, y=0)
-    if bar_title is not None:
-        ax.set_title(bar_title)
+    if basecount_title is not None:
+        ax.set_title(basecount_title)
     if xlim is not None:
         ax.set_xlim(xlim[0],xlim[1])
     if ylim is not None:
@@ -338,16 +327,14 @@ def plot_basecount(alignment:np.ndarray|None,
     
 #%%
 def plot_logos(alignment:np.ndarray|None,
+                save_to_file: bool = False,
+                image_res: int = 600,
                 figsize:list=[2,2],
                 matplot_axes=None,
-                bar_title: str|None = None,
+                logos_title: str|None = None,
                 xlim: list|None = None,
                 ylim: list|None = None,
                 show_plot:bool = False,
-                save_to_file: bool = False,
-                image_res: int = 600,
-                output_filepath: str | None = None,
-                opacity:int|None=None,
                 yhighlights: list|None = None,
                 yhighlight_col: list|None = None,
                 yhighlight_alpha: list|None = None,
@@ -365,8 +352,8 @@ def plot_logos(alignment:np.ndarray|None,
         for idx,yhighlight in enumerate(yhighlights):
             logos.highlight_position_range(pmin=yhighlight[0]+0.5, pmax=yhighlight[1]-0.5, color = yhighlight_col[idx], alpha=yhighlight_alpha[idx])
     ax.margins(x=0, y=0)
-    if bar_title is not None:
-        ax.set_title(bar_title)
+    if logos_title is not None:
+        ax.set_title(logos_title)
     if xlim is not None:
         ax.set_xlim(xlim[0],xlim[1])
     if ylim is not None:

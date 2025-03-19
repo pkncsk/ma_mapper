@@ -112,3 +112,14 @@
 2025-03-03 23:17:40,333 ma_mapper INFO done, returning mapped bam as a list. format: normal_forward
 2025-03-03 23:17:40,594 ma_mapper INFO extract from maf target: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447
 2025-03-03 23:47:00,528 ma_mapper INFO done, returning vcf_out as object
+2025-03-04 00:03:03,461 ma_mapper INFO parse alignment
+2025-03-04 00:04:18,907 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-03-04 00:04:42,710 ma_mapper INFO done, returning bed_out as object
+2025-03-04 00:04:42,713 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-03-04 00:05:11,044 ma_mapper INFO done, returning bed_out as object
+2025-03-04 00:08:50,173 ma_mapper INFO done, returning bigwig_out as object
+2025-03-04 00:09:57,624 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2025-03-04 00:10:01,652 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2025-03-04 00:10:05,664 ma_mapper INFO done, returning mapped bam as a list. format: read_sum
+2025-03-04 00:10:09,686 ma_mapper INFO done, returning mapped bam as a list. format: normal_forward
+2025-03-04 00:11:06,503 ma_mapper INFO extract from maf target: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447
