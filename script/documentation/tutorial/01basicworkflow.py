@@ -31,6 +31,5 @@ phyloP_data_filepath = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resourc
 phyloP_matrix=mapper.map_and_overlay(alignment_filepath, phyloP_data_filepath,data_format='bigwig')
 plots.plot(data=[phyloP_matrix], heatmap_color=[custom_cmap.vlag_r_mpl], vlim =[[-0.5,0.5]])
 phyloP_matrix_extended=mapper.map_and_overlay(alignment_filepath, phyloP_data_filepath,data_format='bigwig', extension_length=100)
-#compared to the data mapped on aligned, the data on unaligned are more non-uniform
 plots.plot(data=[phyloP_matrix_extended], heatmap_color=[custom_cmap.vlag_r_mpl], vlim =[[-0.5,0.5]])
 # %%
