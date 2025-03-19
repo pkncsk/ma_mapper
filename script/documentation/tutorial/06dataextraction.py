@@ -35,7 +35,7 @@ normal_forward_matrix=extract_bam.bam_io(coordinate_table=alignment_coordinate,b
 # extract_maf is a wrapper for MafIO from biopython package
 # it also modified get_spliced function to handle duplicate entries in zoonomia maf file, as for now it will collaspe duplicates according to IUPAC rules, add parallelization support to speed up the process
 from ma_mapper import extract_maf
-MAF_dir = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447'
+MAF_dir = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/'
 # since maf is a collection of multiple seqeucne alignment, extracting the data into numerical matrix means extract just human alignment or simply base counting, we can specify what to count, coverage, common base, frequencies, and more
 #this module was intended to use in junction with output files from teatime package, however it can be used as standalone
 maf_matrix = extract_maf.maf_io(coordinate_table=alignment_coordinate, maf = MAF_dir, separated_maf=True, count_arg='common')

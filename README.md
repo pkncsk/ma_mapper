@@ -38,10 +38,8 @@ pip install git+https://github.com/pkncsk/ma_mapper
 ```
 ## Documentation
 - [Getting started](docs/gettingstarted.md)
-- [Basic MA mapping](docs/basic.md)
-- [Annotation](docs/annotation.md)
-- [Statistic](docs/stats.md)
-- [Plot customization](docs/plot.md)
+- [Tutorials](script/documentation/tutorial_nb/00overview.md)
+- [API references](script/documentation/api_references/01overview.md)
 
 ## License
 This package is licensed under the MIT License. 

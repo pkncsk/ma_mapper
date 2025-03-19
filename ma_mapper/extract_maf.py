@@ -309,6 +309,22 @@ def extract_maf(name:str,
         print('debug',name,output_array)
     return output_array
 #%%
+def get_maf_filepath(maf_dir, chrom):
+    files = os.listdir(maf_dir)
+    maf_filename = f"{chrom}.maf" 
+    maf_files = [f for f in files if f.endswith(maf_filename)]
+
+    # Determine the appropriate file to use
+    maf_filepath = None
+    if any(f.endswith('.maf') for f in maf_files):
+        maf_filepath = f"{maf_dir}/{maf_filename}" #.maf is more optimal performance wise 
+    elif any(f.endswith('.maf.gz') for f in maf_files):
+        maf_filepath = f"{maf_dir}/{maf_filename}.gz" 
+    else:
+        raise FileNotFoundError(f"No .maf or .maf.gz file found for chromosome {chrom} in {maf_dir}")
+
+    return maf_filepath
+#%%
 def maf_io(coordinate_table: pd.DataFrame|str, 
            maf:str,
            separated_maf:bool = False, 
@@ -344,7 +360,7 @@ def maf_io(coordinate_table: pd.DataFrame|str,
     maf_call_list = []
     for chrom in chrom_list:
         if separated_maf == True:
-            maf_file = f'{maf}.{chrom}'
+            maf_file = get_maf_filepath(maf, chrom)
         else:
             maf_file = maf
         maf_call_list.append(maf_file)

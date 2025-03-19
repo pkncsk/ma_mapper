@@ -3,7 +3,6 @@
 - [About MA Mapper](#about-ma-mapper)
 - [Dependencies](#dependencies)
 - [Installation](#installation)
-- [Prerequiste](#prerequiste)
 ## About MA Mapper
 
 A python package for mapping genome-wide data onto multiple alignment of transposable elements. The main function of this package is to work as a wrapper for other biological data file handlers such as biopython to steamline multiple alignment data overlay. The output of this package is a numerical numpy matrix, which can be easily used for visualization by matplotlib or seaborn. 
@@ -35,5 +34,3 @@ There is a plan for a proper release but as of now, this package can be installe
 ```bash
 pip install git+https://github.com/pkncsk/ma_mapper
 ```
-## Prerequiste
-The general workflow of MA Mapper 
