@@ -225,8 +225,9 @@ def extract_maf(name:str,
         return base_counts
 
     maf_id = f'{target_species}.{chrom}'
-    
-    index_maf = MafIO.MafIndex(f'{maf_file}.mafindex', maf_file, maf_id) 
+    mafindex_filedir = '.'.join(str.split(maf_file'.')[:-1])
+    mafindex_filepath = f'{mafindex_filedir}.mafindex'
+    index_maf = MafIO.MafIndex(mafindex_filepath, maf_file, maf_id) 
     n_strand = -1 if strand == '-' else 1
     results =index_maf.get_spliced(start,end,n_strand)
     if e_value_df is None and internal_id_df is None and species_list is None:
