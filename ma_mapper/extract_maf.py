@@ -225,7 +225,7 @@ def extract_maf(name:str,
         return base_counts
 
     maf_id = f'{target_species}.{chrom}'
-    mafindex_filedir = '.'.join(str.split(maf_file'.')[:-1])
+    mafindex_filedir = '.'.join(str.split(maf_file, sep='.')[:-1])
     mafindex_filepath = f'{mafindex_filedir}.mafindex'
     index_maf = MafIO.MafIndex(mafindex_filepath, maf_file, maf_id) 
     n_strand = -1 if strand == '-' else 1

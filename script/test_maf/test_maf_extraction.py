@@ -105,9 +105,7 @@ extract_maf.get_maf_filepath = get_maf_filepath
 #%%
 alignment_filepath = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/output/ma_mapper/hg38_main/alignment/THE1C.fasta.aligned'
 alignment_matrix, alignment_coordinate, filters  = mapper.parse_and_filter(alignment_file=alignment_filepath, preprocess_out=True)
-#%%
-MAF_dir = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/'
-maf_matrix = extract_maf.maf_io(coordinate_table=alignment_coordinate, maf = MAF_dir, separated_maf=True, count_arg='common', target_species='hg38')
+
 #%%
 coordinate_table = alignment_coordinate
 if isinstance(coordinate_table, str):
@@ -158,6 +156,9 @@ else:
 
 #%%
 extract_maf.extract_maf(meta_id[0], maf_call_list[0], chrom_list[0], start_list[0], end_list[0], strand_list[0], target_species, count_arg, e_value_df, internal_id_df, species_list)
+#%%
+MAF_dir = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/'
+maf_matrix = extract_maf.maf_io(coordinate_table=alignment_coordinate, maf = MAF_dir, separated_maf=True, count_arg='common', target_species='hg38')
 #%%
 e_value_table_filepath = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/output/teatime/e_value/THE1C.txt'
 internal_id_table_filepath = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/output/teatime/internal_id/THE1C.txt'
