@@ -230,7 +230,7 @@ def extract_maf(name:str,
     index_maf = MafIO.MafIndex(mafindex_filepath, maf_file, maf_id) 
     n_strand = -1 if strand == '-' else 1
     results =index_maf.get_spliced(start,end,n_strand)
-    print('check1')
+    print('check1-getresult')
     collector = results
     if species_list is not None:
         print('check2')
