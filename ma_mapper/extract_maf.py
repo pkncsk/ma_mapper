@@ -51,7 +51,9 @@ def get_spliced_mod(self, starts, ends, strand=1):
     #return fetched
     expected_letters = sum(end - start for start, end in zip(starts, ends))
     if len(fetched) == 0:
-        return [SeqRecord(Seq("N" * expected_letters), id=self._target_seqname)]
+        return pd.DataFrame({'seqid': [self._target_seqname], 'seq': [Seq("N" * expected_letters)]})
+    if len(fetched) == 1:
+        return pd.DataFrame({'seqid': [self._target_seqname], 'seq': [Seq("N" * expected_letters)]})
     all_seqnames = {sequence.id for multiseq in fetched for sequence in multiseq}
     split_by_position = {seq_name: {} for seq_name in all_seqnames}
     split_by_position
@@ -246,11 +248,7 @@ def extract_maf(name:str,
             if e_value_internal_id.shape[0] <= 1:
                 collector = results[results.seqid.str.contains(target_species)]
             else:
-                collector = results[results.seqid.isin(e_value_internal_id.seqid.values)]
-    if isinstance(collector, pd.DataFrame):
-        print('success')
-    else:
-        print('collector is not a dataframe')         
+                collector = results[results.seqid.isin(e_value_internal_id.seqid.values)]     
     if count_arg == 'raw':
         sequence_length = len(collector.iloc[0]['seq'])
         list_of_dfs = []
@@ -266,7 +264,6 @@ def extract_maf(name:str,
     except IndexError:
         print(f'IndexError:{name}\t{maf_file}\t{maf_id}\t{chrom}\t{start}\t{end}\t{strand}')
        
-    
     
     array_transposed=np.array(collector['seq'].to_list()).transpose()
     output_array=[]
