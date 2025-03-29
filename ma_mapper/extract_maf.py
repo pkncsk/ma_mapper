@@ -242,14 +242,15 @@ def extract_maf(name:str,
             _internal_id = internal_id_df[internal_id_df['meta_id'] == internal_id]['internal_id'].values[0]
         else:
             _internal_id = name
-        e_value_df['seqid'] = e_value_df.species + '.' + e_value_df.chr_code
-        e_value_internal_id=e_value_df[e_value_df['internal_id'] == _internal_id]
+        if e_value_df is not None:
+            e_value_df['seqid'] = e_value_df.species + '.' + e_value_df.chr_code
+            e_value_internal_id=e_value_df[e_value_df['internal_id'] == _internal_id]
         
-        if e_value_internal_id.shape[0] <= 1:
-            collector = results[results.seqid.str.contains(target_species)]
-        else:
-            collector = results[results.seqid.isin(e_value_internal_id.seqid.values)]
-            
+            if e_value_internal_id.shape[0] <= 1:
+                collector = results[results.seqid.str.contains(target_species)]
+            else:
+                collector = results[results.seqid.isin(e_value_internal_id.seqid.values)]
+                
     if count_arg == 'raw':
         sequence_length = len(results.iloc[0]['seq'])
         list_of_dfs = []
