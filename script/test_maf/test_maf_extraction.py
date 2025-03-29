@@ -8,7 +8,29 @@ import os
 from concurrent.futures import ProcessPoolExecutor
 from itertools import repeat 
 #%%
+alignment_filepath = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/output/ma_mapper/hg38_main/alignment/THE1C.fasta.aligned'
+alignment_matrix, alignment_coordinate, filters  = mapper.parse_and_filter(alignment_file=alignment_filepath, preprocess_out=True)
 
+#%%
+coordinate_table = alignment_coordinate
+if isinstance(coordinate_table, str):
+    if os.path.isfile(coordinate_table):
+        coordinate_local = pd.read_csv(coordinate_table, sep='\t', header=None)
+    else:
+        print('coordinate_table file not found')
+else:
+    coordinate_local = coordinate_table
+MAF_dir = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/'
+maf=MAF_dir
+separated_maf=True
+generate_new_id=False
+e_value_table=None
+internal_id_table=None
+species_list=None
+target_species='hg38'
+count_arg='common'
+#%%
+maf_matrix = extract_maf.maf_io(coordinate_table=alignment_coordinate, maf = MAF_dir, separated_maf=True, count_arg='common_raw', target_species='hg38')
 #%%
 def get_maf_filepath(maf_dir, chrom):
     files = os.listdir(maf_dir)
@@ -101,27 +123,6 @@ def maf_io(coordinate_table: pd.DataFrame|str,
 extract_maf.maf_io = maf_io
 extract_maf.get_maf_filepath = get_maf_filepath
 #%%
-alignment_filepath = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/output/ma_mapper/hg38_main/alignment/THE1C.fasta.aligned'
-alignment_matrix, alignment_coordinate, filters  = mapper.parse_and_filter(alignment_file=alignment_filepath, preprocess_out=True)
-
-#%%
-coordinate_table = alignment_coordinate
-if isinstance(coordinate_table, str):
-    if os.path.isfile(coordinate_table):
-        coordinate_local = pd.read_csv(coordinate_table, sep='\t', header=None)
-    else:
-        print('coordinate_table file not found')
-else:
-    coordinate_local = coordinate_table
-MAF_dir = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/'
-maf=MAF_dir
-separated_maf=True
-generate_new_id=False
-e_value_table=None
-internal_id_table=None
-species_list=None
-target_species='hg38'
-count_arg='common'
 print(f'extract from maf target: {maf}')
 if generate_new_id == True:
     meta_id = [f'entry_{index}' for index in coordinate_local.index.astype(str)]

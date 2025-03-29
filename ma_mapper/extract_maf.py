@@ -375,7 +375,7 @@ def maf_io(coordinate_table: pd.DataFrame|str,
         internal_id_df = internal_id_table
     
     with ProcessPoolExecutor(max_workers=40) as executor:
-        results = executor.map(extract_maf.extract_maf, meta_id, maf_call_list, chrom_list, start_list, end_list, strand_list, repeat(target_species), repeat(count_arg), repeat(e_value_df), repeat(internal_id_df), repeat(species_list))
+        results = executor.map(extract_maf, meta_id, maf_call_list, chrom_list, start_list, end_list, strand_list, repeat(target_species), repeat(count_arg), repeat(e_value_df), repeat(internal_id_df), repeat(species_list))
 
     maf_out = []
     for result in results:
