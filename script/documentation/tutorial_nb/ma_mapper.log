@@ -47,3 +47,5 @@
 2025-03-19 07:56:14,270 ma_mapper INFO extract from maf target: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447
 2025-03-19 07:57:18,760 ma_mapper INFO extract from maf target: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/
 2025-03-19 08:09:32,531 ma_mapper INFO done, returning vcf_out as object
+2025-03-29 21:50:31,363 ma_mapper INFO parse alignment
+2025-03-29 22:48:58,210 ma_mapper INFO parse alignment

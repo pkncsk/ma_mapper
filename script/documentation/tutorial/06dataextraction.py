@@ -38,7 +38,7 @@ from ma_mapper import extract_maf
 MAF_dir = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/'
 # since maf is a collection of multiple seqeucne alignment, extracting the data into numerical matrix means extract just human alignment or simply base counting, we can specify what to count, coverage, common base, frequencies, and more
 #this module was intended to use in junction with output files from teatime package, however it can be used as standalone
-maf_matrix = extract_maf.maf_io(coordinate_table=alignment_coordinate, maf = MAF_dir, separated_maf=True, count_arg='common', target_species='hg38')
+maf_matrix = extract_maf.maf_io(coordinate_table=alignment_coordinate, maf = MAF_dir, separated_maf=True, count_arg='common_freq', target_species='hg38')
 #%%
 #if there are teatime output files, they can be used to filter alignment to be counted
 e_value_table_filepath = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/output/teatime/e_value/THE1C.txt'
