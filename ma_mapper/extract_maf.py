@@ -230,14 +230,11 @@ def extract_maf(name:str,
     index_maf = MafIO.MafIndex(mafindex_filepath, maf_file, maf_id) 
     n_strand = -1 if strand == '-' else 1
     results =index_maf.get_spliced(start,end,n_strand)
-    print('check1-getresult')
     collector = results
     if species_list is not None:
-        print('check2')
         pattern = '|'.join(species_list)  
         collector = results[results['seqid'].str.contains(pattern)]
     else:
-        print('check3')
         if internal_id_df is not None:
             _internal_id = internal_id_df[internal_id_df['meta_id'] == internal_id]['internal_id'].values[0]
         else:
@@ -252,17 +249,17 @@ def extract_maf(name:str,
                 collector = results[results.seqid.isin(e_value_internal_id.seqid.values)]
                 
     if count_arg == 'raw':
-        sequence_length = len(results.iloc[0]['seq'])
+        sequence_length = len(collector.iloc[0]['seq'])
         list_of_dfs = []
         for i in range(sequence_length):
             # Extract the base at the i-th position for each row
-            temp_df = results[['seqid']].copy()  # Start with the seqid column
-            temp_df['seq'] = results['seq'].apply(lambda x: x[i])  # Add the base at the i-th position
+            temp_df = collector[['seqid']].copy()  # Start with the seqid column
+            temp_df['seq'] = collector['seq'].apply(lambda x: x[i])  # Add the base at the i-th position
             list_of_dfs.append(temp_df)
         return list_of_dfs
 
     try:
-        ref_alleles = np.char.upper(results[results.seqid.str.contains(target_species)]['seq'].to_list())[0]
+        ref_alleles = np.char.upper(collector[collector.seqid.str.contains(target_species)]['seq'].to_list())[0]
     except IndexError:
         print(f'IndexError:{name}\t{maf_file}\t{maf_id}\t{chrom}\t{start}\t{end}\t{strand}')
        
