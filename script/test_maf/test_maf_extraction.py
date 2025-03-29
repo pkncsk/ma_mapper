@@ -52,7 +52,7 @@ def maf_io(coordinate_table: pd.DataFrame|str,
     else:
         coordinate_local['meta_id'] = coordinate_local.iloc[:,3]
         meta_id = coordinate_local.meta_id.unique()
-    print(meta_id[0])
+
     grouped = coordinate_local.groupby('meta_id', sort=False)
     chrom_list = grouped.apply(lambda x: x.iloc[:,0].unique()[0]).tolist()
     start_list = grouped.apply(lambda x: x.iloc[:,1].tolist()).tolist()
@@ -61,12 +61,10 @@ def maf_io(coordinate_table: pd.DataFrame|str,
     maf_call_list = []
     for chrom in chrom_list:
         if separated_maf == True:
-            print('separated_maf', maf)
             maf_file = get_maf_filepath(maf, chrom)
         else:
             maf_file = maf
         maf_call_list.append(maf_file)
-        print(maf_file)
     e_value_df = None
     if isinstance(e_value_table, str):
         e_value_df = pd.read_csv(e_value_table, sep='\t')
@@ -115,7 +113,7 @@ if isinstance(coordinate_table, str):
         print('coordinate_table file not found')
 else:
     coordinate_local = coordinate_table
-
+MAF_dir = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/'
 maf=MAF_dir
 separated_maf=True
 generate_new_id=False
@@ -155,12 +153,71 @@ else:
     internal_id_df = internal_id_table
 
 #%%
-extract_maf.extract_maf(meta_id[0], maf_call_list[0], chrom_list[0], start_list[0], end_list[0], strand_list[0], target_species, count_arg, e_value_df, internal_id_df, species_list)
+extract_maf.extract_maf(meta_id[0], maf_call_list[0], chrom_list[0], start_list[0], end_list[0], strand_list[0], target_species='hg38', count_arg='common_raw')
 #%%
-MAF_dir = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/'
-maf_matrix = extract_maf.maf_io(coordinate_table=alignment_coordinate, maf = MAF_dir, separated_maf=True, count_arg='common', target_species='hg38')
+name = meta_id[0]
+maf_file = maf_call_list[0]
+chrom = chrom_list[0]
+start = start_list[0]
+end = end_list[0]
+strand = strand_list[0]
+target_species = 'hg38'
+count_arg = 'common_raw'
+iupac_codes = {
+    'A': {'A'},
+    'C': {'C'},
+    'G': {'G'},
+    'T': {'T'},
+    'R': {'A', 'G'},
+    'Y': {'C', 'T'},
+    'S': {'G', 'C'},
+    'W': {'A', 'T'},
+    'K': {'G', 'T'},
+    'M': {'A', 'C'},
+    'B': {'C', 'G', 'T'},
+    'D': {'A', 'G', 'T'},
+    'H': {'A', 'C', 'T'},
+    'V': {'A', 'C', 'G'},
+    'N': {'A', 'C', 'G', 'T'},
+    '-': {'-'}
+}
+
+def count_bases_with_ambiguity(sequences):
+    base_counts = Counter()
+    for sequence in sequences:
+        for base in sequence:
+            possible_bases = iupac_codes.get(base.upper(), {base.upper()})
+            # Distribute counts among all possible bases
+            for possible_base in possible_bases:
+                base_counts[possible_base] += 1 / len(possible_bases)
+    
+    return base_counts
+from Bio.AlignIO import MafIO
+MafIO.MafIndex.get_spliced = extract_maf.get_spliced_mod
+from collections import Counter, defaultdict
+maf_id = f'{target_species}.{chrom}'
+mafindex_filedir = '.'.join(str.split(maf_file, sep='.')[:-1])
+mafindex_filepath = f'{mafindex_filedir}.mafindex'
+index_maf = MafIO.MafIndex(mafindex_filepath, maf_file, maf_id) 
+n_strand = -1 if strand == '-' else 1
+results =index_maf.get_spliced(start,end,n_strand)
+#%%
+import numpy as np
+collector = results
+try:
+    ref_alleles = np.char.upper(results[results.seqid.str.contains(target_species)]['seq'].to_list())[0]
+except IndexError:
+    print(f'IndexError:{name}\t{maf_file}\t{maf_id}\t{chrom}\t{start}\t{end}\t{strand}')
+array_transposed=np.array(collector['seq'].to_list()).transpose()
+output_array=[]
+for idx, pos_array in enumerate(array_transposed):
+        frequencies =count_bases_with_ambiguity(np.char.upper(pos_array))
+        ref_allele=ref_alleles[idx]
+        total = sum(frequencies.values())
+#%%
+maf_matrix = extract_maf.maf_io(coordinate_table=alignment_coordinate, maf = MAF_dir, separated_maf=True, count_arg='common_raw', target_species='hg38')
 #%%
 e_value_table_filepath = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/output/teatime/e_value/THE1C.txt'
-internal_id_table_filepath = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/output/teatime/internal_id/THE1C.txt'
-maf_matrix_filtered = extract_maf.maf_io(coordinate_table=alignment_coordinate, maf = MAF_dir, separated_maf=True, count_arg='common', e_value_table=e_value_table_filepath, internal_id_table=internal_id_table_filepath)
+internal_id_table_filepath = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/output/teatime/internal_id/THE1C.internal_id.txt'
+maf_matrix_filtered = extract_maf.maf_io(coordinate_table=alignment_coordinate, maf = MAF_dir, separated_maf=True, count_arg='common_raw', e_value_table=e_value_table_filepath, internal_id_table=internal_id_table_filepath)
 # %%

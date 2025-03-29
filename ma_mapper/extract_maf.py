@@ -230,12 +230,14 @@ def extract_maf(name:str,
     index_maf = MafIO.MafIndex(mafindex_filepath, maf_file, maf_id) 
     n_strand = -1 if strand == '-' else 1
     results =index_maf.get_spliced(start,end,n_strand)
-    if e_value_df is None and internal_id_df is None and species_list is None:
-        collector = results
-    elif species_list is not None:
+    print('check1')
+    collector = results
+    if species_list is not None:
+        print('check2')
         pattern = '|'.join(species_list)  
         collector = results[results['seqid'].str.contains(pattern)]
     else:
+        print('check3')
         if internal_id_df is not None:
             _internal_id = internal_id_df[internal_id_df['meta_id'] == internal_id]['internal_id'].values[0]
         else:
@@ -257,10 +259,8 @@ def extract_maf(name:str,
             temp_df['seq'] = results['seq'].apply(lambda x: x[i])  # Add the base at the i-th position
             list_of_dfs.append(temp_df)
         return list_of_dfs
-    #return collector
-    #logger.info('pass1')
-    try:
 
+    try:
         ref_alleles = np.char.upper(results[results.seqid.str.contains(target_species)]['seq'].to_list())[0]
     except IndexError:
         print(f'IndexError:{name}\t{maf_file}\t{maf_id}\t{chrom}\t{start}\t{end}\t{strand}')
@@ -330,7 +330,7 @@ def maf_io(coordinate_table: pd.DataFrame|str,
            maf:str,
            separated_maf:bool = False, 
            target_species:str = 'Homo_sapiens', 
-           count_arg:_COUNTARG = 'common', 
+           count_arg = 'common', 
            save_to_file:bool = False, 
            generate_new_id:bool = False, 
            species_list:list=None,
@@ -340,19 +340,19 @@ def maf_io(coordinate_table: pd.DataFrame|str,
         if os.path.isfile(coordinate_table):
             coordinate_local = pd.read_csv(coordinate_table, sep='\t', header=None)
         else:
-            logger.error('coordinate_table file not found')
+            print('coordinate_table file not found')
     else:
         coordinate_local = coordinate_table
     
 
-    logger.info(f'extract from maf target: {maf}')
+    print(f'extract from maf target: {maf}')
     if generate_new_id == True:
         meta_id = [f'entry_{index}' for index in coordinate_local.index.astype(str)]
         coordinate_local['meta_id'] = meta_id
     else:
         coordinate_local['meta_id'] = coordinate_local.iloc[:,3]
         meta_id = coordinate_local.meta_id.unique()
-    print(meta_id[0])
+
     grouped = coordinate_local.groupby('meta_id', sort=False)
     chrom_list = grouped.apply(lambda x: x.iloc[:,0].unique()[0]).tolist()
     start_list = grouped.apply(lambda x: x.iloc[:,1].tolist()).tolist()
@@ -375,9 +375,9 @@ def maf_io(coordinate_table: pd.DataFrame|str,
         internal_id_df = pd.read_csv(internal_id_table, sep='\t')
     else:
         internal_id_df = internal_id_table
-
+    
     with ProcessPoolExecutor(max_workers=40) as executor:
-        results = executor.map(extract_maf, meta_id, maf_call_list, chrom_list, start_list, end_list, strand_list, repeat(target_species), repeat(count_arg), repeat(e_value_df), repeat(internal_id_df), repeat(species_list))
+        results = executor.map(extract_maf.extract_maf, meta_id, maf_call_list, chrom_list, start_list, end_list, strand_list, repeat(target_species), repeat(count_arg), repeat(e_value_df), repeat(internal_id_df), repeat(species_list))
 
     maf_out = []
     for result in results:
@@ -393,8 +393,8 @@ def maf_io(coordinate_table: pd.DataFrame|str,
             output_filepath = f'{output_dir}/maf_output.p'
         import compress_pickle
         compress_pickle.dump(maf_out, output_filepath, compression="lzma")
-        logger.info('done, saving maf_out at: ', output_filepath)
+        print('done, saving maf_out at: ', output_filepath)
     else:
-        logger.info('done, returning maf_out as object')
+        print('done, returning maf_out as object')
         return maf_out
 #%%

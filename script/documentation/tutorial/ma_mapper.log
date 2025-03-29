@@ -173,3 +173,7 @@
 2025-03-19 06:31:32,732 ma_mapper INFO nested_data:False
 2025-03-19 06:31:36,108 ma_mapper INFO done, returning bigwig_out as object
 2025-03-19 06:31:39,099 ma_mapper INFO done, returning bigwig_out as object
+2025-03-29 13:17:34,946 ma_mapper INFO parse alignment
+2025-03-29 13:18:48,106 ma_mapper INFO extract from maf target: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/
+2025-03-29 13:21:52,718 ma_mapper INFO parse alignment
+2025-03-29 13:22:00,302 ma_mapper INFO extract from maf target: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/
