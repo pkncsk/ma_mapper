@@ -247,7 +247,10 @@ def extract_maf(name:str,
                 collector = results[results.seqid.str.contains(target_species)]
             else:
                 collector = results[results.seqid.isin(e_value_internal_id.seqid.values)]
-                
+    if isinstance(collector, pd.DataFrame):
+        print('success')
+    else:
+        print('collector is not a dataframe')         
     if count_arg == 'raw':
         sequence_length = len(collector.iloc[0]['seq'])
         list_of_dfs = []
