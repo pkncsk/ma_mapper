@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='ma_mapper',
-    version='0.8.6.8',
+    version='0.8.6.9',
     packages=find_packages(),
     author= 'Pakkanan',
     author_email= 'pc575@cam.ac.uk',
