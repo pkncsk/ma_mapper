@@ -224,7 +224,7 @@ def extract_maf(name:str,
                 for possible_base in possible_bases:
                     base_counts[possible_base] += 1 / len(possible_bases)
         
-        return base_counts
+        return dict(base_counts)
 
     maf_id = f'{target_species}.{chrom}'
     mafindex_filedir = '.'.join(str.split(maf_file, sep='.')[:-1])
@@ -249,13 +249,15 @@ def extract_maf(name:str,
                 collector = results[results.seqid.str.contains(target_species)]
             else:
                 collector = results[results.seqid.isin(e_value_internal_id.seqid.values)]     
-    if count_arg == 'raw':
+    if count_arg in ['raw','raw_genome']:
         sequence_length = len(collector.iloc[0]['seq'])
         list_of_dfs = []
         for i in range(sequence_length):
             # Extract the base at the i-th position for each row
             temp_df = collector[['seqid']].copy()  # Start with the seqid column
             temp_df['seq'] = collector['seq'].apply(lambda x: x[i])  # Add the base at the i-th position
+            if count_arg == 'raw_genome':
+                temp_df['seqid'] = temp_df['seqid'].str.split('.').str[0]
             list_of_dfs.append(temp_df)
         return list_of_dfs
 
