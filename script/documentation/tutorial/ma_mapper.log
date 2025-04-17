@@ -177,3 +177,53 @@
 2025-03-29 13:18:48,106 ma_mapper INFO extract from maf target: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/
 2025-03-29 13:21:52,718 ma_mapper INFO parse alignment
 2025-03-29 13:22:00,302 ma_mapper INFO extract from maf target: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447/
+2025-04-16 16:13:18,653 ma_mapper INFO parse alignment
+2025-04-16 16:14:05,047 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-04-16 16:14:53,062 ma_mapper INFO done, returning bed_out as object
+2025-04-16 16:14:53,067 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-04-16 16:16:05,655 ma_mapper INFO done, returning bed_out as object
+2025-04-16 16:18:49,280 ma_mapper INFO done, returning bigwig_out as object
+2025-04-16 16:20:03,066 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2025-04-16 16:20:08,038 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2025-04-16 16:20:12,989 ma_mapper INFO done, returning mapped bam as a list. format: read_sum
+2025-04-16 16:20:17,944 ma_mapper INFO done, returning mapped bam as a list. format: normal_forward
+2025-04-16 18:48:33,784 ma_mapper INFO parse alignment
+2025-04-16 18:49:04,218 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-04-16 18:49:38,055 ma_mapper INFO done, returning bed_out as object
+2025-04-16 18:49:38,061 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-04-16 18:50:16,750 ma_mapper INFO done, returning bed_out as object
+2025-04-16 18:53:08,288 ma_mapper INFO done, returning bigwig_out as object
+2025-04-16 18:54:58,966 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2025-04-16 18:55:04,266 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2025-04-16 18:55:09,046 ma_mapper INFO done, returning mapped bam as a list. format: read_sum
+2025-04-16 18:55:13,807 ma_mapper INFO done, returning mapped bam as a list. format: normal_forward
+2025-04-17 02:25:21,829 ma_mapper INFO parse alignment
+2025-04-17 02:25:31,726 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-04-17 02:25:58,982 ma_mapper INFO done, returning bed_out as object
+2025-04-17 02:25:58,986 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-04-17 02:26:30,179 ma_mapper INFO done, returning bed_out as object
+2025-04-17 02:28:34,766 ma_mapper INFO done, returning bigwig_out as object
+2025-04-17 02:29:19,064 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2025-04-17 02:29:23,260 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2025-04-17 02:29:27,454 ma_mapper INFO done, returning mapped bam as a list. format: read_sum
+2025-04-17 02:29:31,646 ma_mapper INFO done, returning mapped bam as a list. format: normal_forward
+2025-04-17 02:53:14,337 ma_mapper INFO parse alignment
+2025-04-17 02:53:19,423 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-04-17 02:53:44,804 ma_mapper INFO done, returning bed_out as object
+2025-04-17 02:53:44,965 ma_mapper INFO {<class 'numpy.float64'>}
+2025-04-17 02:53:44,966 ma_mapper INFO nested_data:False
+2025-04-17 02:53:50,405 ma_mapper INFO parse alignment
+2025-04-17 02:53:54,918 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-04-17 02:54:19,460 ma_mapper INFO done, returning bed_out as object
+2025-04-17 02:54:19,857 ma_mapper INFO {<class 'numpy.float64'>}
+2025-04-17 02:54:19,858 ma_mapper INFO nested_data:False
+2025-04-17 02:54:24,550 ma_mapper INFO parse alignment
+2025-04-17 02:54:32,838 ma_mapper INFO done, returning bigwig_out as object
+2025-04-17 02:54:33,006 ma_mapper INFO {<class 'numpy.float32'>}
+2025-04-17 02:54:33,007 ma_mapper INFO nested_data:False
+2025-04-17 02:54:35,887 ma_mapper INFO parse alignment
+2025-04-17 02:54:42,570 ma_mapper INFO done, returning bigwig_out as object
+2025-04-17 02:54:42,740 ma_mapper INFO {<class 'numpy.float32'>}
+2025-04-17 02:54:42,741 ma_mapper INFO nested_data:False
+2025-04-17 02:54:48,856 ma_mapper INFO done, returning bigwig_out as object
+2025-04-17 02:54:54,853 ma_mapper INFO done, returning bigwig_out as object

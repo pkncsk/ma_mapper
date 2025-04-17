@@ -225,14 +225,29 @@ def extract_maf(name:str,
                     base_counts[possible_base] += 1 / len(possible_bases)
         
         return dict(base_counts)
+    def remove_hg38_gap_columns(df, target_species):
+        # Find hg38 sequence
+        target_row = df[df["seqid"].str.startswith(target_species)]
+        if target_row.empty:
+            return df  # no hg38, return unchanged
+        
+        target_row = target_row.iloc[0]["seq"]
+        keep_indices = [i for i, base in enumerate(target_row) if base != '-']
+        
+        def filter_seq(seq):
+            return Seq(''.join(seq[i] for i in keep_indices))
 
+        df = df.copy()
+        df["seq"] = df["seq"].apply(filter_seq)
+        return df
+    
     maf_id = f'{target_species}.{chrom}'
     mafindex_filedir = '.'.join(str.split(maf_file, sep='.')[:-1])
     mafindex_filepath = f'{mafindex_filedir}.mafindex'
     index_maf = MafIO.MafIndex(mafindex_filepath, maf_file, maf_id) 
     n_strand = -1 if strand == '-' else 1
     results =index_maf.get_spliced(start,end,n_strand)
-    collector = results
+    collector = remove_hg38_gap_columns(results, target_species)
     if species_list is not None:
         pattern = '|'.join(species_list)  
         collector = results[results['seqid'].str.contains(pattern)]

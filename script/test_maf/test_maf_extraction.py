@@ -28,9 +28,10 @@ e_value_table=None
 internal_id_table=None
 species_list=None
 target_species='hg38'
-count_arg='common'
+count_arg='common_freq'
 #%%
-maf_matrix = extract_maf.maf_io(coordinate_table=alignment_coordinate, maf = MAF_dir, separated_maf=True, count_arg='common_raw', target_species='hg38')
+maf_matrix = extract_maf.maf_io(coordinate_table=alignment_coordinate, maf = MAF_dir, separated_maf=True, count_arg='common_freq', target_species='hg38')
+
 #%%
 def get_maf_filepath(maf_dir, chrom):
     files = os.listdir(maf_dir)
@@ -152,9 +153,10 @@ if isinstance(internal_id_table, str):
     internal_id_df = pd.read_csv(internal_id_table, sep='\t')
 else:
     internal_id_df = internal_id_table
-
 #%%
-extract_maf.extract_maf(meta_id[0], maf_call_list[0], chrom_list[0], start_list[0], end_list[0], strand_list[0], target_species='hg38', count_arg='common_raw')
+test_id=0
+#%%
+onerow_output=extract_maf.extract_maf(meta_id[test_id], maf_call_list[test_id], chrom_list[test_id], start_list[test_id], end_list[test_id], strand_list[test_id], target_species='hg38', count_arg='common_raw')
 #%%
 name = 'test'
 maf_file = '/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447//chrY.maf'
@@ -162,8 +164,16 @@ chrom = 'chrY'
 start = [1612306]
 end = [1612361]
 strand = '+'
+#%%
+name = meta_id[test_id]
+maf_file = maf_call_list[test_id]
+chrom = chrom_list[test_id]
+start = start_list[test_id]
+end = end_list[test_id]
+strand = strand_list[test_id]
+#%%
 target_species = 'hg38'
-count_arg = 'common_raw'
+count_arg = 'common_freq'
 iupac_codes = {
     'A': {'A'},
     'C': {'C'},
@@ -432,13 +442,30 @@ def extract_maf_mod(name:str,
         
         return dict(base_counts)
 
+    def remove_hg38_gap_columns(df, target_species):
+        # Find hg38 sequence
+        target_row = df[df["seqid"].str.startswith(target_species)]
+        if target_row.empty:
+            return df  # no hg38, return unchanged
+        
+        target_row = target_row.iloc[0]["seq"]
+        keep_indices = [i for i, base in enumerate(target_row) if base != '-']
+        
+        def filter_seq(seq):
+            return Seq(''.join(seq[i] for i in keep_indices))
+
+        df = df.copy()
+        df["seq"] = df["seq"].apply(filter_seq)
+        return df
+
     maf_id = f'{target_species}.{chrom}'
     mafindex_filedir = '.'.join(str.split(maf_file, sep='.')[:-1])
     mafindex_filepath = f'{mafindex_filedir}.mafindex'
     index_maf = MafIO.MafIndex(mafindex_filepath, maf_file, maf_id) 
     n_strand = -1 if strand == '-' else 1
     results =index_maf.get_spliced(start,end,n_strand)
-    collector = results
+    collector = remove_hg38_gap_columns(results, target_species)
+    #print(collector)
     if species_list is not None:
         pattern = '|'.join(species_list)  
         collector = results[results['seqid'].str.contains(pattern)]
@@ -475,6 +502,7 @@ def extract_maf_mod(name:str,
        
     
     array_transposed=np.array(collector['seq'].to_list()).transpose()
+
     output_array=[]
     for idx, pos_array in enumerate(array_transposed):
         frequencies =count_bases_with_ambiguity(np.char.upper(pos_array))
@@ -519,7 +547,11 @@ def extract_maf_mod(name:str,
 
 extract_maf.extract_maf = extract_maf_mod
 #%%
-extract_maf.extract_maf(meta_id[0], maf_call_list[0], chrom_list[0], start_list[0], end_list[0], strand_list[0], target_species='hg38', count_arg='base_count')
+test_output_object=extract_maf.extract_maf(meta_id[0], maf_call_list[0], chrom_list[0], start_list[0], end_list[0], strand_list[0], target_species='hg38', count_arg='base_count')
 # %%
 maf_matrix = extract_maf.maf_io(coordinate_table=alignment_coordinate, maf = MAF_dir, separated_maf=True, count_arg='common_raw', target_species='hg38')
+# %%
+for idx, pos_array in enumerate(test_output_object):
+        print(idx, pos_array)
+        frequencies =count_bases_with_ambiguity(np.char.upper(pos_array))
 # %%
