@@ -227,3 +227,13 @@
 2025-04-17 02:54:42,741 ma_mapper INFO nested_data:False
 2025-04-17 02:54:48,856 ma_mapper INFO done, returning bigwig_out as object
 2025-04-17 02:54:54,853 ma_mapper INFO done, returning bigwig_out as object
+2025-04-17 07:27:55,063 ma_mapper INFO parse alignment
+2025-04-17 07:28:03,093 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-04-17 07:28:26,125 ma_mapper INFO done, returning bed_out as object
+2025-04-17 07:28:26,128 ma_mapper INFO extract from bed file: /rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/annotation/homer_known_motif_hg38/AP-1(bZIP).bed
+2025-04-17 07:28:53,550 ma_mapper INFO done, returning bed_out as object
+2025-04-17 07:29:22,883 ma_mapper INFO done, returning bigwig_out as object
+2025-04-17 07:31:12,745 ma_mapper INFO done, returning mapped bam as a list. format: read_forward
+2025-04-17 07:31:16,773 ma_mapper INFO done, returning mapped bam as a list. format: read_reverse
+2025-04-17 07:31:20,813 ma_mapper INFO done, returning mapped bam as a list. format: read_sum
+2025-04-17 07:31:24,831 ma_mapper INFO done, returning mapped bam as a list. format: normal_forward
