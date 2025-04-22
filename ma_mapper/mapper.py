@@ -1,5 +1,4 @@
 #%%
-from turtle import back
 import pandas as pd
 
 from ma_mapper import extract_vcf
@@ -8,7 +7,6 @@ import numpy as np
 import sys
 import os
 from . import logger
-import collections
 #from typing import Literal <- python3.8+
 if sys.version_info >= (3, 8, 0):
     from typing import Literal, Tuple, List
@@ -349,7 +347,7 @@ def match_age_to_id_coordinate(coordinate_file: pd.DataFrame|str,
     return merged_table
 
 _FORMAT = Literal['bam_max','bam_min','bam_forward','bam_reverse','bigwig','bed']
-def map_and_overlay(aligment:str,
+def map_and_overlay(alignment:str,
             data_file:str,
             data_format:_FORMAT,
             filter:bool = True,
@@ -362,7 +360,7 @@ def map_and_overlay(aligment:str,
     pf_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('pf_')}
     md_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('md_')}
     kwargs = {key: value for key, value in kwargs.items() if not key.startswith(('pf_','md_','fs_'))}
-    alignment_matrix, alignment_coordinate, filters  = parse_and_filter(alignment_file=aligment, preprocess_out=True, **pf_kwargs)
+    alignment_matrix, alignment_coordinate, filters  = parse_and_filter(alignment_file=alignment, preprocess_out=True, **pf_kwargs)
     #use alignment coordinate as coordinate file if there is no coordinate file input
     if coordinate_file is None:
         coordinate_table = alignment_coordinate
