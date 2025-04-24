@@ -52,8 +52,6 @@ def get_spliced_mod(self, starts, ends, strand=1):
     expected_letters = sum(end - start for start, end in zip(starts, ends))
     if len(fetched) == 0:
         return pd.DataFrame({'seqid': [self._target_seqname], 'seq': [Seq("N" * expected_letters)]})
-    if len(fetched) == 1:
-        return pd.DataFrame({'seqid': [self._target_seqname], 'seq': [Seq("N" * expected_letters)]})
     all_seqnames = {sequence.id for multiseq in fetched for sequence in multiseq}
     split_by_position = {seq_name: {} for seq_name in all_seqnames}
     split_by_position
