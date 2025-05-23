@@ -10,7 +10,7 @@ from concurrent.futures import ProcessPoolExecutor
 from itertools import repeat 
 #%%
 name = 'test'
-chrom = 'chr1'#'chr2'
+chrom = 'chr3'#'chr2'
 maf_file = f'/rds/project/rds-XrHDlpCeVDg/users/pakkanan/data/resource/multi_species_multiple_alignment_maf/cactus447//{chrom}.maf'
 
 start = [119563] #[156425872]
@@ -52,6 +52,7 @@ def get_spliced_mod(self, starts, ends, strand=1):
 
     if strand not in (1, -1): 
         raise ValueError("Strand must be 1 or -1, got %s" % strand)
+    print('check1')
     fetched = list(self.search(starts, ends))
     return fetched
     
@@ -61,6 +62,7 @@ from collections import Counter, defaultdict
 maf_id = f'{target_species}.{chrom}'
 mafindex_filedir = '.'.join(str.split(maf_file, sep='.')[:-1])
 mafindex_filepath = f'{mafindex_filedir}.mafindex'
+#%%
 index_maf = MafIO.MafIndex(mafindex_filepath, maf_file, maf_id) 
 n_strand = -1 if strand == '-' else 1
 fetched =index_maf.get_spliced(start,end,n_strand)

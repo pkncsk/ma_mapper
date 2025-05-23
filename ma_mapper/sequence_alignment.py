@@ -113,7 +113,7 @@ def sequence_io(coordinate_table,
         seq_records.append(seq_record)
 
 
-    if save_to_file == True:
+    if save_to_file:
         if isinstance(save_to_file, str):
             output_filepath = save_to_file
         else:
