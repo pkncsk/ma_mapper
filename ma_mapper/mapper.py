@@ -263,7 +263,7 @@ def flank_sequence_io(coordinate_table: pd.DataFrame,
         return front_coordinate_table, back_coordinate_table
     else:
         front_seq = sequence_alignment.sequence_io(front_coordinate_table, source_fasta)
-        back_seq = sequence_alignment.sequence_io(front_coordinate_table, source_fasta)
+        back_seq = sequence_alignment.sequence_io(back_coordinate_table, source_fasta)
         
         front_list = []
         back_list = []
