@@ -564,9 +564,9 @@ def plot(data: list|np.ndarray|None = None,
                         set_col = agg_colset[idx][_idx % len(agg_data)]
                     else:
                         set_col = agg_colset[idx]
-                    plot_bar(data=sub_agg_data, color=set_col, alignment=alignment, matplot_axes=aggregated_grids[idx], mode='1D', ylim=agg_ylim[idx % len(agg_ylim)], **ag_kwargs, **global_kwargs)
+                    plot_bar(data=sub_agg_data, color=set_col, matplot_axes=aggregated_grids[idx], ylim=agg_ylim[idx % len(agg_ylim)], **ag_kwargs, **global_kwargs)
             else:
-                plot_bar(data=agg_data, color=agg_colset[idx], alignment=alignment, matplot_axes=aggregated_grids[idx], mode='1D', ylim=agg_ylim[idx % len(agg_ylim)], **ag_kwargs, **global_kwargs)
+                plot_bar(data=agg_data, color=agg_colset[idx], matplot_axes=aggregated_grids[idx], ylim=agg_ylim[idx % len(agg_ylim)], **ag_kwargs, **global_kwargs)
             aggregated_grids[idx].tick_params(axis='both', which='major', labelsize=8)
             aggregated_grids[idx].xaxis.set_major_locator(MultipleLocator(agg_major_tick))
             if agg_yhighlight is not None:
