@@ -159,7 +159,8 @@ def iterative_filter(parsed_alignment_np, col_threshold=0.5, row_threshold=0.5, 
 
     if isinstance(parsed_alignment_np, str):
         parsed_alignment_matrix = import_parsed_alignment(parsed_alignment_np)
-
+    else:
+        parsed_alignment_matrix = parsed_alignment_np
     num_rows, num_cols = parsed_alignment_matrix.shape
 
     # initialtion
