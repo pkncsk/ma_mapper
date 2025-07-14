@@ -454,8 +454,9 @@ def map_and_overlay(alignment:str,
             front_extracted_data=extract_bam.bam_io(coordinate_table= front_coordinate_table, bam_file=data_file,bam_format=data_format, **kwargs)
             back_extracted_data=extract_bam.bam_io(coordinate_table= back_coordinate_table, bam_file=data_file,bam_format=data_format, **kwargs)
         elif data_format in ['bigwig']:
-            front_extracted_data=extract_bigwig.bigwig_io(coordinate_table=front_coordinate_table, bigwig=data_file,**kwargs)
-            back_extracted_data=extract_bigwig.bigwig_io(coordinate_table=back_coordinate_table, bigwig=data_file,**kwargs)
+            bigwig_io_kwargs = filter_kwargs(extract_bigwig.bigwig_io, kwargs)
+            front_extracted_data=extract_bigwig.bigwig_io(coordinate_table=front_coordinate_table, bigwig=data_file,**bigwig_io_kwargs)
+            back_extracted_data=extract_bigwig.bigwig_io(coordinate_table=back_coordinate_table, bigwig=data_file,**bigwig_io_kwargs)
         elif data_format in ['bed']:
             front_extracted_data=extract_bed.bed_io(coordinate_table=front_coordinate_table, bed=data_file,**kwargs)
             back_extracted_data=extract_bed.bed_io(coordinate_table=back_coordinate_table, bed=data_file,**kwargs)
