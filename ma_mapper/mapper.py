@@ -2,6 +2,7 @@
 import pandas as pd
 
 from ma_mapper import extract_vcf
+from ma_mapper.extract_bigwig import bigwig_io
 from . import sequence_alignment
 import numpy as np
 import sys
@@ -409,7 +410,8 @@ def map_and_overlay(alignment:str,
         extracted_data=extract_bam.bam_io(coordinate_table= coordinate_table, bam_file=data_file,bam_format=data_format,**kwargs)
     elif data_format in ['bigwig']:
         from . import extract_bigwig
-        extracted_data=extract_bigwig.bigwig_io(coordinate_table=coordinate_table, bigwig=data_file,**kwargs)
+        bigwig_io_kwargs = filter_kwargs(extract_bigwig.bigwig_io, kwargs)
+        extracted_data=extract_bigwig.bigwig_io(coordinate_table=coordinate_table, bigwig=data_file,**bigwig_io_kwargs)
     elif data_format in ['bed']:
         from . import extract_bed
         extracted_data=extract_bed.bed_io(coordinate_table=coordinate_table, bed=data_file,**kwargs)
