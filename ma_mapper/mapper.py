@@ -156,9 +156,9 @@ import numpy as np
 def iterative_filter(parsed_alignment, col_threshold=0.5, row_threshold=0.5, save_to_file=False):
 
     if isinstance(parsed_alignment, str):
-        parsed_alignment = import_parsed_alignment(parsed_alignment)
+        parsed_alignment_matrix = import_parsed_alignment(parsed_alignment)
 
-    num_rows, num_cols = parsed_alignment.shape
+    num_rows, num_cols = parsed_alignment_matrix.shape
 
     # initialtion
     current_row_indices = np.arange(num_rows)
