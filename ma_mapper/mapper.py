@@ -7,6 +7,7 @@ import numpy as np
 import sys
 import os
 from . import logger
+import inspect
 #from typing import Literal <- python3.8+
 if sys.version_info >= (3, 8, 0):
     from typing import Literal, Tuple, List
@@ -149,38 +150,60 @@ def create_filter(parsed_alignment, col_threshold = 0.50, col_content_threshold 
     else:
         return filters
 #%%
-def create_filter_failed(parsed_alignment, col_threshold = 0.50, row_threshold = 0.50, save_to_file = False, output_file = None):
-    if isinstance(parsed_alignment, str) == True:
-        parsed_alignment = import_parsed_alignment(parsed_alignment)
-    col_filter = list(range(parsed_alignment.shape[1]))
-    row_filter = list(range(parsed_alignment.shape[0]))
-    while True:
-        # Filter columns
-        new_col_filter = []
-        for idx in col_filter:
-            nonzero_ratio = np.count_nonzero(parsed_alignment[row_filter, idx]) / len(row_filter)
-            if nonzero_ratio > col_threshold:
-                new_col_filter.append(idx)
-        # Filter rows
-        new_row_filter = []
-        for idx in row_filter:
-            nonzero_ratio = np.count_nonzero(parsed_alignment[idx, new_col_filter]) / len(new_col_filter)
-            if nonzero_ratio > row_threshold:
-                new_row_filter.append(idx)
-        
-        # Check for convergence
-        if new_col_filter == col_filter and new_row_filter == row_filter:
-            break
-        col_filter, row_filter = new_col_filter, new_row_filter    
+import numpy as np
 
-    filters = [row_filter,col_filter]
-    if save_to_file == True:
+def iterative_filter(parsed_alignment, col_threshold=0.5, row_threshold=0.5, save_to_file=False):
+
+    if isinstance(parsed_alignment, str):
+        parsed_alignment = import_parsed_alignment(parsed_alignment)
+
+    num_rows, num_cols = parsed_alignment.shape
+
+    # initialtion
+    current_row_indices = np.arange(num_rows)
+    current_col_indices = np.arange(num_cols)
+
+    while True:
+        submatrix = parsed_alignment[np.ix_(current_row_indices, current_col_indices)]
+
+        # find nonzero column
+        col_nonzero_counts = np.count_nonzero(submatrix, axis=0)
+        col_nonzero_ratio = col_nonzero_counts / submatrix.shape[0]
+
+        # Filter columns by threshold
+        cols_to_keep_mask = col_nonzero_ratio >= col_threshold
+        new_col_indices = current_col_indices[cols_to_keep_mask]
+
+        # find nonzero row after applying column filter
+        submatrix_rows_filtered = parsed_alignment[np.ix_(current_row_indices, new_col_indices)]
+        row_nonzero_counts = np.count_nonzero(submatrix_rows_filtered, axis=1)
+        row_nonzero_ratio = row_nonzero_counts / submatrix_rows_filtered.shape[1]
+
+        # Filter rows by threshold
+        rows_to_keep_mask = row_nonzero_ratio >= row_threshold
+        new_row_indices = current_row_indices[rows_to_keep_mask]
+
+        # check filter change
+        if (np.array_equal(new_row_indices, current_row_indices) and
+            np.array_equal(new_col_indices, current_col_indices)):
+            break
+
+        # Update indices for next iteration
+        current_row_indices = new_row_indices
+        current_col_indices = new_col_indices
+
+    filters = [current_row_indices, current_col_indices]
+
+    if save_to_file:
         import pickle
-        if output_file is None:
-            output_file = 'filter.p'
+        if isinstance(save_to_file, str) == True:
+            output_file = save_to_file 
+        else:
+            output_file = f'{os.path.dirname(os.path.abspath(__file__))}/alignment.filter'
         pickle.dump(filters, open(output_file, "wb" ))
     else:
         return filters
+
 #%%
 def map_data(extracted_data:str,
              alignment_matrix: np.ndarray, 
@@ -279,18 +302,24 @@ def flank_sequence_io(coordinate_table: pd.DataFrame,
         back_parsed_alignment =parse_alignment(back_list)
         return front_parsed_alignment, back_parsed_alignment
 #steamline functions
+
 def parse_and_filter(alignment_file: str,
-                     filter:bool = True,
+                     filter: Literal['one_pass', 'iterative', None] = 'one_pass',
                      extension_length:int | None = None,
                      preprocess_out:bool = False,
                      **kwargs)-> Tuple[np.ndarray, pd.DataFrame]:
-    
+    if filter not in ('one_pass', 'iterative', None):
+        raise ValueError(f"Invalid value for `filter`: {filter!r}. Must be 'one_pass', 'iterative', or None.")
     parsed_alignment = parse_alignment(alignment_file)
     coordinate_table = extract_coordinate_from_alignment(alignment_file)
     coordinate_table['original_order'] = coordinate_table.index
     if filter:
-        cf_kwargs = {key: value for key, value in kwargs.items() if key in ('col_threshold', 'row_threshold')}
-        filters=create_filter(parsed_alignment, **cf_kwargs)
+        if filter == 'one_pass':
+            create_filter_kwargs = filter_kwargs(create_filter, kwargs)
+            filters=create_filter(parsed_alignment, **create_filter_kwargs)
+        if filter == 'iterative':
+            iterative_filter_kwargs = iterative_filter(create_filter, kwargs)
+            filters=iterative_filter(parsed_alignment, **iterative_filter_kwargs)
         row_filter = filters[0]
         col_filter = filters[1]
         parsed_alignment_filtered=parsed_alignment[np.ix_(row_filter,col_filter)]
@@ -346,6 +375,10 @@ def match_age_to_id_coordinate(coordinate_file: pd.DataFrame|str,
 
     return merged_table
 
+def filter_kwargs(func, kwargs):
+    sig = inspect.signature(func)
+    return {k: v for k, v in kwargs.items() if k in sig.parameters}
+
 _FORMAT = Literal['bam_max','bam_min','bam_forward','bam_reverse','bigwig','bed']
 def map_and_overlay(alignment:str,
             data_file:str,
@@ -356,11 +389,11 @@ def map_and_overlay(alignment:str,
             source_fasta:str = None,
             **kwargs,
             ):
-    fs_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('fs_')}
-    pf_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('pf_')}
+    parse_and_filter_kwargs = filter_kwargs(parse_and_filter, kwargs)
+    fs_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('fs_')}   
     md_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('md_')}
     kwargs = {key: value for key, value in kwargs.items() if not key.startswith(('pf_','md_','fs_'))}
-    alignment_matrix, alignment_coordinate, filters  = parse_and_filter(alignment_file=alignment, preprocess_out=True, **pf_kwargs)
+    alignment_matrix, alignment_coordinate, filters  = parse_and_filter(alignment_file=alignment, preprocess_out=True, **parse_and_filter_kwargs)
     #use alignment coordinate as coordinate file if there is no coordinate file input
     if coordinate_file is None:
         coordinate_table = alignment_coordinate

@@ -23,7 +23,7 @@ def normal_array(width=1, sigma=1, odd=0):
 #%%
 _FORMAT = Literal['read_max','read_min','read_forward','read_reverse', 'normal_max','normal_min','normal_forward','normal_reverse','read_sum']
 
-def extract_bam(bam_file:str, chrom:str, start_list:List, end_list:List, strand:str, bam_format:_FORMAT, offset:int = 5, probe_length:int =100, smoothing_length:int= 100)->np.ndarray:
+def extract_bam(bam_file:str, chrom:str, start_list:List, end_list:List, strand:str, bam_format:_FORMAT, offset:int = 5, probe_length:int =100, smoothing_length:int= 100, drop_dup=False, drop_unmap=False, drop_2=False, drop_multimap=False)->np.ndarray:
     if isinstance(bam_file, str):
         bam_file = pysam.AlignmentFile(bam_file, "rb")
     normal = normal_array(width=probe_length, sigma=smoothing_length, odd=1)
@@ -40,6 +40,14 @@ def extract_bam(bam_file:str, chrom:str, start_list:List, end_list:List, strand:
         mapped_reads = bam_file.fetch(chrom, start, end)
         
         for mapped_read in mapped_reads:
+            if drop_dup and mapped_read.is_duplicate:
+                continue
+            if drop_unmap and mapped_read.is_unmapped:
+                continue
+            if drop_2 and (mapped_read.is_secondary or mapped_read.is_supplementary):
+                continue
+            if drop_multimap and mapped_read.has_tag("NH") and mapped_read.get_tag("NH") > 1:
+                continue
             if mapped_read.is_reverse is False:
                 read_position = mapped_read.reference_start - start + offset + probe_length
             else:

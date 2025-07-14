@@ -1,7 +1,7 @@
 #pyproject v.0.0.1
 [tool.poetry]
 name = "ma-mapper"
-version = "0.8.7.1"
+version = "0.8.8.0"
 description = "Multiple Alignment Mapper"
 authors = ["pkncsk <pkncsk@gmail.com>"]
 license = "MIT"
