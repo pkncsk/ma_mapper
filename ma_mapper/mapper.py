@@ -9,11 +9,13 @@ import sys
 import os
 from . import logger
 import inspect
+from functools import lru_cache
 #from typing import Literal <- python3.8+
 if sys.version_info >= (3, 8, 0):
-    from typing import Literal, Tuple, List
+    from typing import Literal, Tuple, List, Callable
 else:
     from typing_extensions import Literal, Tuple, List
+
 #%%
 def load_alignment_file(alignment_file):
     if isinstance(alignment_file, str) == True:
@@ -153,10 +155,10 @@ def create_filter(parsed_alignment, col_threshold = 0.50, col_content_threshold 
 #%%
 import numpy as np
 
-def iterative_filter(parsed_alignment, col_threshold=0.5, row_threshold=0.5, save_to_file=False):
+def iterative_filter(parsed_alignment_np, col_threshold=0.5, row_threshold=0.5, save_to_file=False):
 
-    if isinstance(parsed_alignment, str):
-        parsed_alignment_matrix = import_parsed_alignment(parsed_alignment)
+    if isinstance(parsed_alignment_np, str):
+        parsed_alignment_matrix = import_parsed_alignment(parsed_alignment_np)
 
     num_rows, num_cols = parsed_alignment_matrix.shape
 
@@ -165,7 +167,7 @@ def iterative_filter(parsed_alignment, col_threshold=0.5, row_threshold=0.5, sav
     current_col_indices = np.arange(num_cols)
 
     while True:
-        submatrix = parsed_alignment[np.ix_(current_row_indices, current_col_indices)]
+        submatrix = parsed_alignment_matrix[np.ix_(current_row_indices, current_col_indices)]
 
         # find nonzero column
         col_nonzero_counts = np.count_nonzero(submatrix, axis=0)
@@ -176,7 +178,7 @@ def iterative_filter(parsed_alignment, col_threshold=0.5, row_threshold=0.5, sav
         new_col_indices = current_col_indices[cols_to_keep_mask]
 
         # find nonzero row after applying column filter
-        submatrix_rows_filtered = parsed_alignment[np.ix_(current_row_indices, new_col_indices)]
+        submatrix_rows_filtered = parsed_alignment_matrix[np.ix_(current_row_indices, new_col_indices)]
         row_nonzero_counts = np.count_nonzero(submatrix_rows_filtered, axis=1)
         row_nonzero_ratio = row_nonzero_counts / submatrix_rows_filtered.shape[1]
 
@@ -316,11 +318,9 @@ def parse_and_filter(alignment_file: str,
     coordinate_table['original_order'] = coordinate_table.index
     if filter:
         if filter == 'one_pass':
-            create_filter_kwargs = filter_kwargs(create_filter, kwargs)
-            filters=create_filter(parsed_alignment, **create_filter_kwargs)
+            filters=create_filter(parsed_alignment, **filter_kwargs(create_filter, kwargs))
         if filter == 'iterative':
-            iterative_filter_kwargs = iterative_filter(create_filter, kwargs)
-            filters=iterative_filter(parsed_alignment, **iterative_filter_kwargs)
+            filters=iterative_filter(parsed_alignment, **filter_kwargs(iterative_filter, kwargs))
         row_filter = filters[0]
         col_filter = filters[1]
         parsed_alignment_filtered=parsed_alignment[np.ix_(row_filter,col_filter)]
@@ -376,9 +376,15 @@ def match_age_to_id_coordinate(coordinate_file: pd.DataFrame|str,
 
     return merged_table
 
-def filter_kwargs(func, kwargs):
-    sig = inspect.signature(func)
-    return {k: v for k, v in kwargs.items() if k in sig.parameters}
+@lru_cache
+def get_func_param_names(func: Callable):
+    return set(inspect.signature(func).parameters)
+
+def filter_kwargs(funcs: list[Callable] | Callable, kwargs: dict) -> dict:
+    if not isinstance(funcs, list):
+        funcs = [funcs]
+    accepted_keys = set().union(*(get_func_param_names(f) for f in funcs))
+    return {k: v for k, v in kwargs.items() if k in accepted_keys}
 
 _FORMAT = Literal['bam_max','bam_min','bam_forward','bam_reverse','bigwig','bed']
 def map_and_overlay(alignment:str,
@@ -390,11 +396,11 @@ def map_and_overlay(alignment:str,
             source_fasta:str = None,
             **kwargs,
             ):
-    parse_and_filter_kwargs = filter_kwargs(parse_and_filter, kwargs)
+    combined_kwargs = filter_kwargs([parse_and_filter, create_filter], kwargs)
     fs_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('fs_')}   
     md_kwargs = {key[3:]: value for key, value in kwargs.items() if key.startswith('md_')}
     kwargs = {key: value for key, value in kwargs.items() if not key.startswith(('pf_','md_','fs_'))}
-    alignment_matrix, alignment_coordinate, filters  = parse_and_filter(alignment_file=alignment, preprocess_out=True, **parse_and_filter_kwargs)
+    alignment_matrix, alignment_coordinate, filters  = parse_and_filter(alignment_file=alignment, preprocess_out=True, **combined_kwargs)
     #use alignment coordinate as coordinate file if there is no coordinate file input
     if coordinate_file is None:
         coordinate_table = alignment_coordinate
@@ -423,6 +429,7 @@ def map_and_overlay(alignment:str,
     else:
         logger.error('dataformat field unspecified')
     row_filter, col_filter = filters
+
     if coordinate_file is None:
         alignment_matrix_sorted = alignment_matrix
         alignment_coordinate_sorted = alignment_coordinate
