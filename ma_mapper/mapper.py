@@ -414,19 +414,23 @@ def map_and_overlay(alignment:str,
         coordinate_table = coordinate_file   
     if data_format in ['read_max','read_min','read_forward','read_reverse', 'normal_max','normal_min','normal_forward','normal_reverse','read_sum']:
         from . import extract_bam
-        extracted_data=extract_bam.bam_io(coordinate_table= coordinate_table, bam_file=data_file,bam_format=data_format,**kwargs)
+        bam_io_kwargs = filter_kwargs(extract_bam.bam_io, kwargs)
+        extracted_data=extract_bam.bam_io(coordinate_table= coordinate_table, bam_file=data_file,bam_format=data_format,**bam_io_kwargs)
     elif data_format in ['bigwig']:
         from . import extract_bigwig
         bigwig_io_kwargs = filter_kwargs(extract_bigwig.bigwig_io, kwargs)
         extracted_data=extract_bigwig.bigwig_io(coordinate_table=coordinate_table, bigwig=data_file,**bigwig_io_kwargs)
     elif data_format in ['bed']:
         from . import extract_bed
-        extracted_data=extract_bed.bed_io(coordinate_table=coordinate_table, bed=data_file,**kwargs)
+        bed_io_kwargs = filter_kwargs(extract_bed.bed_io, kwargs)
+        extracted_data=extract_bed.bed_io(coordinate_table=coordinate_table, bed=data_file,**bed_io_kwargs)
     elif data_format in ['maf']:
         from . import extract_maf
-        extracted_data=extract_maf.maf_io(coordinate_table=coordinate_table, maf=data_file,**kwargs)
+        maf_io_kwargs = filter_kwargs(extract_maf.maf_io, kwargs)
+        extracted_data=extract_maf.maf_io(coordinate_table=coordinate_table, maf=data_file,**maf_io_kwargs)
     elif data_format in ['vcf']:
-        extracted_data=extract_vcf.vcf_io(coordinate_table=coordinate_table, vcf=data_file, **kwargs)
+        vcf_io_kwargs = filter_kwargs(extract_vcf.vcf_io, kwargs)
+        extracted_data=extract_vcf.vcf_io(coordinate_table=coordinate_table, vcf=data_file, **vcf_io_kwargs)
     else:
         logger.error('dataformat field unspecified')
     row_filter, col_filter = filters
@@ -459,21 +463,25 @@ def map_and_overlay(alignment:str,
         
         front_coordinate_table, back_coordinate_table = flank_sequence_io(alignment_coordinate_filtered, coordinate_table_out=True, extension_length=extension_length,source_fasta=source_fasta, **fs_kwargs)
         if data_format in ['read_max','read_min','read_forward','read_reverse', 'normal_max','normal_min','normal_forward','normal_reverse','read_sum']:
-            front_extracted_data=extract_bam.bam_io(coordinate_table= front_coordinate_table, bam_file=data_file,bam_format=data_format, **kwargs)
-            back_extracted_data=extract_bam.bam_io(coordinate_table= back_coordinate_table, bam_file=data_file,bam_format=data_format, **kwargs)
+            bam_io_kwargs = filter_kwargs(extract_bam.bam_io, kwargs)
+            front_extracted_data=extract_bam.bam_io(coordinate_table= front_coordinate_table, bam_file=data_file,bam_format=data_format, **bam_io_kwargs)
+            back_extracted_data=extract_bam.bam_io(coordinate_table= back_coordinate_table, bam_file=data_file,bam_format=data_format, **bam_io_kwargs)
         elif data_format in ['bigwig']:
             bigwig_io_kwargs = filter_kwargs(extract_bigwig.bigwig_io, kwargs)
             front_extracted_data=extract_bigwig.bigwig_io(coordinate_table=front_coordinate_table, bigwig=data_file,**bigwig_io_kwargs)
             back_extracted_data=extract_bigwig.bigwig_io(coordinate_table=back_coordinate_table, bigwig=data_file,**bigwig_io_kwargs)
         elif data_format in ['bed']:
-            front_extracted_data=extract_bed.bed_io(coordinate_table=front_coordinate_table, bed=data_file,**kwargs)
-            back_extracted_data=extract_bed.bed_io(coordinate_table=back_coordinate_table, bed=data_file,**kwargs)
+            bed_io_kwargs = filter_kwargs(extract_bed.bed_io, kwargs)
+            front_extracted_data=extract_bed.bed_io(coordinate_table=front_coordinate_table, bed=data_file,**bed_io_kwargs)
+            back_extracted_data=extract_bed.bed_io(coordinate_table=back_coordinate_table, bed=data_file,**bed_io_kwargs)
         elif data_format in ['maf']:
-            front_extracted_data=extract_maf.maf_io(coordinate_table=front_coordinate_table, maf=data_file,**kwargs)
-            back_extracted_data=extract_maf.maf_io(coordinate_table=back_coordinate_table, maf=data_file,**kwargs)
+            maf_io_kwargs = filter_kwargs(extract_maf.maf_io, kwargs)
+            front_extracted_data=extract_maf.maf_io(coordinate_table=front_coordinate_table, maf=data_file,**maf_io_kwargs)
+            back_extracted_data=extract_maf.maf_io(coordinate_table=back_coordinate_table, maf=data_file,**maf_io_kwargs)
         elif data_format in ['vcf']:
-            front_extracted_data=extract_vcf.vcf_io(coordinate_table=front_coordinate_table, vcf=data_file,**kwargs)
-            back_extracted_data=extract_vcf.vcf_io(coordinate_table=back_coordinate_table, vcf=data_file,**kwargs)
+            vcf_io_kwargs = filter_kwargs(extract_vcf.vcf_io, kwargs)
+            front_extracted_data=extract_vcf.vcf_io(coordinate_table=front_coordinate_table, vcf=data_file,**vcf_io_kwargs)
+            back_extracted_data=extract_vcf.vcf_io(coordinate_table=back_coordinate_table, vcf=data_file,**vcf_io_kwargs)
   
         print(alignment_coordinate_sorted.shape, len(front_extracted_data), len(back_extracted_data))
         output_matrix_filtered = np.hstack((front_extracted_data,output_matrix_filtered,back_extracted_data))
