@@ -12,3 +12,5 @@
 /.ipynb_checkpoints/
 *.pyc
 /script/
+/.lh/*
+/.history/*
