@@ -52,7 +52,51 @@ pip install git+https://github.com/pkncsk/ma_mapper@experimental
 
 <img src="docs/img/packagestructure.png" alt="THE1C alignment" style="width:70%;" />
 
-## Usage
+## Usage examples
+
+This section illustrates the `ma_mapper` workflow with minimal working example files in the `/test` folder.
+
+### Required inputs
+- A `FASTA` file of multiple alignment 
+- A `BED` file with genomic coordinates for the multiple alignment (optional: if missing, coordinates are parsed from alignment headers).
+- A genome-wide data file of interest (support multiple file types: `BED`, `BIGWIG`, `BAM`, `VCF`, `MAF`) - in this example, the AP-1(BZIP) motif from [HOMER transcription factor motif prediction](http://homer.ucsd.edu/homer/data/motifs/homer.KnownMotifs.hg38.191020.bed.gz) is used.
+
+Import `ma_mapper` and path to the input.
+
+```python
+from ma_mapper import mapper
+alignment_filepath = '/ma_mapper/test/THE1C.fasta.aligned'
+genomewide_data_filepath  = '/ma_mapper/test/AP-1.bed'
+```
+
+Parse the alignment (and extract alignment coordinates).
+
+```python
+filtered_alignment_matrix, alignment_coordinate  = mapper.parse_and_filter(alignment_file=alignment_filepath,col_threshold = 0.10, col_content_threshold = 0.10, row_threshold = 0.10)
+```
+
+Extract genome-wide data using the coordinate table.
+
+```python
+data_matrix=mapper.map_and_overlay(alignment_filepath, genomewide_data_filepath,data_format='bed', col_threshold = 0.10, col_content_threshold = 0.10, row_threshold = 0.10)
+```
+
+Visualize the result.
+
+```python
+from ma_mapper import plots
+plots.plot(
+    data = [data_matrix], 
+    alignment=filtered_alignment_matrix,
+    show_alignment=False, 
+    heatmap_color=['Blues'],
+    heatmap_mode='overlay',
+    )
+```
+<p>
+  <img src="docs/img/overlay_sample.png" alt="THE1C signal" style="width:30%; display:inline-block;"/>
+</p>
+This produces a heatmap overlay of the genome-wide data on the MSA. For advanced customization, see the full documentation.
 
 ## Documentation quick links
 - [Getting started](docs/gettingstarted.md)

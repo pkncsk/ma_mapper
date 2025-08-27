@@ -1,8 +1,7 @@
 ##################################
 
 # for experimental branch
-#/script/
-#/test/
+/test/
 /_unused/
 /data/
 # vscode/environment session
@@ -11,6 +10,16 @@
 /.vscode/*
 /.ipynb_checkpoints/
 *.pyc
-/script/
 /.lh/*
 /.history/*
+!/test/chr1_region_cut.mafindex
+!/test/hg38.mwe.fasta
+!/test/repeatmasker.mwe.txt
+!/test/species447_info.txt
+!/test/output/THE1C-int.e_table.txt
+!/test/output/THE1C-int.internal_id.txt
+!/test/output/THE1C-int.teatime.txt
+!/test/output/THE1C.e_table.txt
+!/test/output/THE1C.internal_id.txt
+!/test/output/THE1C.teatime.txt
+!/test/output/THE1C.ltr_fix.txt
